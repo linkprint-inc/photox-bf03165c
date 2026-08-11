@@ -9,7 +9,6 @@ import {
 } from "./ShopFilterPanel";
 import metalDetail from "@/assets/metal-detail.jpg";
 import {
-  categories,
   materialLabel,
   priceBands,
   shopProducts,
@@ -38,7 +37,6 @@ export function ShopCatalog() {
   const [category, setCategory] = useState<string>("All");
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [material, setMaterial] = useState<"all" | "metal" | "canvas">("all");
   const [view, setView] = useState<"grid" | "room">("grid");
   const [sort, setSort] = useState<SortOption>("Featured");
   const [count, setCount] = useState(PAGE);
@@ -46,9 +44,6 @@ export function ShopCatalog() {
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
 
-    if (material !== "all") {
-      list = list.filter((p) => p.material === material || p.material === "both");
-    }
     if (filters.materials.length) {
       list = list.filter((p) =>
         filters.materials.some((m) => materialLabel[p.material] === m || p.material === "both"),
@@ -77,7 +72,7 @@ export function ShopCatalog() {
     if (sort === "Best Selling")
       sorted.sort((a, b) => Number(b.badges.includes("best")) - Number(a.badges.includes("best")));
     return sorted;
-  }, [category, filters, material, sort]);
+  }, [category, filters, sort]);
 
   const shown = results.slice(0, count);
   const active = countFilters(filters);
@@ -219,7 +214,6 @@ export function ShopCatalog() {
                   onClick={() => {
                     setFilters(emptyFilters);
                     setCategory("All");
-                    setMaterial("all");
                   }}
                   className="px-label px-underline mt-6"
                 >
