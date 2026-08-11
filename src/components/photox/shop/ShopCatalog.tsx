@@ -21,17 +21,17 @@ import {
 
 const PAGE = 24;
 
+const primaryCategories = [
+  { key: "All", label: "All Art" },
+  { key: "Photography", label: "Photography" },
+  { key: "Abstract", label: "Abstract" },
+  { key: "Landscape", label: "Landscape" },
+  { key: "Architecture", label: "Architecture" },
+] as const;
+
 function matchesCategory(p: ShopProduct, cat: string) {
-  switch (cat) {
-    case "All":
-      return true;
-    case "New":
-      return p.badges.includes("new");
-    case "Best Sellers":
-      return p.badges.includes("best");
-    default:
-      return (p.styles as string[]).includes(cat);
-  }
+  if (cat === "All") return true;
+  return (p.styles as string[]).includes(cat);
 }
 
 export function ShopCatalog() {
