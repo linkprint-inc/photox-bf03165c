@@ -295,3 +295,10 @@
   }
 }
 
+
+@utility px-price {
+  font-size: 0.875rem;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}

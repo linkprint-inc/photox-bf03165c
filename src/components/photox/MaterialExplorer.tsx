@@ -1,19 +1,22 @@
 import { useState } from "react";
 import materialMetal from "@/assets/material-metal.jpg";
 import materialCanvas from "@/assets/material-canvas.jpg";
+import { sizeList } from "@/lib/photox-data";
 
 const surfaces = {
   METAL: {
     image: materialMetal,
     alt: "Macro of a gloss aluminium print surface catching directional light",
-    lines: ["Luminous gloss", "Crisp detail", "Deep, vivid colour", "Modern rigid profile"],
-    from: 119,
+    lines: ["Gloss finish", "Crisp detail", "Rich colour"],
+    from: 79,
+    cta: "Shop metal →",
   },
   CANVAS: {
     image: materialCanvas,
     alt: "Macro of a matte gallery-wrapped canvas showing woven texture and wrapped edge",
-    lines: ["Soft matte surface", "Visible woven texture", "Warm, tactile finish", "Gallery-wrapped edge"],
-    from: 99,
+    lines: ["Matte woven finish", "Soft texture", "Gallery-wrapped edge"],
+    from: 69,
+    cta: "Shop canvas →",
   },
 } as const;
 
@@ -43,12 +46,12 @@ export function MaterialExplorer() {
 
   return (
     <section id="surface" className="bg-ink text-paper">
-      <div className="mx-auto max-w-[1600px] px-6 py-24 md:px-10 md:py-36">
+      <div className="mx-auto max-w-[1440px] px-6 py-24 md:px-10 md:py-36">
         <h2 className="px-serif max-w-[14ch] text-[2.4rem] md:text-[3.4rem]">
           Choose your surface.
         </h2>
 
-        <div className="mt-14 flex gap-10">
+        <div className="mt-12 flex gap-10">
           {(Object.keys(surfaces) as Array<keyof typeof surfaces>).map((key) => (
             <button
               key={key}
@@ -65,8 +68,8 @@ export function MaterialExplorer() {
           ))}
         </div>
 
-        <div className="mt-8 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-16">
-          <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40">
+        <div className="mt-8 grid gap-10 md:grid-cols-12 md:gap-8">
+          <div className="relative aspect-[4/3] w-full overflow-hidden bg-black/40 md:col-span-7">
             {(Object.keys(surfaces) as Array<keyof typeof surfaces>).map((key) => (
               <img
                 key={key}
@@ -79,16 +82,27 @@ export function MaterialExplorer() {
             ))}
           </div>
 
-          <div className="pt-2">
+          <div className="md:col-span-5">
             <p className="px-label">{surface}</p>
-            <ul className="mt-6 space-y-2">
+            <ul className="mt-5 space-y-2">
               {s.lines.map((l) => (
                 <li key={l} className="px-meta opacity-80">
                   {l}
                 </li>
               ))}
             </ul>
-            <p className="px-meta mt-8">From ${s.from}</p>
+
+            <p className="px-label mt-8 opacity-60">Available sizes</p>
+            <p className="px-meta mt-2 opacity-85">{sizeList.join(" / ")}</p>
+
+            <div className="mt-8 flex items-baseline justify-between gap-6">
+              <p className="px-price">
+                <span className="px-label mr-1 opacity-70">From</span>${s.from}
+              </p>
+              <a href="#shop" className="px-label px-underline">
+                {s.cta}
+              </a>
+            </div>
 
             <ul className="mt-12 border-t border-paper/20">
               {details.map((d) => {

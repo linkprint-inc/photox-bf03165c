@@ -1,25 +1,31 @@
 import { useState } from "react";
-import { filterMap, filters, products, type Product } from "@/lib/photox-data";
+import { filterMap, filters, products, sizeRange, type Product } from "@/lib/photox-data";
+import { Shell, SectionHead } from "./Section";
 
-function ProductCell({ product, className }: { product: Product; className?: string }) {
+function ProductCell({ product }: { product: Product }) {
   const isMetal = product.material === "Metal Print";
 
   return (
-    <article className={className}>
-      <a href={`#shop`} className="group block">
+    <article>
+      <a href="#shop" className="group block">
         <div
           className={[
-            "relative w-full overflow-hidden bg-secondary",
+            "relative aspect-square w-full overflow-hidden bg-secondary",
             isMetal ? "px-gloss" : "px-weave",
             "group-hover:after:opacity-100 group-focus-visible:after:opacity-100",
           ].join(" ")}
-          style={{ aspectRatio: product.ratio }}
         >
           <img
             src={product.image}
             alt={`${product.name} — ${product.material}`}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-[620ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:scale-[1.012]"
+            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[620ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-0 group-focus-visible:opacity-0"
+          />
+          <img
+            src={product.hover}
+            alt={`${product.name} shown as a finished ${product.material.toLowerCase()} on a wall`}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[620ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-100 group-focus-visible:opacity-100"
           />
           <span
             aria-hidden
@@ -28,17 +34,15 @@ function ProductCell({ product, className }: { product: Product; className?: str
               "group-hover:w-[7px] group-focus-visible:w-[7px]",
             ].join(" ")}
           />
-          <span className="px-label absolute bottom-3 right-4 text-white mix-blend-difference px-reveal group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100">
-            View artwork →
-          </span>
         </div>
 
-        <div className="mt-3 flex items-baseline justify-between gap-4">
-          <div>
-            <h3 className="px-label">{product.name}</h3>
-            <p className="px-meta text-muted-foreground">{product.material}</p>
-          </div>
-          <p className="px-meta whitespace-nowrap">From ${product.from}</p>
+        <div className="mt-4">
+          <h3 className="px-label">{product.name}</h3>
+          <p className="px-meta mt-1 text-muted-foreground">{product.material}</p>
+          <p className="px-meta text-muted-foreground">{sizeRange}</p>
+          <p className="px-price mt-2">
+            <span className="px-label mr-1 opacity-70">From</span>${product.from}
+          </p>
         </div>
       </a>
     </article>
@@ -50,18 +54,10 @@ export function ProductWall() {
   const tag = filterMap[active];
   const shown = tag ? products.filter((p) => p.tags.includes(tag)) : products;
 
-  const spanFor = (p: Product) => {
-    if (p.span === "feature") return "md:col-span-6";
-    if (p.span === "wide") return "md:col-span-4";
-    if (p.span === "square") return "md:col-span-3";
-    return "md:col-span-3";
-  };
-
   return (
-    <section id="shop" className="mx-auto max-w-[1600px] px-6 pb-24 md:px-10 md:pb-32">
-      <div className="px-rule flex flex-wrap items-baseline justify-between gap-6 pt-8">
-        <h2 className="px-label">Shop the collection</h2>
-        <ul className="flex flex-wrap gap-x-6 gap-y-2">
+    <Shell id="shop" className="pb-24 md:pb-32">
+      <SectionHead title="Shop the collection">
+        <ul className="col-span-2 flex flex-wrap gap-x-6 gap-y-2 md:col-auto">
           {filters.map((f) => (
             <li key={f}>
               <button
@@ -78,13 +74,13 @@ export function ProductWall() {
             </li>
           ))}
         </ul>
-      </div>
+      </SectionHead>
 
-      <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-14 md:grid-cols-12 md:gap-x-8">
+      <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
         {shown.map((p) => (
-          <ProductCell key={p.id} product={p} className={spanFor(p)} />
+          <ProductCell key={p.id} product={p} />
         ))}
       </div>
-    </section>
+    </Shell>
   );
 }

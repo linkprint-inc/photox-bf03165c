@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import metalDetail from "@/assets/metal-detail.jpg";
+import { sizes } from "@/lib/photox-data";
+import { Shell } from "./Section";
 
 export function MetalInterruption() {
   const ref = useRef<HTMLDivElement>(null);
@@ -19,16 +21,19 @@ export function MetalInterruption() {
   }, []);
 
   return (
-    <section id="metal" className="mx-auto max-w-[1600px] px-6 pb-28 md:px-10 md:pb-40">
-      <div className="grid gap-10 md:grid-cols-[1.9fr_1fr] md:items-end md:gap-16">
-        <div ref={ref} className="relative overflow-hidden bg-secondary">
+    <Shell id="metal" className="pb-28 md:pb-40">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-8">
+        <div
+          ref={ref}
+          className="relative aspect-[4/3] overflow-hidden bg-secondary md:col-span-7 lg:col-span-8"
+        >
           <img
             src={metalDetail}
             width={1440}
             height={1088}
             loading="lazy"
             alt="Close crop of a gloss aluminium metal print showing surface reflection and the thin rigid edge"
-            className="h-full w-full object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
           />
           <span
             aria-hidden
@@ -40,28 +45,40 @@ export function MetalInterruption() {
           />
         </div>
 
-        <div className="pb-2">
+        <div className="md:col-span-5 lg:col-span-4">
           <h2 className="px-serif text-[2.2rem] md:text-[2.8rem]">Why metal?</h2>
-          <p className="px-meta mt-4 max-w-[30ch] text-muted-foreground">
-            Light becomes part of the image.
-          </p>
 
-          <ul className="px-rule mt-10">
-            {["Glossy surface", "Crisp detail", "Deep colour", "Rigid profile"].map((f) => (
+          <ul className="px-rule mt-8">
+            {["Glossy surface", "Crisp detail", "Deep colour", "Thin rigid profile"].map((f) => (
               <li key={f} className="px-meta border-b border-hairline py-3">
                 {f}
               </li>
             ))}
           </ul>
 
-          <div className="mt-8 flex items-center justify-between gap-6">
-            <p className="px-meta">From $119</p>
+          <p className="px-label mt-10 text-muted-foreground">Available sizes</p>
+          <ul className="mt-4 border-t border-hairline">
+            {sizes.map((s) => (
+              <li
+                key={s.label}
+                className="flex items-baseline justify-between border-b border-hairline py-3"
+              >
+                <span className="px-meta">{s.label}</span>
+                <span className="px-price">${s.price}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-8 flex items-baseline justify-between gap-6">
+            <p className="px-price">
+              <span className="px-label mr-1 opacity-70">From</span>$79
+            </p>
             <a href="#shop" className="px-label px-underline">
               Explore metal →
             </a>
           </div>
         </div>
       </div>
-    </section>
+    </Shell>
   );
 }

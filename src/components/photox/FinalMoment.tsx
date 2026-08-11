@@ -13,7 +13,7 @@ const strip = [
 export function FinalMoment() {
   return (
     <section aria-label="Made for real walls" className="pb-24 md:pb-32">
-      <div className="mx-auto max-w-[1600px] px-6 md:px-10">
+      <div className="mx-auto max-w-[1440px] px-6 md:px-10">
         <div className="px-rule flex flex-wrap items-baseline justify-between gap-4 pt-8">
           <h2 className="px-label">Made for real walls</h2>
           <p className="px-meta text-muted-foreground">4.8 / 5 · 2,140 reviews</p>
@@ -32,7 +32,7 @@ export function FinalMoment() {
         ))}
       </div>
 
-      <div className="mx-auto mt-8 max-w-[1600px] px-6 md:px-10">
+      <div className="mx-auto mt-8 max-w-[1440px] px-6 md:px-10">
         <a href="#shop" className="px-label px-underline">
           Shop all art →
         </a>
