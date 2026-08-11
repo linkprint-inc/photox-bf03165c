@@ -5,16 +5,15 @@ import roomDining from "@/assets/room-dining.jpg";
 
 const rooms = [
   {
-    label: "Living",
+    label: "Living room",
     image: roomLiving,
     alt: "Living room with a large metal print of a coastal cliff above a linen sofa",
     work: "Pacific Coast No. 08",
     material: "Metal Print",
     size: '30 × 40"',
     price: 249,
-    ratio: "7 / 6",
+    ratio: "7 / 5",
     className: "md:col-span-7",
-    inset: "left-6 bottom-6",
   },
   {
     label: "Bedroom",
@@ -25,8 +24,7 @@ const rooms = [
     size: '24 × 36"',
     price: 189,
     ratio: "4 / 5",
-    className: "md:col-span-4 md:col-start-9 md:mt-24",
-    inset: "left-6 bottom-6",
+    className: "md:col-span-4 md:col-start-9 md:mt-28",
   },
   {
     label: "Workspace",
@@ -37,8 +35,7 @@ const rooms = [
     size: '20 × 30"',
     price: 159,
     ratio: "5 / 4",
-    className: "md:col-span-5 md:col-start-2",
-    inset: "left-6 bottom-6",
+    className: "md:col-span-5 md:col-start-2 md:-mt-16",
   },
   {
     label: "Dining",
@@ -49,17 +46,19 @@ const rooms = [
     size: '24 × 36"',
     price: 199,
     ratio: "4 / 5",
-    className: "md:col-span-4 md:col-start-8",
-    inset: "left-6 bottom-6",
+    className: "md:col-span-4 md:col-start-8 md:mt-20",
   },
 ];
 
 export function RoomSection() {
   return (
-    <section aria-label="In real spaces" className="mx-auto max-w-[1440px] px-6 py-28 md:px-10 md:py-40">
+    <section
+      aria-label="In real spaces"
+      className="mx-auto max-w-[1440px] px-6 py-24 md:px-10 md:py-36"
+    >
       <h2 className="px-serif text-[2.2rem] md:text-[3rem]">In real spaces</h2>
 
-      <div className="mt-14 grid gap-x-8 gap-y-14 md:grid-cols-12">
+      <div className="mt-14 grid gap-x-8 gap-y-16 md:grid-cols-12">
         {rooms.map((r) => (
           <article key={r.label} className={r.className}>
             <a href="#shop" className="group relative block overflow-hidden">
@@ -76,15 +75,15 @@ export function RoomSection() {
                 {r.label}
               </span>
 
-              <span
-                className={`absolute ${r.inset} text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)] px-reveal group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0`}
-              >
-                <span className="px-meta block">{r.work}</span>
-                <span className="px-meta block opacity-80">
-                  {r.material} · {r.size}
+              <span className="absolute bottom-6 left-6 right-6 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+                <span className="px-label block">{r.work}</span>
+                <span className="px-price mt-1 block">${r.price}</span>
+                <span className="px-reveal mt-1 block group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+                  <span className="px-meta block opacity-90">
+                    {r.material} · {r.size}
+                  </span>
+                  <span className="px-label mt-2 block">View artwork →</span>
                 </span>
-                <span className="px-meta block">${r.price}</span>
-                <span className="px-label mt-2 block">View artwork →</span>
               </span>
             </a>
           </article>
