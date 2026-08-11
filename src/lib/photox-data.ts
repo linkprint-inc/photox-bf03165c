@@ -95,7 +95,7 @@ export const products: Product[] = [
     from: 139,
     image: artConcrete,
     hover: roomLiving,
-    tags: ["landscape", "best"],
+    tags: ["photography", "best"],
   },
   {
     id: "study-in-olive",
