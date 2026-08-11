@@ -56,7 +56,7 @@ const rooms = [
 
 export function RoomSection() {
   return (
-    <section aria-label="In real spaces" className="mx-auto max-w-[1600px] px-6 py-28 md:px-10 md:py-40">
+    <section aria-label="In real spaces" className="mx-auto max-w-[1440px] px-6 py-28 md:px-10 md:py-40">
       <h2 className="px-serif text-[2.2rem] md:text-[3rem]">In real spaces</h2>
 
       <div className="mt-14 grid gap-x-8 gap-y-14 md:grid-cols-12">

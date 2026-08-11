@@ -40,7 +40,7 @@ export function SiteNav() {
     >
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-6 py-5 md:px-10"
+        className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 py-5 md:px-10"
       >
         <a href="#hero" className="px-label px-underline text-[0.8rem] tracking-[0.3em]">
           PHOTX
