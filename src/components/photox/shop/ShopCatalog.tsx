@@ -9,7 +9,6 @@ import {
 } from "./ShopFilterPanel";
 import metalDetail from "@/assets/metal-detail.jpg";
 import {
-  categories,
   materialLabel,
   priceBands,
   shopProducts,
@@ -21,24 +20,23 @@ import {
 
 const PAGE = 24;
 
+const primaryCategories = [
+  { key: "All", label: "All Art" },
+  { key: "Photography", label: "Photography" },
+  { key: "Abstract", label: "Abstract" },
+  { key: "Landscape", label: "Landscape" },
+  { key: "Architecture", label: "Architecture" },
+] as const;
+
 function matchesCategory(p: ShopProduct, cat: string) {
-  switch (cat) {
-    case "All":
-      return true;
-    case "New":
-      return p.badges.includes("new");
-    case "Best Sellers":
-      return p.badges.includes("best");
-    default:
-      return (p.styles as string[]).includes(cat);
-  }
+  if (cat === "All") return true;
+  return (p.styles as string[]).includes(cat);
 }
 
 export function ShopCatalog() {
   const [category, setCategory] = useState<string>("All");
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [material, setMaterial] = useState<"all" | "metal" | "canvas">("all");
   const [view, setView] = useState<"grid" | "room">("grid");
   const [sort, setSort] = useState<SortOption>("Featured");
   const [count, setCount] = useState(PAGE);
@@ -46,9 +44,6 @@ export function ShopCatalog() {
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
 
-    if (material !== "all") {
-      list = list.filter((p) => p.material === material || p.material === "both");
-    }
     if (filters.materials.length) {
       list = list.filter((p) =>
         filters.materials.some((m) => materialLabel[p.material] === m || p.material === "both"),
@@ -77,7 +72,7 @@ export function ShopCatalog() {
     if (sort === "Best Selling")
       sorted.sort((a, b) => Number(b.badges.includes("best")) - Number(a.badges.includes("best")));
     return sorted;
-  }, [category, filters, material, sort]);
+  }, [category, filters, sort]);
 
   const shown = results.slice(0, count);
   const active = countFilters(filters);
@@ -97,39 +92,37 @@ export function ShopCatalog() {
     <>
       {/* 02 — intro */}
       <Shell label="Shop introduction" className="pt-28 md:pt-32">
-        <div className="grid grid-cols-1 gap-6 pb-10 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-8">
-            <p className="px-label text-muted-foreground">Shop</p>
-            <h1 className="px-serif mt-4 text-[2.6rem] md:text-[4rem]">Art for your walls.</h1>
-            <p className="px-meta mt-4 max-w-[42ch] text-muted-foreground">
-              Explore photography and artwork available on Metal Print and Frameless Canvas.
-            </p>
-          </div>
-          <p className="px-label text-muted-foreground md:col-span-4 md:text-right">
-            {totalWorks} works
+        <div className="pb-14 md:pb-16">
+          <p className="px-label text-muted-foreground">Shop</p>
+          <h1 className="px-serif mt-4 text-[2.6rem] md:text-[4rem]">Art for your walls.</h1>
+          <p className="px-meta mt-4 max-w-[46ch] text-muted-foreground">
+            Explore photography and artwork available on Metal Print and Frameless Canvas.
           </p>
         </div>
       </Shell>
 
       {/* 03 — category navigation */}
       <Shell label="Categories">
-        <nav aria-label="Categories" className="px-rule overflow-x-auto">
-          <ul className="flex min-w-max gap-8 py-4">
-            {categories.map((c) => (
-              <li key={c}>
+        <nav aria-label="Categories" className="overflow-x-auto">
+          <ul className="flex min-w-max gap-10 md:gap-14">
+            {primaryCategories.map((c) => (
+              <li key={c.key}>
                 <button
                   type="button"
                   onClick={() => {
-                    setCategory(c);
+                    setCategory(c.key);
                     setCount(PAGE);
                   }}
-                  aria-pressed={category === c}
+                  aria-pressed={category === c.key}
                   className={[
-                    "px-label px-underline whitespace-nowrap transition-opacity duration-300",
-                    category === c ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100",
+                    "relative whitespace-nowrap pb-2 text-[0.8125rem] font-medium uppercase tracking-[0.08em] transition-colors duration-300",
+                    "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground after:transition-transform after:duration-300 after:origin-left",
+                    category === c.key
+                      ? "text-foreground after:scale-x-100"
+                      : "text-muted-foreground hover:text-foreground after:scale-x-0 hover:after:scale-x-100",
                   ].join(" ")}
                 >
-                  {c}
+                  {c.label}
                 </button>
               </li>
             ))}
@@ -137,49 +130,33 @@ export function ShopCatalog() {
         </nav>
       </Shell>
 
-      {/* 04 — control bar */}
-      <Shell label="Shop controls">
-        <div className="px-rule flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-b border-hairline py-3">
+      {/* 04 — toolbar */}
+      <Shell label="Shop controls" className="pt-8 md:pt-10">
+        <div className="px-rule flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-3">
           <button
             type="button"
             onClick={() => setPanelOpen((v) => !v)}
-            className="px-label px-underline"
+            className="px-underline text-[0.75rem] uppercase tracking-[0.1em]"
           >
             {active > 0 ? `Filter (${active})` : "Filter +"}
           </button>
 
-          <ul className="hidden items-center gap-6 md:flex">
-            {(["all", "metal", "canvas"] as const).map((m) => (
-              <li key={m}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMaterial(m);
-                    setCount(PAGE);
-                  }}
-                  aria-pressed={material === m}
-                  className={[
-                    "px-label px-underline transition-opacity duration-300",
-                    material === m ? "opacity-100" : "opacity-45 hover:opacity-100",
-                  ].join(" ")}
-                >
-                  {m === "all" ? "All materials" : m === "metal" ? "Metal" : "Canvas"}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[0.75rem] uppercase tracking-[0.1em]">
+            <span className="text-muted-foreground">
+              {results.length === shopProducts.length ? totalWorks : results.length} works
+            </span>
 
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <div className="flex items-center gap-3">
-              <span className="px-label text-muted-foreground">View:</span>
+              <span className="text-muted-foreground">View</span>
               {(["grid", "room"] as const).map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => setView(v)}
                   aria-pressed={view === v}
+                  aria-label={v === "grid" ? "Grid view" : "Room view"}
                   className={[
-                    "px-label px-underline transition-opacity duration-300",
+                    "px-underline transition-opacity duration-300",
                     view === v ? "opacity-100" : "opacity-45 hover:opacity-100",
                   ].join(" ")}
                 >
@@ -189,11 +166,11 @@ export function ShopCatalog() {
             </div>
 
             <label className="flex items-center gap-2">
-              <span className="px-label text-muted-foreground">Sort:</span>
+              <span className="text-muted-foreground">Sort</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="px-label cursor-pointer appearance-none bg-transparent pr-4 outline-none"
+                className="cursor-pointer appearance-none bg-transparent pr-4 text-[0.75rem] uppercase tracking-[0.1em] outline-none"
               >
                 {sortOptions.map((o) => (
                   <option key={o} value={o}>
@@ -205,6 +182,7 @@ export function ShopCatalog() {
           </div>
         </div>
       </Shell>
+
 
       {/* 05 + 06 — filters and grid */}
       <Shell label="Products" className="pb-24">
@@ -236,7 +214,6 @@ export function ShopCatalog() {
                   onClick={() => {
                     setFilters(emptyFilters);
                     setCategory("All");
-                    setMaterial("all");
                   }}
                   className="px-label px-underline mt-6"
                 >
