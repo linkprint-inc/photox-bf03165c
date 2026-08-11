@@ -1,16 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 
 const center = [
-  { label: "Shop", href: "#shop" },
-  { label: "Metal", href: "#metal" },
-  { label: "Canvas", href: "#surface" },
-  { label: "Custom", href: "#custom" },
-  { label: "Photo Tools", href: "#tools" },
+  { label: "Shop", href: "/shop" },
+  { label: "Metal", href: "/#metal" },
+  { label: "Canvas", href: "/#surface" },
+  { label: "Custom", href: "/#custom" },
+  { label: "Photo Tools", href: "/#tools" },
 ];
 
-export function SiteNav() {
+export function SiteNav({
+  variant = "hero",
+  onSearch,
+}: {
+  variant?: "hero" | "light";
+  onSearch?: () => void;
+}) {
   const [hidden, setHidden] = useState(false);
-  const [overHero, setOverHero] = useState(true);
+  const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
 
   useEffect(() => {
@@ -18,14 +24,14 @@ export function SiteNav() {
       const y = window.scrollY;
       const hero = document.getElementById("hero");
       const heroBottom = hero ? hero.offsetHeight - 80 : 600;
-      setOverHero(y < heroBottom);
+      setOverHero(variant === "hero" && y < heroBottom);
       setHidden(y > lastY.current && y > 120);
       lastY.current = y;
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [variant]);
 
   const tone = overHero ? "text-white" : "text-ink";
 
@@ -42,7 +48,7 @@ export function SiteNav() {
         aria-label="Primary"
         className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 py-5 md:px-10"
       >
-        <a href="#hero" className="px-label px-underline text-[0.8rem] tracking-[0.3em]">
+        <a href="/" className="px-label px-underline text-[0.8rem] tracking-[0.3em]">
           PHOTX
         </a>
 
@@ -58,7 +64,7 @@ export function SiteNav() {
 
         <ul className="flex items-center gap-5">
           <li className="hidden sm:block">
-            <button type="button" className="px-label px-underline opacity-90">
+            <button type="button" onClick={onSearch} className="px-label px-underline opacity-90">
               Search
             </button>
           </li>
