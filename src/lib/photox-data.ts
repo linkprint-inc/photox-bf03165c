@@ -10,8 +10,36 @@ import artBluehour from "@/assets/art-bluehour.jpg";
 import artMonolith from "@/assets/art-monolith.jpg";
 import artTideline from "@/assets/art-tideline.jpg";
 import artChroma from "@/assets/art-chroma.jpg";
+import roomLiving from "@/assets/room-living.jpg";
+import roomBedroom from "@/assets/room-bedroom.jpg";
+import roomWorkspace from "@/assets/room-workspace.jpg";
+import roomDining from "@/assets/room-dining.jpg";
+import idxMetal from "@/assets/idx-metal.jpg";
+import idxCanvas from "@/assets/idx-canvas.jpg";
 
 export type Material = "Metal Print" | "Frameless Canvas";
+
+export const sizes = [
+  { label: '12 × 18"', inches: 12, price: 79 },
+  { label: '16 × 24"', inches: 16, price: 119 },
+  { label: '20 × 30"', inches: 20, price: 159 },
+  { label: '24 × 36"', inches: 24, price: 189 },
+  { label: '30 × 40"', inches: 30, price: 249 },
+];
+
+export const sizeRange = '12 × 18" — 30 × 40"';
+export const sizeList = sizes.map((s) => s.label);
+
+export const materialFrom: Record<Material, number> = {
+  "Metal Print": 79,
+  "Frameless Canvas": 69,
+};
+
+/** Angled, three-quarter physical view used on product hover. */
+export const angleFor: Record<Material, string> = {
+  "Metal Print": idxMetal,
+  "Frameless Canvas": idxCanvas,
+};
 
 export type Product = {
   id: string;
@@ -19,8 +47,7 @@ export type Product = {
   material: Material;
   from: number;
   image: string;
-  ratio: string;
-  span: "tall" | "wide" | "square" | "feature";
+  hover: string;
   tags: string[];
 };
 
@@ -31,8 +58,7 @@ export const products: Product[] = [
     material: "Metal Print",
     from: 119,
     image: artRain,
-    ratio: "4 / 5",
-    span: "tall",
+    hover: roomDining,
     tags: ["new", "photography"],
   },
   {
@@ -41,8 +67,7 @@ export const products: Product[] = [
     material: "Frameless Canvas",
     from: 109,
     image: artSaltflat,
-    ratio: "16 / 10",
-    span: "wide",
+    hover: roomLiving,
     tags: ["landscape", "best"],
   },
   {
@@ -51,8 +76,7 @@ export const products: Product[] = [
     material: "Metal Print",
     from: 129,
     image: artBrutal,
-    ratio: "4 / 5",
-    span: "tall",
+    hover: roomWorkspace,
     tags: ["photography", "new"],
   },
   {
@@ -61,8 +85,7 @@ export const products: Product[] = [
     material: "Frameless Canvas",
     from: 99,
     image: artRedfield,
-    ratio: "1 / 1",
-    span: "square",
+    hover: roomWorkspace,
     tags: ["abstract", "best"],
   },
   {
@@ -71,8 +94,7 @@ export const products: Product[] = [
     material: "Metal Print",
     from: 139,
     image: artNorthsea,
-    ratio: "16 / 10",
-    span: "feature",
+    hover: roomLiving,
     tags: ["landscape", "best"],
   },
   {
@@ -81,8 +103,7 @@ export const products: Product[] = [
     material: "Frameless Canvas",
     from: 119,
     image: artFigure,
-    ratio: "4 / 5",
-    span: "tall",
+    hover: roomBedroom,
     tags: ["photography"],
   },
   {
@@ -91,8 +112,7 @@ export const products: Product[] = [
     material: "Metal Print",
     from: 129,
     image: artSignal,
-    ratio: "16 / 10",
-    span: "wide",
+    hover: roomDining,
     tags: ["abstract", "new"],
   },
   {
@@ -101,8 +121,7 @@ export const products: Product[] = [
     material: "Metal Print",
     from: 149,
     image: artCanopy,
-    ratio: "4 / 5",
-    span: "tall",
+    hover: roomBedroom,
     tags: ["landscape", "new"],
   },
 ];
@@ -130,18 +149,48 @@ export type LargeWork = {
   name: string;
   material: Material;
   size: string;
-  from: number;
+  price: number;
   image: string;
   room: string;
-  ratio: string;
 };
 
-export const sizes = [
-  { label: '12 × 18"', inches: 12, price: 89 },
-  { label: '16 × 24"', inches: 16, price: 129 },
-  { label: '20 × 30"', inches: 20, price: 159 },
-  { label: '24 × 36"', inches: 24, price: 189 },
-  { label: '30 × 40"', inches: 30, price: 249 },
+export const largeWorks: LargeWork[] = [
+  {
+    id: "blue-hour",
+    name: "Blue Hour",
+    material: "Metal Print",
+    size: '30 × 40"',
+    price: 249,
+    image: artBluehour,
+    room: roomLiving,
+  },
+  {
+    id: "monolith",
+    name: "Monolith",
+    material: "Metal Print",
+    size: '24 × 36"',
+    price: 189,
+    image: artMonolith,
+    room: roomDining,
+  },
+  {
+    id: "tide-line",
+    name: "Tide Line",
+    material: "Frameless Canvas",
+    size: '30 × 40"',
+    price: 249,
+    image: artTideline,
+    room: roomWorkspace,
+  },
+  {
+    id: "chroma-study",
+    name: "Chroma Study",
+    material: "Frameless Canvas",
+    size: '24 × 36"',
+    price: 189,
+    image: artChroma,
+    room: roomBedroom,
+  },
 ];
 
 export { artBluehour, artMonolith, artTideline, artChroma };
