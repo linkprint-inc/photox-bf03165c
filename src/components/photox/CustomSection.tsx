@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 import customOriginal from "@/assets/custom-original.jpg";
 import customPrint from "@/assets/custom-print.jpg";
+import { sizes } from "@/lib/photox-data";
+import { Shell } from "./Section";
 
 export function CustomSection() {
   const [pos, setPos] = useState(45);
@@ -15,11 +17,11 @@ export function CustomSection() {
   }, []);
 
   return (
-    <section id="custom" className="mx-auto max-w-[1600px] px-6 pb-28 md:px-10 md:pb-40">
-      <div className="grid gap-10 md:grid-cols-[1fr_20rem] md:items-end md:gap-16">
+    <Shell id="custom" className="pb-28 md:pb-40">
+      <div className="grid gap-10 md:grid-cols-12 md:gap-8">
         <div
           ref={ref}
-          className="relative aspect-[7/5] w-full touch-pan-y select-none overflow-hidden bg-secondary"
+          className="relative aspect-[4/3] w-full touch-pan-y select-none overflow-hidden bg-secondary md:col-span-6"
           onMouseMove={(e) => dragging.current && move(e.clientX)}
           onMouseDown={(e) => {
             dragging.current = true;
@@ -75,21 +77,49 @@ export function CustomSection() {
           </span>
         </div>
 
-        <div className="pb-2">
+        <div className="md:col-span-6">
           <h2 className="px-serif text-[2.2rem] md:text-[2.9rem]">
             Your image.
             <br />
             Made for the wall.
           </h2>
-          <p className="px-meta mt-6 max-w-[34ch] text-muted-foreground">
-            Print your photography, artwork or favourite image on metal or frameless canvas.
+          <p className="px-meta mt-6 max-w-[38ch] text-muted-foreground">
+            Turn your photography, artwork or favourite image into a physical print.
           </p>
-          <p className="px-meta mt-8">Custom prints from $89</p>
-          <a href="#tools" className="px-label px-underline mt-6 inline-block">
+
+          <div className="mt-10 grid gap-8 sm:grid-cols-2">
+            <div className="px-rule pt-4">
+              <p className="px-label">Metal Prints</p>
+              <p className="px-price mt-2">
+                <span className="px-label mr-1 opacity-70">From</span>$79
+              </p>
+            </div>
+            <div className="px-rule pt-4">
+              <p className="px-label">Frameless Canvas</p>
+              <p className="px-price mt-2">
+                <span className="px-label mr-1 opacity-70">From</span>$69
+              </p>
+            </div>
+          </div>
+
+          <p className="px-label mt-10 text-muted-foreground">Available sizes</p>
+          <ul className="mt-4 border-t border-hairline">
+            {sizes.map((s) => (
+              <li
+                key={s.label}
+                className="flex items-baseline justify-between border-b border-hairline py-3"
+              >
+                <span className="px-meta">{s.label}</span>
+                <span className="px-price">${s.price}</span>
+              </li>
+            ))}
+          </ul>
+
+          <a href="#tools" className="px-label px-underline mt-8 inline-block">
             Upload your image →
           </a>
         </div>
       </div>
-    </section>
+    </Shell>
   );
 }
