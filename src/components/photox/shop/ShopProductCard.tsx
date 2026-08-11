@@ -53,9 +53,47 @@ export function ShopProductCard({
             ].join(" ")}
           />
 
-          <div className="px-reveal pointer-events-none absolute inset-x-0 bottom-0 hidden items-end justify-between p-3 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:flex">
-            <span className="px-label bg-paper/90 px-2 py-1">View artwork →</span>
-            <span className="px-label bg-paper/90 px-2 py-1">♡ Save</span>
+          {/* Mobile: small standalone heart in upper-right */}
+          <button
+            type="button"
+            aria-label="Save"
+            className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center text-foreground/80 transition-colors hover:text-foreground md:hidden"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+            </svg>
+          </button>
+
+          {/* Desktop: slim single-row action strip */}
+          <div className="px-reveal pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-center justify-between rounded-[2px] bg-paper/92 px-4 py-3.5 backdrop-blur-sm group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:flex">
+            <span className="flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-foreground transition-colors">
+              View artwork
+              <svg
+                className="ml-1.5 transition-transform duration-300 ease-out group-hover:translate-x-[3px]"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              >
+                <path d="M1 7h11M8 3l4 4-4 4" />
+              </svg>
+            </span>
+            <span className="group/save flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-foreground/60 transition-colors hover:text-foreground">
+              <svg
+                className="mr-1.5 transition-all duration-300 group-hover/save:fill-foreground"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+              >
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+              </svg>
+              Save
+            </span>
           </div>
         </div>
       </a>
