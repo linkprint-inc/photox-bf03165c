@@ -8,9 +8,9 @@ const center = [
   { label: "Photo Tools", href: "#tools" },
 ];
 
-export function SiteNav() {
+export function SiteNav({ variant = "hero" }: { variant?: "hero" | "light" }) {
   const [hidden, setHidden] = useState(false);
-  const [overHero, setOverHero] = useState(true);
+  const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export function SiteNav() {
       const y = window.scrollY;
       const hero = document.getElementById("hero");
       const heroBottom = hero ? hero.offsetHeight - 80 : 600;
-      setOverHero(y < heroBottom);
+      setOverHero(variant === "hero" && y < heroBottom);
       setHidden(y > lastY.current && y > 120);
       lastY.current = y;
     };
