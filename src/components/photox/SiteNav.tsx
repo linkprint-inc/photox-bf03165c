@@ -58,7 +58,7 @@ export function SiteNav({ variant = "hero" }: { variant?: "hero" | "light" }) {
 
         <ul className="flex items-center gap-5">
           <li className="hidden sm:block">
-            <button type="button" className="px-label px-underline opacity-90">
+            <button type="button" onClick={onSearch} className="px-label px-underline opacity-90">
               Search
             </button>
           </li>
