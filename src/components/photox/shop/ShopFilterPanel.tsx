@@ -147,11 +147,11 @@ export function ShopFilterPanel({
           ))}
         </Group>
 
-        <div className="px-rule sticky bottom-0 flex items-center justify-between gap-4 bg-paper py-5">
-          <button type="button" onClick={onClear} className="px-label px-underline opacity-60">
+        <div className="px-rule sticky bottom-0 flex flex-wrap items-center justify-between gap-3 bg-paper py-5">
+          <button type="button" onClick={onClear} className="px-label px-underline whitespace-nowrap opacity-60">
             Clear all
           </button>
-          <button type="button" onClick={onClose} className="px-label px-underline">
+          <button type="button" onClick={onClose} className="px-label px-underline whitespace-nowrap">
             Show {results} results →
           </button>
         </div>
