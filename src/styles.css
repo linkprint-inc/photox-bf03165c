@@ -19,13 +19,19 @@
  */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-2xl: calc(var(--radius) + 8px);
-  --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+  --color-ink: var(--ink);
+  --color-hairline: var(--hairline);
+  --color-paper: var(--paper);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -62,26 +68,30 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --radius: 0rem;
+  --paper: oklch(0.988 0.004 95);
+  --ink: oklch(0.19 0.005 60);
+  --hairline: oklch(0.19 0.005 60 / 14%);
+  --background: oklch(0.988 0.004 95);
+  --foreground: oklch(0.19 0.005 60);
+  --card: oklch(0.988 0.004 95);
+  --card-foreground: oklch(0.19 0.005 60);
+  --popover: oklch(0.988 0.004 95);
+  --popover-foreground: oklch(0.19 0.005 60);
+  --primary: oklch(0.19 0.005 60);
+  --primary-foreground: oklch(0.988 0.004 95);
+  --secondary: oklch(0.955 0.004 90);
+  --secondary-foreground: oklch(0.19 0.005 60);
+  --muted: oklch(0.955 0.004 90);
+  --muted-foreground: oklch(0.52 0.008 70);
+  --accent: oklch(0.955 0.004 90);
+  --accent-foreground: oklch(0.19 0.005 60);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.988 0.004 95);
+  --border: oklch(0.19 0.005 60 / 14%);
+  --input: oklch(0.19 0.005 60 / 20%);
+  --ring: oklch(0.19 0.005 60 / 45%);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +150,148 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  :focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 3px;
   }
 }
+
+/* ---- PhotoX typographic system ---- */
+
+@utility px-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.06;
+}
+
+@utility px-label {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+@utility px-meta {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+}
+
+@utility px-rule {
+  border-top: 1px solid var(--hairline);
+}
+
+@utility px-underline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -3px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 480ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  &:hover::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Material treatments — metal reads glossy/rigid, canvas matte/woven */
+
+@utility px-gloss {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      104deg,
+      transparent 28%,
+      rgb(255 255 255 / 0.34) 42%,
+      rgb(255 255 255 / 0.06) 52%,
+      transparent 66%
+    );
+    opacity: 0;
+    transition: opacity 560ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+}
+
+@utility px-weave {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgb(0 0 0 / 0.1) 0 1px,
+        transparent 1px 3px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgb(255 255 255 / 0.1) 0 1px,
+        transparent 1px 3px
+      );
+    opacity: 0;
+    transition: opacity 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+}
+
+@utility px-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 0px;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.4), rgb(255 255 255 / 0.85));
+  transition: width 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@utility px-canvas-edge {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 0px;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.28), rgb(0 0 0 / 0.1));
+  transition: width 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@utility px-reveal {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 460ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 460ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
