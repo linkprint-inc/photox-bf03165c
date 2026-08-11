@@ -351,7 +351,7 @@ const source: Omit<ShopProduct, "room">[] = [
 
 export const shopProducts: ShopProduct[] = source.map((p, i) => ({
   ...p,
-  room: rooms[i % rooms.length],
+  room: rooms[i % rooms.length]!,
 }));
 
 export const categories = [
