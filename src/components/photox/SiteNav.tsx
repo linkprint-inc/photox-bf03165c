@@ -8,7 +8,13 @@ const center = [
   { label: "Photo Tools", href: "/#tools" },
 ];
 
-export function SiteNav({ variant = "hero" }: { variant?: "hero" | "light" }) {
+export function SiteNav({
+  variant = "hero",
+  onSearch,
+}: {
+  variant?: "hero" | "light";
+  onSearch?: () => void;
+}) {
   const [hidden, setHidden] = useState(false);
   const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
