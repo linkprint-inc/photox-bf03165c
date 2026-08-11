@@ -25,7 +25,7 @@ export function SiteNav({ variant = "hero" }: { variant?: "hero" | "light" }) {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [variant]);
 
   const tone = overHero ? "text-white" : "text-ink";
 
