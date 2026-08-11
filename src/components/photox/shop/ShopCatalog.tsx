@@ -92,10 +92,9 @@ export function ShopCatalog() {
     <>
       {/* 02 — intro */}
       <Shell label="Shop introduction" className="pt-28 md:pt-32">
-        <div className="pb-20 md:pb-24">
-          <p className="px-label text-muted-foreground">Shop</p>
-          <h1 className="px-serif mt-4 text-[2.6rem] md:text-[4rem]">Art for your walls.</h1>
-          <p className="px-meta mt-4 max-w-[46ch] text-muted-foreground">
+        <div className="pb-16 md:pb-20">
+          <h1 className="px-serif text-[2.2rem] md:text-[3.25rem]">Art for your walls.</h1>
+          <p className="px-meta mt-3 max-w-[48ch] text-muted-foreground">
             Explore photography and artwork available on Metal Print and Frameless Canvas.
           </p>
         </div>
@@ -103,8 +102,8 @@ export function ShopCatalog() {
 
       {/* 03 — category navigation */}
       <Shell label="Categories">
-        <nav aria-label="Categories" className="overflow-x-auto pb-10 md:pb-12">
-          <ul className="flex min-w-max gap-12 md:gap-16">
+        <nav aria-label="Categories" className="overflow-x-auto pb-8 md:pb-10">
+          <ul className="flex min-w-max gap-10 md:gap-14">
             {primaryCategories.map((c) => (
               <li key={c.key}>
                 <button
@@ -115,7 +114,7 @@ export function ShopCatalog() {
                   }}
                   aria-pressed={category === c.key}
                   className={[
-                    "relative whitespace-nowrap pb-2 text-[0.95rem] font-medium uppercase tracking-[0.03em] transition-colors duration-300",
+                    "relative whitespace-nowrap pb-2.5 text-[0.95rem] font-medium uppercase tracking-[0.03em] transition-colors duration-300",
                     "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground after:transition-transform after:duration-300 after:origin-left",
                     category === c.key
                       ? "text-foreground after:scale-x-100"
@@ -132,22 +131,21 @@ export function ShopCatalog() {
 
       {/* 04 — toolbar */}
       <Shell label="Shop controls">
-        <div className="px-rule flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
+        <div className="px-rule flex items-center justify-between gap-x-8 py-3.5">
           <button
             type="button"
             onClick={() => setPanelOpen((v) => !v)}
-            className="text-[0.8125rem] font-medium uppercase tracking-[0.05em] text-foreground/70 transition-colors hover:text-foreground"
+            className="text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-foreground/70 transition-colors hover:text-foreground"
           >
             {active > 0 ? `Filter (${active})` : "Filter +"}
           </button>
 
-          <div className="flex flex-wrap items-center gap-x-7 gap-y-2 text-[0.8125rem] uppercase tracking-[0.04em]">
-            <span className="text-foreground/55">
+          <div className="flex items-center gap-x-6 text-[0.8125rem] uppercase tracking-[0.04em]">
+            <span className="text-foreground/50">
               {results.length === shopProducts.length ? totalWorks : results.length} works
             </span>
 
-            <div className="flex items-center gap-3">
-              <span className="text-foreground/55">View</span>
+            <div className="flex items-center gap-2.5">
               {(["grid", "room"] as const).map((v) => (
                 <button
                   key={v}
@@ -157,20 +155,32 @@ export function ShopCatalog() {
                   aria-label={v === "grid" ? "Grid view" : "Room view"}
                   className={[
                     "transition-opacity duration-300",
-                    view === v ? "opacity-100 text-foreground" : "opacity-45 hover:opacity-100 text-foreground",
+                    view === v ? "opacity-100 text-foreground" : "opacity-40 hover:opacity-100 text-foreground",
                   ].join(" ")}
                 >
-                  {v}
+                  {v === "grid" ? (
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.2">
+                      <rect x="1.5" y="1.5" width="6" height="6" />
+                      <rect x="10.5" y="1.5" width="6" height="6" />
+                      <rect x="1.5" y="10.5" width="6" height="6" />
+                      <rect x="10.5" y="10.5" width="6" height="6" />
+                    </svg>
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.2">
+                      <rect x="1.5" y="3" width="15" height="12" />
+                      <path d="M5 15V9h8v6" />
+                    </svg>
+                  )}
                 </button>
               ))}
             </div>
 
-            <label className="flex items-center gap-2">
-              <span className="text-foreground/55">Sort</span>
+            <label className="flex items-center gap-1.5">
+              <span className="text-foreground/50">Sort</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="cursor-pointer appearance-none bg-transparent pr-4 text-[0.8125rem] uppercase tracking-[0.04em] text-foreground outline-none"
+                className="cursor-pointer appearance-none bg-transparent pr-1 text-[0.8125rem] uppercase tracking-[0.04em] text-foreground outline-none"
               >
                 {sortOptions.map((o) => (
                   <option key={o} value={o}>
