@@ -1,4 +1,4 @@
-import roomLiving from "@/assets/room-living.jpg";
+import roomLiving from "@/assets/room-living-architectural.jpg";
 import roomBedroom from "@/assets/room-bedroom.jpg";
 import roomWorkspace from "@/assets/room-workspace.jpg";
 import roomDining from "@/assets/room-dining.jpg";
@@ -7,7 +7,7 @@ const rooms = [
   {
     label: "Living room",
     image: roomLiving,
-    alt: "Living room with a large metal print of a coastal cliff above a linen sofa",
+    alt: "Living room with soft gray plaster walls, a dark walnut console and a large metal print of a coastal cliff",
     work: "Pacific Coast No. 08",
     material: "Metal Print",
     size: '30 × 40"',

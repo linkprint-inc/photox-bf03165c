@@ -2,12 +2,12 @@ import artRain from "@/assets/art-rain.jpg";
 import artSaltflat from "@/assets/art-saltflat.jpg";
 import artBrutal from "@/assets/art-brutal.jpg";
 import artRedfield from "@/assets/art-redfield.jpg";
-import artNorthsea from "@/assets/art-northsea.jpg";
+import artConcrete from "@/assets/art-concrete-planes.jpg";
 import artFigure from "@/assets/art-figure.jpg";
 import artSignal from "@/assets/art-signal.jpg";
 import artCanopy from "@/assets/art-canopy.jpg";
 import artBluehour from "@/assets/art-bluehour.jpg";
-import artMonolith from "@/assets/art-monolith.jpg";
+import artNightcity from "@/assets/art-nightcity.jpg";
 import artTideline from "@/assets/art-tideline.jpg";
 import artChroma from "@/assets/art-chroma.jpg";
 import roomLiving from "@/assets/room-living.jpg";
@@ -89,13 +89,13 @@ export const products: Product[] = [
     tags: ["abstract", "best"],
   },
   {
-    id: "north-sea",
-    name: "North Sea",
+    id: "concrete-planes",
+    name: "Concrete Planes",
     material: "Metal Print",
     from: 139,
-    image: artNorthsea,
+    image: artConcrete,
     hover: roomLiving,
-    tags: ["landscape", "best"],
+    tags: ["photography", "best"],
   },
   {
     id: "study-in-olive",
@@ -165,12 +165,12 @@ export const largeWorks: LargeWork[] = [
     room: roomLiving,
   },
   {
-    id: "monolith",
-    name: "Monolith",
+    id: "night-city",
+    name: "Night City",
     material: "Metal Print",
     size: '24 × 36"',
     price: 189,
-    image: artMonolith,
+    image: artNightcity,
     room: roomDining,
   },
   {
@@ -193,4 +193,4 @@ export const largeWorks: LargeWork[] = [
   },
 ];
 
-export { artBluehour, artMonolith, artTideline, artChroma };
+export { artBluehour, artNightcity, artTideline, artChroma };
