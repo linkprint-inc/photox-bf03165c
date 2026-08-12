@@ -302,3 +302,16 @@
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
+
+@utility px-fade {
+  animation: px-fade-in 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes px-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

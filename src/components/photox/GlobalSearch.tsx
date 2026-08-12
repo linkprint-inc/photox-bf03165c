@@ -9,6 +9,7 @@ const MAX_RESULTS = 6;
 export function GlobalSearch() {
   const { open, closeSearch } = useSearchUI();
   const [q, setQ] = useState("");
+  const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -72,36 +73,40 @@ export function GlobalSearch() {
 
   const goToShop = (query: string) => {
     closeSearch();
-    navigate({ to: "/shop", search: query ? { q: query } : ({} as { q?: string | undefined }) });
+    navigate({ to: "/shop", search: query ? { q: query } : {} });
   };
 
   const results = matches.slice(0, MAX_RESULTS);
+  const empty = term && results.length === 0 && categoryHits.length === 0;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-foreground/10">
       <button
         type="button"
         aria-label="Close search"
         onClick={closeSearch}
-        className="absolute inset-0 h-full w-full cursor-default bg-foreground/10"
+        className="fixed inset-0 h-full w-full cursor-default"
       />
 
-      <div className="relative max-h-full w-full overflow-y-auto bg-paper">
-        <div className="mx-auto max-w-[1440px] px-6 pb-14 pt-6 md:px-10 md:pb-20 md:pt-8">
+      <div className="relative min-h-screen w-full bg-paper">
+        <div className="mx-auto max-w-[1440px] px-6 pb-12 pt-5 md:px-10 md:pb-16 md:pt-6">
           <div className="flex items-center justify-between">
             <span className="px-label">Search</span>
             <button
               type="button"
               onClick={closeSearch}
               aria-label="Close search"
-              className="px-label px-underline text-[1.1rem] leading-none"
+              className="-mr-3 flex h-11 w-11 items-center justify-center text-[1.1rem] leading-none transition-opacity hover:opacity-60"
             >
               ×
             </button>
           </div>
 
           <form
-            className="mt-6 border-b border-foreground/25 md:mt-8"
+            className={[
+              "mt-4 border-b transition-colors md:mt-5",
+              focused ? "border-foreground/60" : "border-foreground/25",
+            ].join(" ")}
             onSubmit={(e) => {
               e.preventDefault();
               if (term) goToShop(q.trim());
@@ -111,100 +116,80 @@ export function GlobalSearch() {
               ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
               placeholder="Search artwork, styles or collections"
               aria-label="Search artwork, styles or collections"
-              className="px-serif w-full bg-transparent py-4 text-[1.5rem] outline-none placeholder:opacity-35 md:text-[2.1rem]"
+              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/45 md:text-[1.7rem]"
             />
           </form>
 
-          {!term ? (
-            <div className="mt-10 grid gap-12 md:mt-14 md:grid-cols-[1fr_2fr] md:gap-16">
-              <div>
-                <p className="px-label text-muted-foreground">Popular searches</p>
-                <ul className="mt-5 space-y-3">
-                  {popularTerms.map((t) => (
-                    <li key={t}>
-                      <button
-                        type="button"
-                        onClick={() => setQ(t)}
-                        className="px-serif text-[1.15rem] transition-opacity hover:opacity-60"
-                      >
-                        {t}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+          {term ? (
+            <p className="px-meta mt-3 text-muted-foreground">
+              {matches.length} {matches.length === 1 ? "result" : "results"} for “{q.trim()}”
+            </p>
+          ) : null}
 
-              <div>
-                <p className="px-label text-muted-foreground">Popular artwork</p>
-                <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4">
-                  {popularArtwork.map((p) => (
-                    <li key={p.id}>
-                      <ResultCard product={p} onSelect={() => goToShop(p.name)} />
-                    </li>
-                  ))}
-                </ul>
+          <div key={term ? "results" : "discovery"} className="px-fade">
+            {empty ? (
+              <div className="mt-10 md:mt-12">
+                <p className="px-serif text-[1.3rem]">No results for “{q.trim()}”</p>
+                <p className="px-meta mt-2 text-muted-foreground">
+                  Try another search or explore all artwork.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => goToShop("")}
+                  className="px-label px-underline mt-5 inline-block"
+                >
+                  Shop all art →
+                </button>
               </div>
-            </div>
-          ) : results.length === 0 && categoryHits.length === 0 ? (
-            <div className="mt-12 md:mt-16">
-              <p className="px-serif text-[1.4rem]">No results for “{q.trim()}”</p>
-              <p className="px-meta mt-2 text-muted-foreground">
-                Try another search or browse all artwork.
-              </p>
-              <button
-                type="button"
-                onClick={() => goToShop("")}
-                className="px-label px-underline mt-6 inline-block"
-              >
-                Shop all art →
-              </button>
-            </div>
-          ) : (
-            <div className="mt-10 space-y-12 md:mt-14">
-              {results.length > 0 && (
+            ) : (
+              <div className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[1fr_2.2fr] md:gap-14">
                 <div>
-                  <p className="px-label text-muted-foreground">Artwork</p>
-                  <ul className="mt-5 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-                    {results.map((p) => (
-                      <li key={p.id}>
-                        <ResultCard product={p} onSelect={() => goToShop(p.name)} />
-                      </li>
-                    ))}
-                  </ul>
-                  {matches.length > results.length && (
-                    <button
-                      type="button"
-                      onClick={() => goToShop(q.trim())}
-                      className="px-label px-underline mt-8 inline-block"
-                    >
-                      View all results →
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {categoryHits.length > 0 && (
-                <div>
-                  <p className="px-label text-muted-foreground">Categories</p>
-                  <ul className="mt-4 flex flex-wrap gap-x-8 gap-y-3">
-                    {categoryHits.map((c) => (
-                      <li key={c}>
+                  <p className="px-label text-muted-foreground">
+                    {term ? "Related" : "Popular searches"}
+                  </p>
+                  <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
+                    {(term ? categoryHits : popularTerms).map((t) => (
+                      <li key={t}>
                         <button
                           type="button"
-                          onClick={() => goToShop(c)}
-                          className="px-serif text-[1.05rem] transition-opacity hover:opacity-60"
+                          onClick={() => (term ? goToShop(t) : setQ(t))}
+                          className="px-serif px-underline text-left text-[1rem] transition-opacity hover:opacity-60"
                         >
-                          {c}
+                          {t}
                         </button>
                       </li>
                     ))}
                   </ul>
                 </div>
-              )}
-            </div>
-          )}
+
+                <div>
+                  <p className="px-label text-muted-foreground">
+                    {term ? "Results" : "Popular artwork"}
+                  </p>
+                  <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-4">
+                    {(term ? results : popularArtwork).map((p) => (
+                      <li key={p.id}>
+                        <ResultCard product={p} onSelect={() => goToShop(p.name)} />
+                      </li>
+                    ))}
+                  </ul>
+                  {term && matches.length > results.length && (
+                    <button
+                      type="button"
+                      onClick={() => goToShop(q.trim())}
+                      className="px-label px-underline mt-7 inline-block"
+                    >
+                      View all results →
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -219,20 +204,26 @@ function ResultCard({
   onSelect: () => void;
 }) {
   return (
-    <button type="button" onClick={onSelect} className="group block w-full text-left">
-      <div className="relative aspect-square overflow-hidden bg-secondary">
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group flex w-full items-center gap-4 text-left sm:block"
+    >
+      <div className="relative aspect-square w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-85"
         />
       </div>
-      <p className="px-label mt-3">{product.name}</p>
-      <p className="px-meta text-muted-foreground">{materialLabel[product.material]}</p>
-      <p className="px-price mt-1">
-        <span className="px-label mr-1 opacity-70">From</span>${product.from}
-      </p>
+      <div className="min-w-0 sm:mt-2.5">
+        <p className="px-label">{product.name}</p>
+        <p className="px-meta text-muted-foreground">{materialLabel[product.material]}</p>
+        <p className="px-price mt-0.5">
+          <span className="px-label mr-1 opacity-70">From</span>${product.from}
+        </p>
+      </div>
     </button>
   );
 }
