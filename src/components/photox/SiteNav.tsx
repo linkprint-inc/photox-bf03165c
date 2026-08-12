@@ -68,13 +68,13 @@ export function SiteNav({
             </button>
           </li>
           <li className="hidden sm:block">
-            <button type="button" className="px-label px-underline opacity-90">
+            <Link to="/account" className="px-label px-underline opacity-90">
               Account
-            </button>
+            </Link>
           </li>
           <li>
-            <button type="button" className="px-label px-underline">
-              Bag (0)
+            <button type="button" onClick={openDrawer} className="px-label px-underline">
+              Bag ({hydrated ? bagCount : 0})
             </button>
           </li>
         </ul>
