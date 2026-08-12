@@ -210,7 +210,7 @@ function MaterialsVisual() {
             loading="lazy"
             width={1200}
             height={1200}
-            className="h-full w-full scale-[1.6] object-cover object-left"
+            className="h-full w-[200%] max-w-none object-cover object-left"
           />
         </div>
         <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Metal — gloss</figcaption>
@@ -223,7 +223,7 @@ function MaterialsVisual() {
             loading="lazy"
             width={1200}
             height={1200}
-            className="h-full w-full scale-[1.6] object-cover object-right"
+            className="-ml-[100%] h-full w-[200%] max-w-none object-cover object-left"
           />
         </div>
         <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Canvas — matte</figcaption>
@@ -462,7 +462,11 @@ export function HelpTopics() {
                   quiet ? "opacity-45 hover:opacity-80" : "opacity-100"
                 }`}
               >
-                <div className="relative aspect-square overflow-hidden bg-muted">
+                <div
+                  className={`relative overflow-hidden bg-muted transition-all duration-700 ${
+                    isActive ? "h-[380px]" : "aspect-square"
+                  }`}
+                >
                   <img
                     src={t.image}
                     alt={t.alt}
