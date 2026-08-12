@@ -73,7 +73,7 @@ export function GlobalSearch() {
 
   const goToShop = (query: string) => {
     closeSearch();
-    navigate({ to: "/shop", search: query ? { q: query } : ({} as { q?: string | undefined }) });
+    navigate({ to: "/shop", search: query ? { q: query } : {} });
   };
 
   const results = matches.slice(0, MAX_RESULTS);
