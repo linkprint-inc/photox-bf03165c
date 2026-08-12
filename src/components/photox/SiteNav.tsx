@@ -73,7 +73,6 @@ export function SiteNav({
               Search
             </button>
           </li>
-          </li>
           <li className="hidden sm:block">
             <Link to="/account" className="px-label px-underline opacity-90">
               Account
