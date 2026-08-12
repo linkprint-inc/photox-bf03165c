@@ -1,105 +1,88 @@
-import { useState } from "react";
 import { Shell } from "./Section";
-import customOriginal from "@/assets/custom-original.jpg";
-import customPrint from "@/assets/custom-print.jpg";
 
 const tools = [
   {
-    label: "Restore old photo",
-    body: "Repair fading, scratches and age-related damage before printing.",
+    id: "restore",
+    label: "Restore Old Photo",
+    body: "Bring faded and damaged photos back to life.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-5 w-5">
+        <path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
+        <path d="M3 16l4-4 4 4 5-6 5 6" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+      </svg>
+    ),
   },
   {
-    label: "Enhance resolution",
-    body: "Prepare smaller images for larger print sizes while preserving detail.",
+    id: "enhance",
+    label: "Enhance Resolution",
+    body: "Prepare smaller images for larger prints.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-5 w-5">
+        <path d="M12 3v18M3 12h18" />
+        <path d="m21 21-3-3M3 21l3-3M21 3l-3 3M3 3l3 3" />
+      </svg>
+    ),
   },
   {
-    label: "Add text",
-    body: "Add a name, date, caption or personal message before printing.",
+    id: "text",
+    label: "Add Text",
+    body: "Add names, dates or a personal message.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-5 w-5">
+        <path d="M4 7V5h16v2M9 20h6M12 5v15" />
+      </svg>
+    ),
   },
 ];
 
 export function PhotoTools() {
-  const [open, setOpen] = useState<string | null>(null);
-
   return (
-    <Shell id="tools" className="pb-28 md:pb-36">
-      <div className="px-rule grid gap-y-3 pt-6 md:grid-cols-12 md:items-baseline">
-        <h2 className="px-serif text-[1.9rem] leading-[1.1] md:col-span-5 md:text-[2.4rem]">
-          Before you print
-        </h2>
-        <p className="px-meta max-w-[46ch] text-muted-foreground md:col-span-6 md:col-start-7">
-          Need a little help with your image? Prepare it before turning it into wall art.
+    <Shell id="tools" className="py-16 md:py-20">
+      <div className="px-rule grid gap-x-10 gap-y-4 pt-5 md:grid-cols-12 md:items-baseline">
+        <h2 className="px-label md:col-span-3">Before You Print</h2>
+        <p className="px-meta max-w-[44ch] text-muted-foreground md:col-span-6 md:col-start-5">
+          Need a little help with your image? Prepare your image before you print.
         </p>
       </div>
 
-      <ul className="mt-10 border-t border-hairline">
-        {tools.map((t) => {
-          const isOpen = open === t.label;
-          return (
-            <li key={t.label} className="border-b border-hairline">
-              <button
-                type="button"
-                onClick={() => setOpen(isOpen ? null : t.label)}
-                aria-expanded={isOpen}
-                className="group flex w-full items-center justify-between gap-6 py-7 text-left md:py-9"
+      <div className="mt-10 grid gap-8 md:mt-12 md:grid-cols-3 md:gap-6">
+        {tools.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className="group text-left"
+            onClick={() => {
+              // Navigate to the dedicated photoX Photo Tools page
+              window.location.href = "/photo-tools";
+            }}
+          >
+            <div className="flex items-center gap-3 text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+              {t.icon}
+              <span className="px-label transition-colors duration-300 group-hover:text-foreground">
+                {t.label}
+              </span>
+              <span
+                aria-hidden
+                className="ml-auto inline-block text-[0.75rem] opacity-0 transition-all duration-300 group-hover:translate-x-[3px] group-hover:opacity-100 md:ml-0"
               >
-                <span
-                  className={[
-                    "px-label text-[0.95rem] tracking-[0.14em] transition-colors duration-[420ms] md:text-[1.05rem]",
-                    isOpen ? "text-foreground" : "text-foreground/70 group-hover:text-foreground",
-                  ].join(" ")}
-                >
-                  {t.label}
-                </span>
-                <span
-                  aria-hidden
-                  className={[
-                    "shrink-0 text-[1.15rem] leading-none transition-transform duration-[420ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
-                    isOpen
-                      ? "rotate-45 text-foreground"
-                      : "text-foreground/50 group-hover:text-foreground",
-                  ].join(" ")}
-                >
-                  +
-                </span>
-              </button>
+                →
+              </span>
+            </div>
+            <p className="px-meta mt-2 max-w-[34ch] text-muted-foreground">{t.body}</p>
+          </button>
+        ))}
+      </div>
 
-              <div
-                className="grid transition-[grid-template-rows] duration-[480ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]"
-                style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
-              >
-                <div className="overflow-hidden">
-                  <div className="grid gap-6 pb-8 md:grid-cols-12 md:items-start">
-                    <p className="px-meta max-w-[52ch] text-muted-foreground md:col-span-6">
-                      {t.body}
-                    </p>
-                    <div className="flex items-center gap-3 md:col-span-4 md:col-start-9 md:justify-end">
-                      <figure className="w-[92px]">
-                        <img
-                          src={customOriginal}
-                          alt=""
-                          loading="lazy"
-                          className="aspect-square w-full object-cover"
-                        />
-                        <figcaption className="px-meta mt-2 text-muted-foreground">Before</figcaption>
-                      </figure>
-                      <figure className="w-[92px]">
-                        <img
-                          src={customPrint}
-                          alt=""
-                          loading="lazy"
-                          className="aspect-square w-full object-cover"
-                        />
-                        <figcaption className="px-meta mt-2 text-muted-foreground">After</figcaption>
-                      </figure>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="mt-10 md:mt-12">
+        <a
+          href="/photo-tools"
+          className="px-meta px-underline inline-flex items-center gap-2 text-foreground/80 transition-colors duration-300 hover:text-foreground"
+        >
+          View all photo tools
+          <span aria-hidden>→</span>
+        </a>
+      </div>
     </Shell>
   );
 }
