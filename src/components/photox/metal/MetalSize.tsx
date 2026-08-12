@@ -23,7 +23,7 @@ export function MetalSize() {
             height={1104}
             loading="lazy"
             alt="A plaster wall with a low dark wood console to one side, used as a fixed reference for print scale"
-            className="h-full w-full object-cover"
+            className="block h-auto w-full"
           />
           <div
             className="absolute left-[58%] top-[20%] -translate-x-1/2 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)] transition-[width] duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]"
