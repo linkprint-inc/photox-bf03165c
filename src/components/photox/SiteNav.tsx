@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useStore } from "@/lib/store";
 
 const center = [
   { label: "Shop", href: "/shop" },
@@ -17,6 +19,7 @@ export function SiteNav({
   const [hidden, setHidden] = useState(false);
   const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
+  const { bagCount, hydrated, openDrawer } = useStore();
 
   useEffect(() => {
     const onScroll = () => {
@@ -68,13 +71,13 @@ export function SiteNav({
             </button>
           </li>
           <li className="hidden sm:block">
-            <button type="button" className="px-label px-underline opacity-90">
+            <Link to="/account" className="px-label px-underline opacity-90">
               Account
-            </button>
+            </Link>
           </li>
           <li>
-            <button type="button" className="px-label px-underline">
-              Bag (0)
+            <button type="button" onClick={openDrawer} className="px-label px-underline">
+              Bag ({hydrated ? bagCount : 0})
             </button>
           </li>
         </ul>

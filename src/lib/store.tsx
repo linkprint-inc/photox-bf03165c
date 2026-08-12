@@ -1,0 +1,211 @@
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
+import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
+
+export type BagMaterial = "metal" | "canvas";
+
+export type BagItem = {
+  key: string;
+  productId: string;
+  material: BagMaterial;
+  sizeIndex: number;
+  qty: number;
+};
+
+export type Account = { firstName: string; lastName: string; email: string };
+
+export type OrderItem = {
+  productId: string;
+  material: BagMaterial;
+  sizeIndex: number;
+  qty: number;
+};
+
+export type Order = {
+  id: string;
+  placed: string;
+  status: string;
+  items: OrderItem[];
+  shippingAddress: string[];
+};
+
+const STORAGE = "photox-store-v1";
+
+export const finishLabel: Record<BagMaterial, string> = {
+  metal: "Gloss",
+  canvas: "Matte",
+};
+
+export const materialName: Record<BagMaterial, string> = {
+  metal: "Metal Print",
+  canvas: "Frameless Canvas",
+};
+
+export function productById(id: string): ShopProduct | undefined {
+  return shopProducts.find((p) => p.id === id);
+}
+
+export function unitPrice(material: BagMaterial, sizeIndex: number) {
+  const base = sizeSteps[sizeIndex]!.price;
+  return material === "canvas" ? base - 10 : base;
+}
+
+export function sizeLabel(sizeIndex: number) {
+  return sizeSteps[sizeIndex]!.label;
+}
+
+function seedOrders(): Order[] {
+  return [
+    {
+      id: "PX-10482",
+      placed: "Aug 08, 2026",
+      status: "In production",
+      items: [
+        { productId: "north-sea", material: "metal", sizeIndex: 3, qty: 1 },
+        { productId: "blue-hour", material: "canvas", sizeIndex: 1, qty: 1 },
+      ],
+      shippingAddress: ["Anna Ferrell", "148 Warren Street, Apt 4", "Brooklyn, NY 11201", "United States"],
+    },
+    {
+      id: "PX-10231",
+      placed: "Jun 21, 2026",
+      status: "Delivered",
+      items: [{ productId: "concrete-planes", material: "metal", sizeIndex: 2, qty: 1 }],
+      shippingAddress: ["Anna Ferrell", "148 Warren Street, Apt 4", "Brooklyn, NY 11201", "United States"],
+    },
+  ];
+}
+
+type State = {
+  account: Account | null;
+  saved: string[];
+  bag: BagItem[];
+  orders: Order[];
+};
+
+type Ctx = State & {
+  hydrated: boolean;
+  bagCount: number;
+  subtotal: number;
+  signIn: (a: Account) => void;
+  signOut: () => void;
+  toggleSaved: (id: string) => void;
+  isSaved: (id: string) => boolean;
+  addToBag: (item: Omit<BagItem, "key">) => void;
+  updateBag: (key: string, patch: Partial<Omit<BagItem, "key">>) => void;
+  removeFromBag: (key: string) => void;
+  drawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+};
+
+const StoreContext = createContext<Ctx | null>(null);
+
+const initial: State = { account: null, saved: [], bag: [], orders: [] };
+
+export function StoreProvider({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<State>(initial);
+  const [hydrated, setHydrated] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE);
+      if (raw) setState({ ...initial, ...(JSON.parse(raw) as State) });
+    } catch {
+      /* ignore */
+    }
+    setHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE, JSON.stringify(state));
+    } catch {
+      /* ignore */
+    }
+  }, [state, hydrated]);
+
+  const signIn = useCallback((account: Account) => {
+    setState((s) => ({ ...s, account, orders: s.orders.length ? s.orders : seedOrders() }));
+  }, []);
+
+  const signOut = useCallback(() => {
+    setState((s) => ({ ...s, account: null }));
+  }, []);
+
+  const toggleSaved = useCallback((id: string) => {
+    setState((s) => ({
+      ...s,
+      saved: s.saved.includes(id) ? s.saved.filter((x) => x !== id) : [id, ...s.saved],
+    }));
+  }, []);
+
+  const addToBag = useCallback((item: Omit<BagItem, "key">) => {
+    setState((s) => {
+      const key = `${item.productId}-${item.material}-${item.sizeIndex}`;
+      const found = s.bag.find((b) => b.key === key);
+      const bag = found
+        ? s.bag.map((b) => (b.key === key ? { ...b, qty: b.qty + item.qty } : b))
+        : [...s.bag, { ...item, key }];
+      return { ...s, bag };
+    });
+    setDrawerOpen(true);
+  }, []);
+
+  const updateBag = useCallback((key: string, patch: Partial<Omit<BagItem, "key">>) => {
+    setState((s) => {
+      const next = s.bag.map((b) => (b.key === key ? { ...b, ...patch } : b));
+      // merge duplicates created by config edits
+      const merged: BagItem[] = [];
+      for (const item of next) {
+        const newKey = `${item.productId}-${item.material}-${item.sizeIndex}`;
+        const existing = merged.find((m) => m.key === newKey);
+        if (existing) existing.qty += item.qty;
+        else merged.push({ ...item, key: newKey });
+      }
+      return { ...s, bag: merged };
+    });
+  }, []);
+
+  const removeFromBag = useCallback((key: string) => {
+    setState((s) => ({ ...s, bag: s.bag.filter((b) => b.key !== key) }));
+  }, []);
+
+  const value = useMemo<Ctx>(() => {
+    const bagCount = state.bag.reduce((n, b) => n + b.qty, 0);
+    const subtotal = state.bag.reduce((n, b) => n + unitPrice(b.material, b.sizeIndex) * b.qty, 0);
+    return {
+      ...state,
+      hydrated,
+      bagCount,
+      subtotal,
+      signIn,
+      signOut,
+      toggleSaved,
+      isSaved: (id: string) => state.saved.includes(id),
+      addToBag,
+      updateBag,
+      removeFromBag,
+      drawerOpen,
+      openDrawer: () => setDrawerOpen(true),
+      closeDrawer: () => setDrawerOpen(false),
+    };
+  }, [state, hydrated, drawerOpen, signIn, signOut, toggleSaved, addToBag, updateBag, removeFromBag]);
+
+  return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
+}
+
+export function useStore() {
+  const ctx = useContext(StoreContext);
+  if (!ctx) throw new Error("useStore must be used within StoreProvider");
+  return ctx;
+}
