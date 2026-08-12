@@ -59,7 +59,7 @@ export function Hero() {
               >
                 Shop the print
               </a>
-              <a href="#custom" className="px-label px-underline">
+              <a href="/custom" className="px-label px-underline">
                 Create your own →
               </a>
             </div>
