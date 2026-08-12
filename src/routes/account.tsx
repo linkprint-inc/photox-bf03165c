@@ -304,15 +304,43 @@ function SavedRow({ ids, limit }: { ids: string[]; limit: number }) {
 }
 
 function EmptySaved() {
+  const suggestions = ["blue-hour", "concrete-planes"]
+    .map((id) => shopProducts.find((p) => p.id === id))
+    .filter(Boolean);
+
   return (
-    <div className="mt-8">
-      <p className="px-serif text-[1.5rem]">Nothing saved yet.</p>
-      <p className="px-meta mt-2 text-muted-foreground">
-        Save pieces while you browse and they'll appear here.
-      </p>
-      <Link to="/shop" className="px-label px-underline mt-6 inline-block">
-        Shop art →
-      </Link>
+    <div className="mt-8 grid gap-12 md:grid-cols-[45fr_55fr] md:gap-16">
+      <div>
+        <p className="px-serif text-[1.5rem]">Nothing saved yet.</p>
+        <p className="px-meta mt-2 max-w-[34ch] text-muted-foreground">
+          Save pieces while you browse and they'll appear here.
+        </p>
+        <Link to="/shop" className="px-label px-underline mt-6 inline-block">
+          Explore art →
+        </Link>
+      </div>
+
+      <div>
+        <p className="px-label text-muted-foreground">You might like</p>
+        <div className="mt-5 grid grid-cols-2 gap-x-6">
+          {suggestions.map((p) => (
+            <article key={p!.id}>
+              <Link to="/shop" className="block">
+                <img
+                  src={p!.image}
+                  alt={p!.name}
+                  loading="lazy"
+                  className="aspect-square w-full object-cover"
+                />
+              </Link>
+              <h4 className="px-label mt-3">{p!.name}</h4>
+              <p className="px-price mt-1">
+                <span className="px-label mr-1 opacity-70">From</span>${p!.from}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
