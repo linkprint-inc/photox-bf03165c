@@ -16,13 +16,13 @@ import { SiteFooter } from "@/components/photox/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "PhotoX — Metal Prints & Frameless Canvas Wall Art" },
+      { title: "photoX — Metal Prints & Frameless Canvas Wall Art" },
       {
         name: "description",
         content:
           "Premium metal prints, frameless canvas and custom wall art. Shop by artwork, material and size, or print your own image.",
       },
-      { property: "og:title", content: "PhotoX — Metal Prints & Frameless Canvas Wall Art" },
+      { property: "og:title", content: "photoX — Metal Prints & Frameless Canvas Wall Art" },
       {
         property: "og:description",
         content:
