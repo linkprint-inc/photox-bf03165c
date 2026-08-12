@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 import { ShopCatalog } from "@/components/photox/shop/ShopCatalog";
-import { ShopSearchOverlay } from "@/components/photox/shop/ShopSearchOverlay";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -24,18 +22,20 @@ export const Route = createFileRoute("/shop")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search["q"] === "string" ? (search["q"] as string) : undefined,
+  }),
   component: ShopPage,
 });
 
 function ShopPage() {
-  const [search, setSearch] = useState(false);
+  const { q } = Route.useSearch();
 
   return (
     <div className="bg-background text-foreground">
-      <SiteNav variant="light" onSearch={() => setSearch(true)} />
-      <ShopSearchOverlay open={search} onClose={() => setSearch(false)} />
+      <SiteNav variant="light" />
       <main>
-        <ShopCatalog />
+        <ShopCatalog query={q} />
       </main>
       <SiteFooter />
     </div>

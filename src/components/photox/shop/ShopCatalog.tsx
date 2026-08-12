@@ -33,7 +33,7 @@ function matchesCategory(p: ShopProduct, cat: string) {
   return (p.styles as string[]).includes(cat);
 }
 
-export function ShopCatalog() {
+export function ShopCatalog({ query }: { query?: string }) {
   const [category, setCategory] = useState<string>("All");
   const [filters, setFilters] = useState<FilterState>(emptyFilters);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -43,6 +43,16 @@ export function ShopCatalog() {
 
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
+
+    const term = (query ?? "").trim().toLowerCase();
+    if (term) {
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(term) ||
+          materialLabel[p.material].toLowerCase().includes(term) ||
+          p.styles.some((s) => s.toLowerCase().includes(term)),
+      );
+    }
 
     if (filters.materials.length) {
       list = list.filter((p) =>
@@ -72,7 +82,7 @@ export function ShopCatalog() {
     if (sort === "Best Selling")
       sorted.sort((a, b) => Number(b.badges.includes("best")) - Number(a.badges.includes("best")));
     return sorted;
-  }, [category, filters, sort]);
+  }, [category, filters, sort, query]);
 
   const shown = results.slice(0, count);
   const active = countFilters(filters);

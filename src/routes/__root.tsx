@@ -13,6 +13,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { StoreProvider } from "../lib/store";
 import { BagDrawer } from "../components/photox/BagDrawer";
+import { SearchProvider } from "../lib/search-ui";
+import { GlobalSearch } from "../components/photox/GlobalSearch";
 
 function NotFoundComponent() {
   return (
@@ -133,9 +135,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
-        <BagDrawer />
+        <SearchProvider>
+          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <Outlet />
+          <BagDrawer />
+          <GlobalSearch />
+        </SearchProvider>
       </StoreProvider>
     </QueryClientProvider>
   );

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
+import { useSearchUI } from "@/lib/search-ui";
 
 const center = [
   { label: "Shop", href: "/shop" },
@@ -20,6 +21,8 @@ export function SiteNav({
   const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
   const { bagCount, hydrated, openDrawer } = useStore();
+  const { openSearch } = useSearchUI();
+  const handleSearch = onSearch ?? openSearch;
 
   useEffect(() => {
     const onScroll = () => {
