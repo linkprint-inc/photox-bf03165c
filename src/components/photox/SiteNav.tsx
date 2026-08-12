@@ -5,10 +5,11 @@ import { useSearchUI } from "@/lib/search-ui";
 
 const center = [
   { label: "Shop", href: "/shop" },
-  { label: "Metal", href: "/#metal" },
+  { label: "Metal", href: "/metal" },
   { label: "Custom", href: "/#custom" },
   { label: "Photo Tools", href: "/#tools" },
 ];
+
 
 export function SiteNav({
   variant = "hero",

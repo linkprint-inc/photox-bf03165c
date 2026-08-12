@@ -13,7 +13,7 @@ const entries = [
     cta: "Shop metal →",
     image: idxMetal,
     alt: "Angled gloss aluminium metal print showing its thin rigid edge and daylight reflection",
-    href: "#metal",
+    href: "/metal",
   },
   {
     n: "02",
