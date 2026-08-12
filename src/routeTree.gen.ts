@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as BagRouteImport } from './routes/bag'
+import { Route as MetalRouteImport } from './routes/metal'
 import { Route as ShopRouteImport } from './routes/shop'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const BagRoute = BagRouteImport.update({
   path: '/bag',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetalRoute = MetalRouteImport.update({
+  id: '/metal',
+  path: '/metal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/metal': typeof MetalRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/metal': typeof MetalRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/metal': typeof MetalRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/bag' | '/shop'
+  fullPaths: '/' | '/account' | '/bag' | '/metal' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/bag' | '/shop'
-  id: '__root__' | '/' | '/account' | '/bag' | '/shop'
+  to: '/' | '/account' | '/bag' | '/metal' | '/shop'
+  id: '__root__' | '/' | '/account' | '/bag' | '/metal' | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
   BagRoute: typeof BagRoute
+  MetalRoute: typeof MetalRoute
   ShopRoute: typeof ShopRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BagRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/metal': {
+      id: '/metal'
+      path: '/metal'
+      fullPath: '/metal'
+      preLoaderRoute: typeof MetalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
   BagRoute: BagRoute,
+  MetalRoute: MetalRoute,
   ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport

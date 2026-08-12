@@ -73,7 +73,7 @@ export function MetalInterruption() {
             <p className="px-price">
               <span className="px-label mr-1 opacity-70">From</span>$79
             </p>
-            <a href="#shop" className="px-label px-underline">
+            <a href="/metal" className="px-label px-underline">
               Explore metal →
             </a>
           </div>
