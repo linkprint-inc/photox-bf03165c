@@ -10,6 +10,7 @@ import { MaterialExplorer } from "@/components/photox/MaterialExplorer";
 import { RoomSection } from "@/components/photox/RoomSection";
 import { CustomSection } from "@/components/photox/CustomSection";
 import { PhotoTools } from "@/components/photox/PhotoTools";
+import { HelpTopics } from "@/components/photox/HelpTopics";
 import { FinalMoment } from "@/components/photox/FinalMoment";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 
@@ -50,6 +51,7 @@ function Index() {
         <RoomSection />
         <CustomSection />
         <PhotoTools />
+        <HelpTopics />
         <FinalMoment />
       </main>
       <SiteFooter />
