@@ -13,11 +13,14 @@ export function ShopProductCard({
   product,
   view,
   action = "save",
+  href,
 }: {
   product: ShopProduct;
   view: "grid" | "room";
   action?: "save" | "remove";
+  href?: string;
 }) {
+  const link = href ?? `/shop?q=${encodeURIComponent(product.name)}`;
   const [size, setSize] = useState<number | null>(null);
   const { isSaved, toggleSaved, hydrated, addToBag } = useStore();
   const saved = hydrated && isSaved(product.id);
@@ -28,7 +31,7 @@ export function ShopProductCard({
 
   return (
     <article className="group">
-      <a href="#" className="block" aria-label={`${product.name} — view artwork`}>
+      <a href={link} className="block" aria-label={`${product.name} — view artwork`}>
         <div
           className={[
             "relative aspect-square w-full overflow-hidden bg-secondary",
@@ -130,7 +133,7 @@ export function ShopProductCard({
 
       <div className="mt-4">
         <h3 className="px-label">
-          <a href="#" className="px-underline">
+          <a href={link} className="px-underline">
             {product.name}
           </a>
         </h3>
