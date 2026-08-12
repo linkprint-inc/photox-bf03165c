@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const center = [
   { label: "Shop", href: "/shop" },
   { label: "Metal", href: "/#metal" },
-  { label: "Canvas", href: "/#surface" },
   { label: "Custom", href: "/#custom" },
   { label: "Photo Tools", href: "/#tools" },
 ];
