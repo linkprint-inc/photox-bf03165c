@@ -31,7 +31,7 @@ export function MetalHero() {
           <p className="px-price">
             <span className="px-label mr-1 opacity-70">From</span>${metalFrom}
           </p>
-          <a href="/shop?q=metal#metal-shop" className="px-label px-underline">
+          <a href="#metal-shop" className="px-label px-underline">
             Shop metal →
           </a>
         </div>
