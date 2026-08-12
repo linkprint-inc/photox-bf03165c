@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import customPrintImage from "@/assets/custom-print.jpg";
 import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
 
 export type BagMaterial = "metal" | "canvas";
@@ -48,7 +49,21 @@ export const materialName: Record<BagMaterial, string> = {
   canvas: "Frameless Canvas",
 };
 
+/** Placeholder record for prints built from a customer's own image. */
+export const customPrintProduct: ShopProduct = {
+  id: "custom-print",
+  name: "Your Custom Print",
+  material: "both",
+  orientation: "Landscape",
+  styles: ["Photography"],
+  from: 69,
+  image: customPrintImage,
+  room: customPrintImage,
+  badges: [],
+};
+
 export function productById(id: string): ShopProduct | undefined {
+  if (id === customPrintProduct.id) return customPrintProduct;
   return shopProducts.find((p) => p.id === id);
 }
 

@@ -115,7 +115,7 @@ export function CustomSection() {
             ))}
           </ul>
 
-          <a href="#tools" className="px-label px-underline mt-8 inline-block">
+          <a href="/custom" className="px-label px-underline mt-8 inline-block">
             Upload your image →
           </a>
         </div>

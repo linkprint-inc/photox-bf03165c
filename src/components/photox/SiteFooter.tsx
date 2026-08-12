@@ -35,7 +35,7 @@ export function SiteFooter() {
               <ul className="mt-5 space-y-2">
                 {c.links.map((l) => (
                   <li key={l}>
-                    <a href="#shop" className="px-meta px-underline text-muted-foreground">
+                    <a href="/shop" className="px-meta px-underline text-muted-foreground">
                       {l}
                     </a>
                   </li>
@@ -49,7 +49,7 @@ export function SiteFooter() {
           <ul className="flex gap-6">
             {["Instagram", "Pinterest", "Newsletter"].map((s) => (
               <li key={s}>
-                <a href="#shop" className="px-meta px-underline">
+                <a href="/shop" className="px-meta px-underline">
                   {s}
                 </a>
               </li>

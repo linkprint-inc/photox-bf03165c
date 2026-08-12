@@ -61,7 +61,7 @@ export function RoomSection() {
       <div className="mt-14 grid gap-x-8 gap-y-16 md:grid-cols-12">
         {rooms.map((r) => (
           <article key={r.label} className={r.className}>
-            <a href="#shop" className="group relative block overflow-hidden">
+            <a href="/shop" className="group relative block overflow-hidden">
               <div className="w-full" style={{ aspectRatio: r.ratio }}>
                 <img
                   src={r.image}

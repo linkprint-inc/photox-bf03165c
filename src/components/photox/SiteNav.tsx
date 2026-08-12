@@ -6,9 +6,10 @@ import { useSearchUI } from "@/lib/search-ui";
 const center = [
   { label: "Shop", href: "/shop" },
   { label: "Metal", href: "/metal" },
-  { label: "Custom", href: "/#custom" },
-  { label: "Photo Tools", href: "/#tools" },
+  { label: "Custom", href: "/custom" },
+  { label: "Photo Tools", href: "/photo-tools" },
 ];
+
 
 
 export function SiteNav({
