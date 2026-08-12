@@ -68,10 +68,11 @@ export function SiteNav({
         </ul>
 
         <ul className="flex items-center gap-5">
-          <li className="hidden sm:block">
-            <button type="button" onClick={onSearch} className="px-label px-underline opacity-90">
+          <li>
+            <button type="button" onClick={handleSearch} className="px-label px-underline opacity-90">
               Search
             </button>
+          </li>
           </li>
           <li className="hidden sm:block">
             <Link to="/account" className="px-label px-underline opacity-90">
