@@ -258,8 +258,13 @@ function ItemRow({
   const p = productById(productId);
   if (!p) return null;
   return (
-    <div className="px-rule flex gap-5 py-6">
-      <img src={p.image} alt={p.name} loading="lazy" className="aspect-square w-20 object-cover" />
+    <div className="px-rule flex items-start gap-6 py-6 md:gap-7">
+      <img
+        src={p.image}
+        alt={p.name}
+        loading="lazy"
+        className="aspect-square w-[72px] shrink-0 object-cover md:w-[84px]"
+      />
       <div className="flex-1">
         <p className="px-label">{p.name}</p>
         <p className="px-meta mt-1 text-muted-foreground">{materialName[material]}</p>
