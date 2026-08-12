@@ -598,11 +598,11 @@ function AccountPage() {
         {!hydrated || !account ? (
           <AuthScreen />
         ) : (
-          <Shell className="pb-28 pt-32 md:pt-40">
+          <Shell className="pb-28 pt-[108px] md:pt-[132px]">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
               <div>
                 <p className="px-label text-muted-foreground">Account</p>
-                <h1 className="px-serif mt-4 text-[2.5rem] md:text-[3rem]">
+                <h1 className="px-serif mt-3 text-[2.15rem] md:text-[2.6rem]">
                   Welcome back, {account.firstName}.
                 </h1>
               </div>
@@ -611,7 +611,7 @@ function AccountPage() {
               </button>
             </div>
 
-            <div className="px-rule mt-12 grid gap-12 pt-10 md:grid-cols-[23fr_77fr] md:gap-16">
+            <div className="px-rule mt-10 grid gap-12 pt-10 md:grid-cols-[23fr_77fr] md:gap-16">
               <nav aria-label="Account sections">
                 <ul className="-mx-6 flex gap-6 overflow-x-auto px-6 md:mx-0 md:block md:space-y-3 md:overflow-visible md:px-0">
                   {tabs.map((t) => (
