@@ -210,7 +210,7 @@ function MaterialsVisual() {
             loading="lazy"
             width={1200}
             height={1200}
-            className="h-full w-[200%] max-w-none object-cover object-left"
+            className="h-full w-full origin-left scale-[2] object-cover"
           />
         </div>
         <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Metal — gloss</figcaption>
@@ -223,7 +223,7 @@ function MaterialsVisual() {
             loading="lazy"
             width={1200}
             height={1200}
-            className="-ml-[100%] h-full w-[200%] max-w-none object-cover object-left"
+            className="h-full w-full origin-right scale-[2] object-cover"
           />
         </div>
         <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Canvas — matte</figcaption>
