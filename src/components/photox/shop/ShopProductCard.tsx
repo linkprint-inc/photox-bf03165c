@@ -7,6 +7,7 @@ import {
   sizeSteps,
   type ShopProduct,
 } from "@/lib/shop-data";
+import { useStore } from "@/lib/store";
 
 export function ShopProductCard({
   product,
