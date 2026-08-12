@@ -14,6 +14,7 @@ import { Route as AccountRouteImport } from './routes/account'
 import { Route as BagRouteImport } from './routes/bag'
 import { Route as CustomRouteImport } from './routes/custom'
 import { Route as MetalRouteImport } from './routes/metal'
+import { Route as PhotoToolsRouteImport } from './routes/photo-tools'
 import { Route as ShopRouteImport } from './routes/shop'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const MetalRoute = MetalRouteImport.update({
   path: '/metal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PhotoToolsRoute = PhotoToolsRouteImport.update({
+  id: '/photo-tools',
+  path: '/photo-tools',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/bag': typeof BagRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
+  '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/bag': typeof BagRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
+  '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,25 @@ export interface FileRoutesById {
   '/bag': typeof BagRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
+  '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account' | '/bag' | '/custom' | '/metal' | '/shop'
+  fullPaths:
+    '/' | '/account' | '/bag' | '/custom' | '/metal' | '/photo-tools' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account' | '/bag' | '/custom' | '/metal' | '/shop'
-  id: '__root__' | '/' | '/account' | '/bag' | '/custom' | '/metal' | '/shop'
+  to:
+    '/' | '/account' | '/bag' | '/custom' | '/metal' | '/photo-tools' | '/shop'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/bag'
+    | '/custom'
+    | '/metal'
+    | '/photo-tools'
+    | '/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -86,6 +105,7 @@ export interface RootRouteChildren {
   BagRoute: typeof BagRoute
   CustomRoute: typeof CustomRoute
   MetalRoute: typeof MetalRoute
+  PhotoToolsRoute: typeof PhotoToolsRoute
   ShopRoute: typeof ShopRoute
 }
 
@@ -126,6 +146,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MetalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/photo-tools': {
+      id: '/photo-tools'
+      path: '/photo-tools'
+      fullPath: '/photo-tools'
+      preLoaderRoute: typeof PhotoToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
@@ -142,6 +169,7 @@ const rootRouteChildren: RootRouteChildren = {
   BagRoute: BagRoute,
   CustomRoute: CustomRoute,
   MetalRoute: MetalRoute,
+  PhotoToolsRoute: PhotoToolsRoute,
   ShopRoute: ShopRoute,
 }
 export const routeTree = rootRouteImport
