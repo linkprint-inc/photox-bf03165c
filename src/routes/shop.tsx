@@ -35,7 +35,7 @@ function ShopPage() {
     <div className="bg-background text-foreground">
       <SiteNav variant="light" />
       <main>
-        <ShopCatalog query={q} />
+        <ShopCatalog query={q ?? ""} />
       </main>
       <SiteFooter />
     </div>
