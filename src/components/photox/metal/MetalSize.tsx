@@ -16,7 +16,7 @@ export function MetalSize() {
       <SectionHead title="Find your size" note={`${work.name} · Metal Print`} />
 
       <div className="mt-8 grid gap-8 md:grid-cols-12">
-        <div className="relative overflow-hidden bg-secondary md:col-span-8">
+        <div className="relative min-w-0 overflow-hidden bg-secondary md:col-span-8">
           <img
             src={metalRoom}
             width={1600}
@@ -47,7 +47,7 @@ export function MetalSize() {
           </div>
         </div>
 
-        <div className="md:col-span-4">
+        <div className="min-w-0 md:col-span-4">
           <p className="px-label text-muted-foreground">Select a size</p>
 
           <ul className="mt-4 flex gap-3 overflow-x-auto pb-2 md:mt-6 md:block md:gap-0 md:overflow-visible md:border-t md:border-hairline md:pb-0">
