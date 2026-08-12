@@ -12,7 +12,7 @@ export function MetalArrives() {
             Every metal print is produced as a single finished panel and shipped flat in protective
             packaging.
           </p>
-          <a href="/shop?q=shipping" className="px-label px-underline mt-8 inline-block">
+          <a href="/#help" className="px-label px-underline mt-8 inline-block">
             Shipping &amp; delivery →
           </a>
         </div>
