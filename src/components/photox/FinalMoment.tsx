@@ -33,7 +33,7 @@ export function FinalMoment() {
       </div>
 
       <div className="mx-auto mt-8 max-w-[1440px] px-6 md:px-10">
-        <a href="#shop" className="px-label px-underline">
+        <a href="/shop" className="px-label px-underline">
           Shop all art →
         </a>
       </div>

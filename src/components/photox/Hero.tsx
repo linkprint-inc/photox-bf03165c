@@ -54,7 +54,7 @@ export function Hero() {
 
             <div className="flex flex-wrap items-center gap-8 md:col-span-7 md:justify-end">
               <a
-                href="#shop"
+                href="/shop"
                 className="px-label border border-white/70 px-7 py-4 transition-colors duration-[420ms] hover:bg-white hover:text-ink"
               >
                 Shop the print

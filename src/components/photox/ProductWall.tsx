@@ -7,7 +7,7 @@ function ProductCell({ product }: { product: Product }) {
 
   return (
     <article>
-      <a href="#shop" className="group block">
+      <a href="/shop" className="group block">
         <div
           className={[
             "relative aspect-square w-full overflow-hidden bg-secondary",

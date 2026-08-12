@@ -74,7 +74,7 @@ export function SizeScene() {
             <p className="px-meta mt-1 text-muted-foreground">Metal Print</p>
             <p className="px-meta text-muted-foreground">{size.label}</p>
             <p className="px-price mt-2">${size.price}</p>
-            <a href="#shop" className="px-label px-underline mt-6 inline-block">
+            <a href="/shop" className="px-label px-underline mt-6 inline-block">
               Shop this size →
             </a>
           </div>
