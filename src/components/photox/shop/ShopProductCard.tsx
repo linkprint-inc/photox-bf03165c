@@ -19,7 +19,7 @@ export function ShopProductCard({
   action?: "save" | "remove";
 }) {
   const [size, setSize] = useState<number | null>(null);
-  const { isSaved, toggleSaved, hydrated } = useStore();
+  const { isSaved, toggleSaved, hydrated, addToBag } = useStore();
   const saved = hydrated && isSaved(product.id);
   const isMetal = product.material !== "canvas";
   const primary = view === "room" ? product.room : product.image;
