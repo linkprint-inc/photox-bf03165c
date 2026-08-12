@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useStore } from "@/lib/store";
 
 const center = [
   { label: "Shop", href: "/shop" },
