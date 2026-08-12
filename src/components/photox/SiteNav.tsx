@@ -19,6 +19,7 @@ export function SiteNav({
   const [hidden, setHidden] = useState(false);
   const [overHero, setOverHero] = useState(variant === "hero");
   const lastY = useRef(0);
+  const { bagCount, hydrated, openDrawer } = useStore();
 
   useEffect(() => {
     const onScroll = () => {
