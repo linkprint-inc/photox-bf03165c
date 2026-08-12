@@ -61,10 +61,23 @@ export function ShopProductCard({
           {/* Mobile: small standalone heart in upper-right */}
           <button
             type="button"
-            aria-label="Save"
+            aria-label={action === "remove" ? "Remove from saved" : saved ? "Saved" : "Save"}
+            aria-pressed={saved}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleSaved(product.id);
+            }}
             className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center text-foreground/80 transition-colors hover:text-foreground md:hidden"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill={saved ? "currentColor" : "none"}
+              stroke="currentColor"
+              strokeWidth="1.6"
+            >
               <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
             </svg>
           </button>
@@ -85,20 +98,32 @@ export function ShopProductCard({
                 <path d="M1 7h11M8 3l4 4-4 4" />
               </svg>
             </span>
-            <span className="group/save flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-foreground/60 transition-colors hover:text-foreground">
+            <button
+              type="button"
+              aria-pressed={saved}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSaved(product.id);
+              }}
+              className={[
+                "group/save flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] transition-colors hover:text-foreground",
+                saved && action === "save" ? "text-foreground" : "text-foreground/60",
+              ].join(" ")}
+            >
               <svg
                 className="mr-1.5 transition-all duration-300 group-hover/save:fill-foreground"
                 width="15"
                 height="15"
                 viewBox="0 0 24 24"
-                fill="none"
+                fill={saved && action === "save" ? "currentColor" : "none"}
                 stroke="currentColor"
                 strokeWidth="1.6"
               >
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
               </svg>
-              Save
-            </span>
+              {action === "remove" ? "Remove" : saved ? "Saved" : "Save"}
+            </button>
           </div>
         </div>
       </a>
