@@ -8,13 +8,13 @@ import { ShopSearchOverlay } from "@/components/photox/shop/ShopSearchOverlay";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop Wall Art — Metal Prints & Frameless Canvas | PhotoX" },
+      { title: "Shop Wall Art — Metal Prints & Frameless Canvas | photoX" },
       {
         name: "description",
         content:
           "Browse 128 works on Metal Print and Frameless Canvas. Filter by style, size and price, and see every artwork in a real room.",
       },
-      { property: "og:title", content: "Shop Wall Art — Metal Prints & Frameless Canvas | PhotoX" },
+      { property: "og:title", content: "Shop Wall Art — Metal Prints & Frameless Canvas | photoX" },
       {
         property: "og:description",
         content:

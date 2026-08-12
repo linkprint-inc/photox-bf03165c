@@ -13,7 +13,7 @@ const columns = [
   },
   {
     title: "About",
-    links: ["About PhotoX", "Materials", "Artists"],
+    links: ["About photoX", "Materials", "Artists"],
   },
 ];
 
@@ -23,7 +23,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-20">
         <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-5">
           <div className="col-span-2 md:col-span-1">
-            <p className="px-label tracking-[0.3em]">PHOTX</p>
+            <p className="px-label tracking-[0.3em] normal-case">photoX</p>
             <p className="px-meta mt-4 max-w-[24ch] text-muted-foreground">
               Metal prints, frameless canvas and custom wall art.
             </p>
@@ -58,7 +58,7 @@ export function SiteFooter() {
           <div className="flex flex-wrap items-center gap-6">
             <p className="px-meta text-muted-foreground">Visa · Mastercard · Amex · PayPal</p>
             <p className="px-meta text-muted-foreground">United States (USD $)</p>
-            <p className="px-meta text-muted-foreground">© {new Date().getFullYear()} PhotoX</p>
+            <p className="px-meta text-muted-foreground">© {new Date().getFullYear()} photoX</p>
           </div>
         </div>
       </div>
