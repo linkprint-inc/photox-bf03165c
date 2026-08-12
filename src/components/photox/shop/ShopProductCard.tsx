@@ -156,7 +156,15 @@ export function ShopProductCard({
                 type="button"
                 onMouseEnter={() => setSize(i)}
                 onFocus={() => setSize(i)}
-                aria-label={`${s.label} — $${s.price}`}
+                onClick={() =>
+                  addToBag({
+                    productId: product.id,
+                    material: product.material === "canvas" ? "canvas" : "metal",
+                    sizeIndex: i,
+                    qty: 1,
+                  })
+                }
+                aria-label={`Add ${product.name} ${s.label} to bag — $${s.price}`}
                 className={[
                   "px-meta transition-opacity duration-300",
                   size === i ? "opacity-100" : "opacity-45 hover:opacity-100",
