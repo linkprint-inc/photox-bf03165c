@@ -132,7 +132,7 @@ export function GlobalSearch() {
 
           <div key={term ? "results" : "discovery"} className="px-fade">
             {empty ? (
-              <div className="mt-10 md:mt-12">
+              <div className="mt-12 md:mt-16">
                 <p className="px-serif text-[1.3rem]">No results for “{q.trim()}”</p>
                 <p className="px-meta mt-2 text-muted-foreground">
                   Try another search or explore all artwork.
@@ -146,12 +146,12 @@ export function GlobalSearch() {
                 </button>
               </div>
             ) : (
-              <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1fr_2.75fr] md:gap-10">
+              <div className="mt-12 grid gap-10 md:mt-20 md:grid-cols-[0.26fr_1fr] md:gap-12">
                 <div>
                   <p className="px-label text-muted-foreground">
                     {term ? "Related" : "Popular searches"}
                   </p>
-                  <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5">
+                  <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 md:grid-cols-1 md:gap-x-0">
                     {(term ? categoryHits : popularTerms).map((t) => (
                       <li key={t}>
                         <button
@@ -170,7 +170,7 @@ export function GlobalSearch() {
                   <p className="px-label text-muted-foreground">
                     {term ? "Results" : "Popular artwork"}
                   </p>
-                  <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-4">
+                  <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-7 sm:gap-y-9 lg:grid-cols-4">
                     {(term ? results : popularArtwork).map((p) => (
                       <li key={p.id}>
                         <ResultCard product={p} onSelect={() => goToShop(p.name)} />
