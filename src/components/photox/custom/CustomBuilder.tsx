@@ -55,6 +55,33 @@ const icons: Record<ToolId, ReactNode> = {
   ),
 };
 
+function StepLabel({
+  n,
+  name,
+  state,
+}: {
+  n: string;
+  name: string;
+  state: "active" | "done" | "future";
+}) {
+  return (
+    <p
+      className={[
+        "px-label",
+        state === "active"
+          ? "text-foreground"
+          : state === "done"
+            ? "text-muted-foreground"
+            : "text-foreground/35",
+      ].join(" ")}
+    >
+      <span className="mr-2 opacity-60">{n}</span>
+      {name}
+      {state === "done" ? <span className="ml-2 opacity-70">✓</span> : null}
+    </p>
+  );
+}
+
 function price(material: BagMaterial, sizeIndex: number) {
   const base = sizes[sizeIndex]!.price;
   return material === "canvas" ? base - 10 : base;
@@ -207,7 +234,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
                 dragOver ? "border-foreground bg-secondary" : "border-hairline bg-secondary/40",
               ].join(" ")}
             >
-              <p className="px-label text-muted-foreground">Step 01 — Image</p>
+              <StepLabel n="01" name="Image" state="active" />
               <h3 className="px-serif mt-3 text-[1.7rem]">Upload your image</h3>
               <p className="px-meta mt-3 max-w-[34ch] text-muted-foreground">
                 {pendingTool
@@ -372,9 +399,9 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
             />
           ) : (
             <>
-              <div className={image ? "" : "opacity-45"}>
+              <div className={image ? "" : "opacity-70"}>
                 <div className="px-rule pt-6">
-                  <p className="px-label text-muted-foreground">Step 02 — Surface</p>
+                  <StepLabel n="02" name="Surface" state={image ? "active" : "future"} />
                   <h3 className="px-label mt-2">Choose your surface</h3>
                   <ul className="mt-4 border-t border-hairline">
                     {materials.map((m) => (
@@ -405,7 +432,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
                 </div>
 
                 <div className="mt-10">
-                  <p className="px-label text-muted-foreground">Step 03 — Size</p>
+                  <StepLabel n="03" name="Size" state={image ? "active" : "future"} />
                   <h3 className="px-label mt-2">Choose your size</h3>
                   <ul className="mt-4 border-t border-hairline">
                     {sizes.map((s, i) => (
@@ -444,7 +471,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
                 </div>
 
                 <div className="mt-10">
-                  <p className="px-label text-muted-foreground">Step 04 — Edit</p>
+                  <StepLabel n="04" name="Edit" state={!image ? "future" : applied.length ? "done" : "active"} />
                   <h3 className="px-label mt-2">Edit your image</h3>
                   <div className="mt-4 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-hairline pt-4">
                     {(["restore", "enhance", "text"] as const).map((t) => (
@@ -487,7 +514,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
 
               {/* Summary */}
               <div className="px-rule mt-12 pt-6">
-                <p className="px-label text-muted-foreground">Step 05 — Preview · Step 06 — Bag</p>
+                <StepLabel n="05" name="Preview · Your print" state={image ? "active" : "future"} />
                 <p className="px-label mt-3">
                   {material === "metal" ? "Metal Print" : "Frameless Canvas"}
                 </p>
