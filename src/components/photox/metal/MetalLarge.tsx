@@ -24,6 +24,7 @@ export function MetalLarge() {
         </p>
         <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 md:col-span-4">
           <p className="px-price">
+            <span className="px-label mr-3 opacity-70">Metal Print</span>
             {largeFormatSize}
             <span className="px-label ml-3 mr-1 opacity-70">From</span>${largeFormatPrice}
           </p>
