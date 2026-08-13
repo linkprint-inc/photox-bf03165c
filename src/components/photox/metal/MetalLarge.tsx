@@ -4,7 +4,7 @@ import { Shell } from "../Section";
 
 export function MetalLarge() {
   return (
-    <Shell label="Large format" className="pb-20 md:pb-28">
+    <Shell label="Large format" className="pb-16 md:pb-20">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-secondary md:aspect-[21/9]">
         <img
           src={metalLarge}
@@ -24,6 +24,7 @@ export function MetalLarge() {
         </p>
         <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 md:col-span-4">
           <p className="px-price">
+            <span className="px-label mr-3 opacity-70">Metal Print</span>
             {largeFormatSize}
             <span className="px-label ml-3 mr-1 opacity-70">From</span>${largeFormatPrice}
           </p>

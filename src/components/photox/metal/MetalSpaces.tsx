@@ -12,7 +12,7 @@ const scenes = [
 
 export function MetalSpaces() {
   return (
-    <Shell label="Metal in real spaces" className="pb-20 md:pb-28">
+    <Shell label="Metal in real spaces" className="pb-16 md:pb-20">
       <SectionHead title="Metal in real spaces" />
 
       <div className="mt-8 grid gap-6 md:grid-cols-3 md:gap-8">
