@@ -46,7 +46,7 @@ function CustomIntro() {
   };
 
   return (
-    <Shell label="Custom prints" className="pt-[132px] pb-14 md:pt-[148px] md:pb-16">
+    <Shell label="Custom prints" className="pt-[108px] pb-10 md:pt-[118px] md:pb-12">
       <div className="grid gap-10 md:grid-cols-12 md:items-end md:gap-8">
         <div className="md:col-span-5">
           <p className="px-label text-muted-foreground">Custom Prints</p>

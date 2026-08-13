@@ -20,7 +20,7 @@ const columns = [
 
 export function MetalCompare() {
   return (
-    <Shell label="Metal or canvas" className="pb-20 md:pb-28">
+    <Shell label="Metal or canvas" className="pb-16 md:pb-20">
       <h2 className="px-serif text-[2rem] md:text-[2.6rem]">Metal or canvas?</h2>
 
       <div className="mt-8 grid gap-10 md:grid-cols-2 md:gap-8">

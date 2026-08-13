@@ -4,7 +4,7 @@ import { Shell } from "../Section";
 
 export function MetalArrives() {
   return (
-    <Shell label="How it arrives" className="pb-20 md:pb-28">
+    <Shell label="How it arrives" className="pb-16 md:pb-20">
       <div className="px-rule grid gap-8 pt-6 md:grid-cols-12 md:gap-8">
         <div className="md:col-span-4">
           <h2 className="px-serif text-[2rem] md:text-[2.6rem]">Ready for the wall.</h2>

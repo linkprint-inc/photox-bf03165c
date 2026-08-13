@@ -4,7 +4,7 @@ import { Shell } from "../Section";
 
 export function MetalLarge() {
   return (
-    <Shell label="Large format" className="pb-20 md:pb-28">
+    <Shell label="Large format" className="pb-16 md:pb-20">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-secondary md:aspect-[21/9]">
         <img
           src={metalLarge}

@@ -6,19 +6,19 @@ import { Shell } from "../Section";
 const frames = [
   {
     title: "Surface",
-    note: "A glossy finish that reflects the light in the room.",
+    note: "Gloss responds naturally to ambient light.",
     image: metalSurface,
     alt: "Extreme close-up of the glossy printed surface of a metal print",
   },
   {
     title: "Edge",
-    note: "A thin rigid panel with no frame around the image.",
+    note: "A thin rigid profile keeps the print visually light.",
     image: metalEdge,
     alt: "Three-quarter view of a metal print corner showing the thin rigid panel",
   },
   {
     title: "Detail",
-    note: "Fine detail stays sharp, even in the darkest areas.",
+    note: "A crisp surface preserves fine photographic detail.",
     image: metalDetailCrop,
     alt: "Close crop of a metal print showing sharp architectural detail",
   },
@@ -26,7 +26,7 @@ const frames = [
 
 export function MetalSurface() {
   return (
-    <Shell label="Detail, edge and surface" className="pb-20 md:pb-28">
+    <Shell label="Detail, edge and surface" className="pb-16 md:pb-20">
       <div className="px-rule grid gap-8 pt-6 sm:grid-cols-3 md:gap-8">
         {frames.map((f) => (
           <figure key={f.title} className="group">
