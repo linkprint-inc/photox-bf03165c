@@ -104,8 +104,8 @@ export function GlobalSearch() {
 
           <form
             className={[
-              "mt-4 border-b transition-colors md:mt-5",
-              focused ? "border-foreground/60" : "border-foreground/25",
+              "mt-4 border-b transition-colors duration-300 md:mt-5",
+              focused ? "border-foreground/85" : "border-foreground/30",
             ].join(" ")}
             onSubmit={(e) => {
               e.preventDefault();
@@ -120,7 +120,7 @@ export function GlobalSearch() {
               onBlur={() => setFocused(false)}
               placeholder="Search artwork, styles or collections"
               aria-label="Search artwork, styles or collections"
-              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/45 md:text-[1.7rem]"
+              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/45 placeholder:transition-colors placeholder:duration-300 focus:placeholder:text-foreground/70 md:text-[1.7rem]"
             />
           </form>
 
