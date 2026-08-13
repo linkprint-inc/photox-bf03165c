@@ -6,7 +6,7 @@ const tools = [
     num: "01",
     label: "Restore Old Photo",
     body: "Bring faded and damaged photos back to life.",
-    href: "/photo-tools?tool=restore",
+    href: "/custom?tool=restore",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-4 w-4">
         <path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
@@ -20,7 +20,7 @@ const tools = [
     num: "02",
     label: "Enhance Resolution",
     body: "Prepare smaller images for larger prints.",
-    href: "/photo-tools?tool=enhance",
+    href: "/custom?tool=enhance",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-4 w-4">
         <path d="M12 3v18M3 12h18" />
@@ -33,7 +33,7 @@ const tools = [
     num: "03",
     label: "Add Text",
     body: "Add names, dates or a personal message.",
-    href: "/photo-tools?tool=text",
+    href: "/custom?tool=text",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-4 w-4">
         <path d="M4 7V5h16v2M9 20h6M12 5v15" />
@@ -51,10 +51,10 @@ export function PhotoTools() {
           Need a little help with your image? Prepare it before turning it into wall art.
         </p>
         <a
-          href="/photo-tools"
+          href="/custom"
           className="px-meta px-underline text-foreground/80 transition-colors duration-300 hover:text-foreground md:col-span-3 md:col-start-10 md:text-right"
         >
-          View photo tools <span aria-hidden>→</span>
+          Prepare an image in Custom <span aria-hidden>→</span>
         </a>
       </div>
 
