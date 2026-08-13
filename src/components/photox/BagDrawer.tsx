@@ -7,9 +7,11 @@ import {
   sizeLabel,
   materialName,
 } from "@/lib/store";
+import { usePreparedImage } from "@/lib/prepared-image";
 
 export function BagDrawer() {
   const { drawerOpen, closeDrawer, bag, subtotal, bagCount } = useStore();
+  const { image: prepared } = usePreparedImage();
 
   useEffect(() => {
     if (!drawerOpen) return;

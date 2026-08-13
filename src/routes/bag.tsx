@@ -14,6 +14,7 @@ import {
   type BagItem,
   type BagMaterial,
 } from "@/lib/store";
+import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/bag")({
   head: () => ({
