@@ -60,7 +60,7 @@ function price(material: BagMaterial, sizeIndex: number) {
   return material === "canvas" ? base - 10 : base;
 }
 
-export function CustomBuilder({ initialTool }: { initialTool?: ToolId }) {
+export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefined }) {
   const { image, setImage } = usePreparedImage();
   const { addToBag } = useStore();
   const inputRef = useRef<HTMLInputElement>(null);
