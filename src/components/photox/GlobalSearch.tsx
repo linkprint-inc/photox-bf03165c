@@ -146,7 +146,7 @@ export function GlobalSearch() {
                 </button>
               </div>
             ) : (
-              <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1fr_2.75fr] md:gap-14">
+              <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1fr_2.75fr] md:gap-10">
                 <div>
                   <p className="px-label text-muted-foreground">
                     {term ? "Related" : "Popular searches"}
