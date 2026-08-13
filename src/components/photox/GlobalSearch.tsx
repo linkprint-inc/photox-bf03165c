@@ -104,8 +104,8 @@ export function GlobalSearch() {
 
           <form
             className={[
-              "mt-4 border-b transition-colors md:mt-5",
-              focused ? "border-foreground/60" : "border-foreground/25",
+              "mt-4 border-b transition-colors duration-300 md:mt-5",
+              focused ? "border-foreground/85" : "border-foreground/30",
             ].join(" ")}
             onSubmit={(e) => {
               e.preventDefault();
@@ -120,7 +120,7 @@ export function GlobalSearch() {
               onBlur={() => setFocused(false)}
               placeholder="Search artwork, styles or collections"
               aria-label="Search artwork, styles or collections"
-              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/45 md:text-[1.7rem]"
+              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/45 placeholder:transition-colors placeholder:duration-300 focus:placeholder:text-foreground/70 md:text-[1.7rem]"
             />
           </form>
 
@@ -146,7 +146,7 @@ export function GlobalSearch() {
                 </button>
               </div>
             ) : (
-              <div className="mt-8 grid gap-10 md:mt-10 md:grid-cols-[1fr_2.2fr] md:gap-14">
+              <div className="mt-10 grid gap-10 md:mt-14 md:grid-cols-[1fr_2.75fr] md:gap-10">
                 <div>
                   <p className="px-label text-muted-foreground">
                     {term ? "Related" : "Popular searches"}
@@ -209,7 +209,7 @@ function ResultCard({
       onClick={onSelect}
       className="group flex w-full items-center gap-4 text-left sm:block"
     >
-      <div className="relative aspect-square w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
+      <div className="relative aspect-[5/4] w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
         <img
           src={product.image}
           alt={product.name}
