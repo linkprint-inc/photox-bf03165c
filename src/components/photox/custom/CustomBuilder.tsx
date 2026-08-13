@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import sizeRoom from "@/assets/size-room.jpg";
 import { Shell } from "../Section";
 import { BeforeAfter } from "./BeforeAfter";
@@ -34,7 +34,7 @@ const appliedLabel: Record<ToolId, string> = {
   text: "Text added",
 };
 
-const icons: Record<ToolId, JSX.Element> = {
+const icons: Record<ToolId, ReactNode> = {
   restore: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25" className="h-4 w-4">
       <path d="M3 7c0-1.1.9-2 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" />
