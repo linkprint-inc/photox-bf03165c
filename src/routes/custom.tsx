@@ -8,6 +8,9 @@ import { SiteFooter } from "@/components/photox/SiteFooter";
 import { Shell } from "@/components/photox/Section";
 import { CustomBuilder } from "@/components/photox/custom/CustomBuilder";
 import { CustomExtras } from "@/components/photox/custom/CustomExtras";
+import type { ToolId } from "@/lib/image-tools";
+
+const toolIds: ToolId[] = ["restore", "enhance", "text"];
 
 const title = "Custom Prints — Your Image on Metal or Canvas | photoX";
 const description =
@@ -24,8 +27,12 @@ export const Route = createFileRoute("/custom")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tool?: ToolId } =>
+    toolIds.includes(search["tool"] as ToolId) ? { tool: search["tool"] as ToolId } : {},
   component: CustomPage,
 });
+
+
 
 function CustomIntro() {
   const ref = useRef<HTMLDivElement>(null);
@@ -96,12 +103,13 @@ function CustomIntro() {
 }
 
 function CustomPage() {
+  const { tool } = Route.useSearch();
   return (
     <div className="bg-background text-foreground">
       <SiteNav variant="light" />
       <main>
         <CustomIntro />
-        <CustomBuilder />
+        <CustomBuilder initialTool={tool} />
         <CustomExtras />
         <Shell className="pb-24">
           <p className="px-meta text-muted-foreground">

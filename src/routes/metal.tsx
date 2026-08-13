@@ -35,7 +35,6 @@ export const Route = createFileRoute("/metal")({
 
 function MetalPage() {
   const first = metalProducts.slice(0, 8);
-  const more = metalProducts.slice(8, 12);
 
   return (
     <div className="bg-background text-foreground">
@@ -65,14 +64,6 @@ function MetalPage() {
         <MetalCompare />
         <MetalArrives />
 
-        <Shell label="More in metal" className="pb-20 md:pb-28">
-          <SectionHead title="More in metal" />
-          <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 md:gap-x-8 lg:grid-cols-4">
-            {more.map((p) => (
-              <ShopProductCard key={p.id} product={p} view="grid" />
-            ))}
-          </div>
-        </Shell>
 
         <MetalHelp />
       </main>

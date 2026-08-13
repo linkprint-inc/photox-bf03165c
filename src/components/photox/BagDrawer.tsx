@@ -7,9 +7,11 @@ import {
   sizeLabel,
   materialName,
 } from "@/lib/store";
+import { usePreparedImage } from "@/lib/prepared-image";
 
 export function BagDrawer() {
   const { drawerOpen, closeDrawer, bag, subtotal, bagCount } = useStore();
+  const { image: prepared } = usePreparedImage();
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -86,7 +88,7 @@ export function BagDrawer() {
                   <li key={item.key} className="px-rule flex gap-4 py-5 first:border-t-0">
                     <Link to="/shop" onClick={closeDrawer} className="block w-16 shrink-0">
                       <img
-                        src={p.image}
+                        src={item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image}
                         alt={p.name}
                         className="aspect-square w-16 object-cover"
                         loading="lazy"

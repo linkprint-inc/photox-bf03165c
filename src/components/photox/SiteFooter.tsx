@@ -1,19 +1,32 @@
 const columns = [
   {
     title: "Shop",
-    links: ["Metal Prints", "Frameless Canvas", "New Works", "Best Sellers"],
+    links: [
+      { label: "Metal Prints", href: "/metal" },
+      { label: "Frameless Canvas", href: "/shop" },
+      { label: "New Works", href: "/shop" },
+      { label: "Best Sellers", href: "/shop" },
+    ],
   },
   {
     title: "Create",
-    links: ["Custom Prints", "Restore Photo", "Enhance Resolution", "Add Text"],
+    links: [
+      { label: "Custom Prints", href: "/custom" },
+      { label: "Restore Photo", href: "/custom?tool=restore" },
+      { label: "Enhance Resolution", href: "/custom?tool=enhance" },
+      { label: "Add Text", href: "/custom?tool=text" },
+    ],
   },
   {
     title: "Help",
-    links: ["Size Guide", "Shipping", "Returns", "FAQ", "Contact"],
+    links: ["Size Guide", "Shipping", "Returns", "FAQ", "Contact"].map((label) => ({
+      label,
+      href: "/shop",
+    })),
   },
   {
     title: "About",
-    links: ["About photoX", "Materials", "Artists"],
+    links: ["About photoX", "Materials", "Artists"].map((label) => ({ label, href: "/shop" })),
   },
 ];
 
@@ -34,9 +47,9 @@ export function SiteFooter() {
               <h3 className="px-label">{c.title}</h3>
               <ul className="mt-5 space-y-2">
                 {c.links.map((l) => (
-                  <li key={l}>
-                    <a href="/shop" className="px-meta px-underline text-muted-foreground">
-                      {l}
+                  <li key={l.label}>
+                    <a href={l.href} className="px-meta px-underline text-muted-foreground">
+                      {l.label}
                     </a>
                   </li>
                 ))}

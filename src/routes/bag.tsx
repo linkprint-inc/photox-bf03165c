@@ -14,6 +14,7 @@ import {
   type BagItem,
   type BagMaterial,
 } from "@/lib/store";
+import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/bag")({
   head: () => ({
@@ -65,6 +66,8 @@ function BagRow({ item }: { item: BagItem }) {
   const { updateBag, removeFromBag } = useStore();
   const [editing, setEditing] = useState(false);
   const p = productById(item.productId);
+  const { image: prepared } = usePreparedImage();
+  const src = item.productId === "custom-print" && prepared ? prepared.dataUrl : p?.image;
   if (!p) return null;
 
   const materials: BagMaterial[] =
@@ -78,7 +81,7 @@ function BagRow({ item }: { item: BagItem }) {
           className="group relative block w-24 shrink-0 overflow-hidden sm:w-32"
           aria-label={`${p.name} — view artwork`}
         >
-          <img src={p.image} alt={p.name} loading="lazy" className="aspect-square w-full object-cover" />
+          <img src={src} alt={p.name} loading="lazy" className="aspect-square w-full object-cover" />
           <span className="px-reveal absolute inset-x-0 bottom-0 bg-paper/92 py-1.5 text-center text-[0.6rem] font-medium uppercase tracking-[0.14em] group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
             View →
           </span>

@@ -83,7 +83,7 @@ const topics: Topic[] = [
     descriptor: "Custom prints and image quality.",
     image: helpImage,
     alt: "A photograph on a screen beside the same photograph as a physical print",
-    destination: { label: "View photo tools", href: "/photo-tools" },
+    destination: { label: "Prepare an image", href: "/custom" },
     answers: [
       {
         q: "Can I print my own photo or artwork?",
