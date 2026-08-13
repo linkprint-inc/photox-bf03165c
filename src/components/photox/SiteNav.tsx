@@ -7,6 +7,7 @@ const center = [
   { label: "Shop", href: "/shop" },
   { label: "Metal", href: "/metal" },
   { label: "Custom", href: "/custom" },
+  { label: "About", href: "/about" },
 ];
 
 
