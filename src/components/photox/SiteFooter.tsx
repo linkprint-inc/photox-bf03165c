@@ -26,7 +26,11 @@ const columns = [
   },
   {
     title: "About",
-    links: ["About photoX", "Materials", "Artists"].map((label) => ({ label, href: "/shop" })),
+    links: [
+      { label: "About photoX", href: "/about" },
+      { label: "Materials", href: "/about" },
+      { label: "Artists", href: "/shop" },
+    ],
   },
 ];
 
