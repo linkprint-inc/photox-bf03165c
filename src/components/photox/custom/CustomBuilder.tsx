@@ -352,8 +352,9 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
         </div>
 
         {/* Controls */}
-        <div className="md:col-span-5">
         <div className="md:col-span-5 md:self-start">
+          <div className="md:sticky md:top-24">
+          
           {editing && original ? (
             <CustomToolPanel
               tool={editing}
