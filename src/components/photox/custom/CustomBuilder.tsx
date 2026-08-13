@@ -514,6 +514,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
               </div>
             </>
           )}
+          </div>
         </div>
       </div>
     </Shell>
