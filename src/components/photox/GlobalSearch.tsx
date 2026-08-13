@@ -209,7 +209,7 @@ function ResultCard({
       onClick={onSelect}
       className="group flex w-full items-center gap-4 text-left sm:block"
     >
-      <div className="relative aspect-[5/4] w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
+      <div className="relative aspect-[4/3] w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
         <img
           src={product.image}
           alt={product.name}
