@@ -3,8 +3,6 @@ import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 import { ProductDetail } from "@/components/photox/product/ProductDetail";
 import { productBySlug } from "@/lib/product-detail";
-import { materialsFor } from "@/lib/product-detail";
-import { materialName } from "@/lib/store";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: ({ params }) => {
@@ -44,10 +42,6 @@ function ProductPage() {
   const { slug } = Route.useParams();
   const product = productBySlug(slug);
   if (!product) return <ProductNotFound />;
-
-  // Touch the helper so materials stay in sync with data shape changes.
-  void materialsFor(product);
-  void materialName;
 
   return (
     <div className="bg-background text-foreground">

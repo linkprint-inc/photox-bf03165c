@@ -20,7 +20,7 @@ export function ShopProductCard({
   action?: "save" | "remove";
   href?: string;
 }) {
-  const link = href ?? `/shop?q=${encodeURIComponent(product.name)}`;
+  const link = href ?? `/products/${product.id}`;
   const [size, setSize] = useState<number | null>(null);
   const { isSaved, toggleSaved, hydrated, addToBag } = useStore();
   const saved = hydrated && isSaved(product.id);
