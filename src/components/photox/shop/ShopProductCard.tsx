@@ -61,7 +61,7 @@ export function ShopProductCard({
             ].join(" ")}
           />
 
-          {/* Mobile: small standalone heart in upper-right */}
+          {/* Mobile: small standalone heart in lower-right */}
           <button
             type="button"
             aria-label={action === "remove" ? "Remove from saved" : saved ? "Saved" : "Save"}
@@ -71,7 +71,7 @@ export function ShopProductCard({
               e.stopPropagation();
               toggleSaved(product.id);
             }}
-            className="absolute right-2.5 top-2.5 z-10 flex h-8 w-8 items-center justify-center text-foreground/80 transition-colors hover:text-foreground md:hidden"
+            className="absolute bottom-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center text-foreground/80 transition-colors hover:text-foreground md:hidden"
           >
             <svg
               width="16"
@@ -85,10 +85,14 @@ export function ShopProductCard({
             </svg>
           </button>
 
-          {/* Desktop: slim single-row action strip */}
-          <div className="px-reveal pointer-events-none absolute inset-x-3 bottom-3 z-10 flex items-center justify-between rounded-[2px] bg-paper/92 px-4 py-3.5 backdrop-blur-sm group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:flex">
-            <span className="flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-foreground transition-colors">
-              View artwork
+          {/* Desktop: minimal actions embedded in the photography */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-28 bg-gradient-to-t from-black/28 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 md:block"
+          />
+          <div className="pointer-events-none absolute inset-x-5 bottom-5 z-10 hidden items-center justify-between md:flex">
+            <span className="px-reveal flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-white duration-[260ms] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
+              View
               <svg
                 className="ml-1.5 transition-transform duration-300 ease-out group-hover:translate-x-[3px]"
                 width="14"
@@ -103,21 +107,19 @@ export function ShopProductCard({
             </span>
             <button
               type="button"
+              aria-label={action === "remove" ? "Remove from saved" : saved ? "Saved" : "Save"}
               aria-pressed={saved}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 toggleSaved(product.id);
               }}
-              className={[
-                "group/save flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] transition-colors hover:text-foreground",
-                saved && action === "save" ? "text-foreground" : "text-foreground/60",
-              ].join(" ")}
+              className="px-reveal pointer-events-auto text-white duration-[260ms] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
             >
               <svg
-                className="mr-1.5 transition-all duration-300 group-hover/save:fill-foreground"
-                width="15"
-                height="15"
+                className="transition-all duration-300 hover:fill-white"
+                width="17"
+                height="17"
                 viewBox="0 0 24 24"
                 fill={saved && action === "save" ? "currentColor" : "none"}
                 stroke="currentColor"
@@ -125,9 +127,9 @@ export function ShopProductCard({
               >
                 <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
               </svg>
-              {action === "remove" ? "Remove" : saved ? "Saved" : "Save"}
             </button>
           </div>
+
         </div>
       </a>
 
