@@ -5,6 +5,7 @@ import { Shell } from "@/components/photox/Section";
 
 import aboutHero from "@/assets/about-hero.jpg";
 import aboutProduction from "@/assets/about-production.jpg";
+import arrivesPrint from "@/assets/metal-arrives-print.jpg";
 import aboutCommercial from "@/assets/about-commercial.jpg";
 import metalSurface from "@/assets/metal-surface.jpg";
 import metalEdge from "@/assets/metal-edge.jpg";
@@ -79,7 +80,13 @@ function AboutPage() {
               <p className="px-label mt-10 text-muted-foreground">
                 LinkPrint <span className="px-2 opacity-50">×</span> photoX
               </p>
+
+              <div className="mt-12">
+                <p className="px-serif text-[3.4rem] leading-none md:text-[5.5rem]">12+</p>
+                <p className="px-label mt-3 text-muted-foreground">Years of print experience</p>
+              </div>
             </div>
+
 
             <div>
               <p className="px-meta max-w-[52ch] text-foreground/90">
@@ -124,8 +131,9 @@ function AboutPage() {
               <figcaption className="mt-5">
                 <p className="px-label">Metal Print</p>
                 <p className="px-meta mt-2 max-w-[48ch] text-muted-foreground">
-                  A glossy printed surface on a thin aluminium panel. Light moves across it, colour
-                  stays crisp, detail stays sharp, and the edge stays visually light on the wall.
+                  Printed on ChromaLuxe® HD aluminium. A glossy surface on a thin rigid panel:
+                  light moves across it, colour stays crisp, detail stays sharp, and the edge stays
+                  visually light on the wall.
                 </p>
                 <a href="/metal" className="px-label px-underline mt-6 inline-block">
                   Metal prints →
@@ -188,6 +196,36 @@ function AboutPage() {
           </div>
         </Shell>
 
+        {/* 04 Made in the USA */}
+        <Shell label="Made in the USA" className="pb-20 md:pb-28">
+          <div className="px-rule grid gap-8 pt-6 md:grid-cols-12 md:items-end md:gap-16">
+            <div className="md:col-span-4">
+              <h2 className="px-serif text-[2rem] leading-[1.05] md:text-[2.8rem]">
+                Made in
+                <br />
+                the USA.
+              </h2>
+              <p className="px-meta mt-6 max-w-[40ch] text-muted-foreground">
+                Every photoX print — metal, frameless canvas and custom — is produced in the United
+                States and inspected before it ships.
+              </p>
+            </div>
+            <figure className="md:col-span-7 md:col-start-6">
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "16 / 9" }}
+              >
+                <img
+                  src={aboutProduction}
+                  alt="A finished aluminium print panel being handled on a clean production bench"
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+            </figure>
+          </div>
+        </Shell>
+
         {/* 05 The work stays the work */}
         <Shell label="The work stays the work" className="pb-20 md:pb-28">
           <div className="px-rule grid gap-10 pt-6 md:grid-cols-12 md:gap-16">
@@ -210,14 +248,14 @@ function AboutPage() {
             <figure className="md:col-span-6 md:col-start-7">
               <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "4 / 3" }}>
                 <img
-                  src={aboutProduction}
-                  alt="Gloved hands inspecting the edge of a finished aluminium print panel on a clean workbench"
+                  src={arrivesPrint}
+                  alt="A finished photographic print standing against a warm white wall"
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <figcaption className="px-meta mt-4 text-muted-foreground">
-                Finished panels are checked by hand before they ship.
+                The image stays the subject; the print is how it becomes an object.
               </figcaption>
             </figure>
           </div>
