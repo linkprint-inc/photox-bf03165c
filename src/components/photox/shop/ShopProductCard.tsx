@@ -125,14 +125,25 @@ export function ShopProductCard({
             </svg>
           </button>
 
-          {/* Desktop: follow-cursor VIEW label */}
+          {/* Desktop: follow-cursor arrow cue */}
           <div
             aria-hidden
             ref={cursorRef}
-            className="pointer-events-none absolute left-0 top-0 z-20 hidden h-[56px] w-[56px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background text-[0.62rem] font-medium uppercase tracking-[0.12em] text-foreground opacity-0 transition-opacity duration-300 md:flex"
+            className={[
+              "pointer-events-none absolute left-0 top-0 z-20 hidden h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background text-foreground md:flex",
+              "transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)]",
+              cursorOn ? "scale-100 opacity-100" : "scale-75 opacity-0",
+            ].join(" ")}
             style={{ willChange: "transform, opacity" }}
           >
-            View
+            <span
+              className={[
+                "text-[22px] leading-none transition-transform duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)]",
+                cursorOn ? "translate-x-[2px] -translate-y-[2px]" : "translate-x-0 translate-y-0",
+              ].join(" ")}
+            >
+              ↗
+            </span>
           </div>
 
         </div>
