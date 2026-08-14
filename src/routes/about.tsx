@@ -195,6 +195,36 @@ function AboutPage() {
           </div>
         </Shell>
 
+        {/* 04 Made in the USA */}
+        <Shell label="Made in the USA" className="pb-20 md:pb-28">
+          <div className="px-rule grid gap-8 pt-6 md:grid-cols-12 md:items-end md:gap-16">
+            <div className="md:col-span-4">
+              <h2 className="px-serif text-[2rem] leading-[1.05] md:text-[2.8rem]">
+                Made in
+                <br />
+                the USA.
+              </h2>
+              <p className="px-meta mt-6 max-w-[40ch] text-muted-foreground">
+                Every photoX print — metal, frameless canvas and custom — is produced in the United
+                States and inspected before it ships.
+              </p>
+            </div>
+            <figure className="md:col-span-7 md:col-start-6">
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "16 / 9" }}
+              >
+                <img
+                  src={aboutProduction}
+                  alt="A finished aluminium print panel being handled on a clean production bench"
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+            </figure>
+          </div>
+        </Shell>
+
         {/* 05 The work stays the work */}
         <Shell label="The work stays the work" className="pb-20 md:pb-28">
           <div className="px-rule grid gap-10 pt-6 md:grid-cols-12 md:gap-16">
