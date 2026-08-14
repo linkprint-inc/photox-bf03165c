@@ -291,52 +291,99 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         </div>
       </Shell>
 
-      {/* ---------- See it at scale ---------- */}
+      {/* ---------- See the difference in size ---------- */}
       <Shell className="pt-20 md:pt-28">
         <SectionHead
-          title="See it at scale"
-          note={`${product.name} · ${materialName[material]}`}
+          title="See the difference in size"
+          note="Compare every available format at a glance."
         />
-        <div className="mt-10 grid gap-8 md:grid-cols-12">
-          <div className="md:col-span-8">
-            <RoomScene
-              product={product}
-              material={material}
-              inches={scale.inches}
-              sizeLabel={scale.label}
-            />
+        <div className="mt-10">
+          {/* Desktop */}
+          <div
+            className="hidden md:grid md:items-end gap-x-8 border-b border-hairline pb-8"
+            style={{
+              gridTemplateColumns: sizeSteps
+                .map((s) => `minmax(0, ${s.inches}fr)`)
+                .join(" "),
+            }}
+          >
+            {sizeSteps.map((s) => (
+              <div key={s.label} className="flex flex-col items-center">
+                <SizePrint product={product} material={material} size={s} />
+              </div>
+            ))}
           </div>
-          <div className="md:col-span-4">
-            <p className="px-label text-muted-foreground">Select a size</p>
-            <ul className="mt-4 flex gap-3 overflow-x-auto pb-2 md:mt-6 md:block md:gap-0 md:overflow-visible md:border-t md:border-hairline md:pb-0">
-              {sizeSteps.map((s, i) => (
-                <li key={s.label} className="shrink-0 md:border-b md:border-hairline">
-                  <button
-                    type="button"
-                    onClick={() => setScaleIndex(i)}
-                    aria-pressed={scaleIndex === i}
+          <div
+            className="mt-5 hidden md:grid gap-x-8"
+            style={{
+              gridTemplateColumns: sizeSteps
+                .map((s) => `minmax(0, ${s.inches}fr)`)
+                .join(" "),
+            }}
+          >
+            {sizeSteps.map((s, i) => {
+              const selected = sizeIndex === i;
+              return (
+                <div key={`${s.label}-label`} className="text-center">
+                  <span
                     className={[
-                      "flex w-full items-baseline justify-between gap-6 whitespace-nowrap border border-hairline px-4 py-3 transition-opacity duration-[420ms] md:border-0 md:px-0",
-                      scaleIndex === i ? "opacity-100" : "opacity-50 hover:opacity-100",
+                      "px-label relative inline-block",
+                      selected ? "text-foreground" : "text-muted-foreground",
+                      selected
+                        ? "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-foreground"
+                        : "",
                     ].join(" ")}
                   >
-                    <span className="px-label">{s.label}</span>
-                    <span className="px-price">${unitPrice(material, i)}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              onClick={() => {
-                setSizeIndex(scaleIndex);
-                setView("room");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="px-label px-underline mt-8 inline-block"
-            >
-              Size guide →
-            </button>
+                    {s.label}
+                  </span>
+                  <p
+                    className={[
+                      "px-price mt-1",
+                      selected ? "text-foreground" : "text-muted-foreground",
+                    ].join(" ")}
+                  >
+                    ${unitPrice(material, i)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile */}
+          <div className="flex md:hidden items-end gap-6 overflow-x-auto border-b border-hairline pb-6">
+            {sizeSteps.map((s, i) => {
+              const selected = sizeIndex === i;
+              return (
+                <div
+                  key={s.label}
+                  className="flex flex-shrink-0 flex-col items-center"
+                  style={{ width: `${s.inches * 9}px` }}}
+                >
+                  <SizePrint product={product} material={material} size={s} />
+                  <div className="mt-4 text-center">
+                    <span
+                      className={[
+                        "px-label relative inline-block",
+                        selected ? "text-foreground" : "text-muted-foreground",
+                        selected
+                          ? "after:absolute after:bottom-0 after:left-0 after:right-0 after:h-px after:bg-foreground"
+                          : "",
+                      ].join(" ")}
+                    >
+                      {s.label}
+                    </span>
+                    <p
+                      className={[
+                        "px-price mt-1",
+                        selected ? "text-foreground" : "text-muted-foreground",
+                      ].join(" ")}
+                    >
+                      ${unitPrice(material, i)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Shell>
