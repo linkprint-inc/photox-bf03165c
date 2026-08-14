@@ -111,7 +111,7 @@ export function ShopProductCard({
               e.stopPropagation();
               toggleSaved(product.id);
             }}
-            className={["absolute right-2 top-2 z-30 flex h-9 w-9 items-center justify-center text-white transition-opacity duration-300 hover:opacity-100", saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70"].join(" ")}
+            className={["absolute right-2 top-2 z-30 flex h-9 w-9 cursor-pointer items-center justify-center text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity duration-300 hover:opacity-100", saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70"].join(" ")}
           >
             <svg
               width="16"
