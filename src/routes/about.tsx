@@ -124,8 +124,9 @@ function AboutPage() {
               <figcaption className="mt-5">
                 <p className="px-label">Metal Print</p>
                 <p className="px-meta mt-2 max-w-[48ch] text-muted-foreground">
-                  A glossy printed surface on a thin aluminium panel. Light moves across it, colour
-                  stays crisp, detail stays sharp, and the edge stays visually light on the wall.
+                  Printed on ChromaLuxe® HD aluminium. A glossy surface on a thin rigid panel:
+                  light moves across it, colour stays crisp, detail stays sharp, and the edge stays
+                  visually light on the wall.
                 </p>
                 <a href="/metal" className="px-label px-underline mt-6 inline-block">
                   Metal prints →
