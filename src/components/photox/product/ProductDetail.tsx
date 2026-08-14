@@ -6,7 +6,6 @@ import { MainVisual, PrintFace, RoomScene, type ViewMode } from "./ProductVisual
 import {
   categoryLabel,
   closeUps,
-  detailView,
   fromPrice,
   materialBlurb,
   materialsFor,

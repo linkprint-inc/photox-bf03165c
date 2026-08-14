@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Shell } from "../Section";
 import { ShopProductCard } from "./ShopProductCard";
 import {
@@ -19,6 +19,7 @@ import {
 } from "@/lib/shop-data";
 
 const PAGE = 24;
+const SHOP_STATE = "photox-shop-state-v1";
 
 const primaryCategories = [
   { key: "All", label: "All Art" },
@@ -40,6 +41,48 @@ export function ShopCatalog({ query }: { query?: string }) {
   const [view, setView] = useState<"grid" | "room">("grid");
   const [sort, setSort] = useState<SortOption>("Featured");
   const [count, setCount] = useState(PAGE);
+
+  // Preserve browsing state when returning from a product detail page.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(SHOP_STATE);
+      if (!raw) return;
+      const s = JSON.parse(raw) as {
+        category: string;
+        filters: FilterState;
+        view: "grid" | "room";
+        sort: SortOption;
+        count: number;
+        scroll: number;
+      };
+      setCategory(s.category);
+      setFilters(s.filters);
+      setView(s.view);
+      setSort(s.sort);
+      setCount(s.count);
+      requestAnimationFrame(() => window.scrollTo({ top: s.scroll }));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    const save = () => {
+      try {
+        sessionStorage.setItem(
+          SHOP_STATE,
+          JSON.stringify({ category, filters, view, sort, count, scroll: window.scrollY }),
+        );
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("pagehide", save);
+    return () => {
+      save();
+      window.removeEventListener("pagehide", save);
+    };
+  }, [category, filters, view, sort, count]);
 
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
