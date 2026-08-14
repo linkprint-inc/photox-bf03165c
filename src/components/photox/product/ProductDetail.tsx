@@ -21,11 +21,14 @@ const views: { key: ViewMode; label: string }[] = [
   { key: "room", label: "In a room" },
 ];
 
-function parseSize(size: (typeof sizeSteps)[number]) {
+function parsePhysicalSize(size: (typeof sizeSteps)[number]) {
   const match = size.label.match(/(\d+)\s*×\s*(\d+)/);
-  const width = match ? parseInt(match[1]!, 10) : size.inches;
-  const height = match ? parseInt(match[2]!, 10) : Math.round(size.inches * 1.5);
-  return { width, height };
+  if (!match) {
+    return { width: size.inches * 1.5, height: size.inches };
+  }
+  const a = parseInt(match[1]!, 10);
+  const b = parseInt(match[2]!, 10);
+  return { width: Math.max(a, b), height: Math.min(a, b) };
 }
 
 function SizePrint({
@@ -38,7 +41,7 @@ function SizePrint({
   size: (typeof sizeSteps)[number];
 }) {
   const isMetal = material === "metal";
-  const { width, height } = parseSize(size);
+  const { width, height } = parsePhysicalSize(size);
   return (
     <div
       className={[
