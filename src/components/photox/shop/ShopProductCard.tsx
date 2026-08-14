@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   materialLabel,
   angleView,
@@ -29,12 +29,52 @@ export function ShopProductCard({
   const secondary = view === "room" ? product.image : angleView[product.material];
   const price = size !== null ? sizeSteps[size]!.price : product.from;
 
+  const cursorRef = useRef<HTMLDivElement | null>(null);
+  const target = useRef({ x: 0, y: 0 });
+  const pos = useRef({ x: 0, y: 0 });
+  const raf = useRef<number | null>(null);
+  const [cursorOn, setCursorOn] = useState(false);
+
+  const loop = useCallback(() => {
+    const el = cursorRef.current;
+    if (el) {
+      pos.current.x += (target.current.x - pos.current.x) * 0.18;
+      pos.current.y += (target.current.y - pos.current.y) * 0.18;
+      el.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`;
+    }
+    raf.current = requestAnimationFrame(loop);
+  }, []);
+
+  useEffect(() => {
+    if (!cursorOn) return;
+    raf.current = requestAnimationFrame(loop);
+    return () => {
+      if (raf.current) cancelAnimationFrame(raf.current);
+    };
+  }, [cursorOn, loop]);
+
   return (
     <article className="group">
       <a href={link} className="block" aria-label={`${product.name} — view artwork`}>
         <div
+          onMouseEnter={(e) => {
+            if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+            const r = e.currentTarget.getBoundingClientRect();
+            pos.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+            target.current = { ...pos.current };
+            setCursorOn(true);
+            if (cursorRef.current) cursorRef.current.style.opacity = "1";
+          }}
+          onMouseMove={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            target.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+          }}
+          onMouseLeave={() => {
+            setCursorOn(false);
+            if (cursorRef.current) cursorRef.current.style.opacity = "0";
+          }}
           className={[
-            "relative aspect-square w-full overflow-hidden bg-secondary",
+            "relative aspect-square w-full overflow-hidden bg-secondary md:cursor-none",
             isMetal ? "px-gloss" : "px-weave",
             "group-hover:after:opacity-100 group-focus-within:after:opacity-100",
           ].join(" ")}
@@ -45,13 +85,13 @@ export function ShopProductCard({
               view === "room" ? " installed in an interior" : ""
             }`}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-0 group-focus-within:opacity-0"
+            className="absolute inset-0 h-full w-full object-cover transition-opacity duration-[380ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-0 group-focus-within:opacity-0"
           />
           <img
             src={secondary}
             alt={`${product.name} shown as a physical ${materialLabel[product.material].toLowerCase()}`}
             loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-100 group-focus-within:opacity-100"
+            className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[380ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-100 group-focus-within:opacity-100"
           />
           <span
             aria-hidden
@@ -71,13 +111,13 @@ export function ShopProductCard({
               e.stopPropagation();
               toggleSaved(product.id);
             }}
-            className="absolute bottom-2.5 right-2.5 z-10 flex h-8 w-8 items-center justify-center text-foreground/80 transition-colors hover:text-foreground md:hidden"
+            className={["absolute right-2 top-2 z-30 flex h-9 w-9 cursor-pointer items-center justify-center text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity duration-300 hover:opacity-100", saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70"].join(" ")}
           >
             <svg
               width="16"
               height="16"
               viewBox="0 0 24 24"
-              fill={saved ? "currentColor" : "none"}
+              fill={saved && action !== "remove" ? "currentColor" : "none"}
               stroke="currentColor"
               strokeWidth="1.6"
             >
@@ -85,49 +125,14 @@ export function ShopProductCard({
             </svg>
           </button>
 
-          {/* Desktop: minimal actions embedded in the photography */}
+          {/* Desktop: follow-cursor VIEW label */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-28 bg-gradient-to-t from-black/28 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 md:block"
-          />
-          <div className="pointer-events-none absolute inset-x-5 bottom-5 z-10 hidden items-center justify-between md:flex">
-            <span className="px-reveal flex items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.08em] text-white duration-[260ms] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100">
-              View
-              <svg
-                className="ml-1.5 transition-transform duration-300 ease-out group-hover:translate-x-[3px]"
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.4"
-              >
-                <path d="M1 7h11M8 3l4 4-4 4" />
-              </svg>
-            </span>
-            <button
-              type="button"
-              aria-label={action === "remove" ? "Remove from saved" : saved ? "Saved" : "Save"}
-              aria-pressed={saved}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                toggleSaved(product.id);
-              }}
-              className="px-reveal pointer-events-auto text-white duration-[260ms] group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100"
-            >
-              <svg
-                className="transition-all duration-300 hover:fill-white"
-                width="17"
-                height="17"
-                viewBox="0 0 24 24"
-                fill={saved && action === "save" ? "currentColor" : "none"}
-                stroke="currentColor"
-                strokeWidth="1.6"
-              >
-                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
-              </svg>
-            </button>
+            ref={cursorRef}
+            className="pointer-events-none absolute left-0 top-0 z-20 hidden h-[56px] w-[56px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background text-[0.62rem] font-medium uppercase tracking-[0.12em] text-foreground opacity-0 transition-opacity duration-300 md:flex"
+            style={{ willChange: "transform, opacity" }}
+          >
+            View
           </div>
 
         </div>

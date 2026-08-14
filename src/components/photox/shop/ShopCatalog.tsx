@@ -153,10 +153,10 @@ export function ShopCatalog({ query }: { query?: string }) {
         </div>
       </Shell>
 
-      {/* 03 — editorial category index */}
+      {/* 03 — category row */}
       <Shell label="Categories">
-        <nav aria-label="Categories" className="overflow-x-auto pb-10 md:pb-12">
-          <ul className="flex min-w-max items-baseline gap-x-10 md:gap-x-14">
+        <nav aria-label="Categories" className="-mx-6 overflow-x-auto px-6 md:mx-0 md:px-0">
+          <ul className="flex min-w-max items-baseline gap-x-9 md:gap-x-12">
             {primaryCategories.map((c) => {
               const on = category === c.key;
               return (
@@ -169,26 +169,22 @@ export function ShopCatalog({ query }: { query?: string }) {
                     }}
                     aria-pressed={on}
                     className={[
-                      "group whitespace-nowrap text-[0.95rem] uppercase tracking-[0.05em] transition-colors duration-300",
+                      "whitespace-nowrap text-[0.95rem] leading-none transition-colors duration-300",
                       on
-                        ? "font-semibold text-foreground"
+                        ? "font-medium text-foreground"
                         : "font-normal text-muted-foreground hover:text-foreground",
                     ].join(" ")}
                   >
                     {c.label}
-                    <span
-                      aria-hidden
-                      className="ml-1 inline-block translate-x-[-2px] text-[0.7em] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-60"
-                    >
-                      ↗
-                    </span>
                   </button>
                 </li>
               );
             })}
           </ul>
         </nav>
+        <div className="mt-8 border-t border-hairline md:mt-9" />
       </Shell>
+
 
       {/* 04 — toolbar (secondary) */}
       <Shell label="Shop controls">
@@ -262,8 +258,8 @@ export function ShopCatalog({ query }: { query?: string }) {
         <div
           className={
             panelOpen
-              ? "grid gap-10 pt-10 md:grid-cols-[220px_minmax(0,1fr)]"
-              : "grid gap-10 pt-10"
+              ? "grid gap-10 pt-6 md:grid-cols-[220px_minmax(0,1fr)]"
+              : "grid gap-10 pt-6"
           }
         >
           <ShopFilterPanel
