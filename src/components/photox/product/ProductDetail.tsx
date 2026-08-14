@@ -21,6 +21,43 @@ const views: { key: ViewMode; label: string }[] = [
   { key: "room", label: "In a room" },
 ];
 
+function parseSize(size: (typeof sizeSteps)[number]) {
+  const match = size.label.match(/(\d+)\s*×\s*(\d+)/);
+  const width = match ? parseInt(match[1]!, 10) : size.inches;
+  const height = match ? parseInt(match[2]!, 10) : Math.round(size.inches * 1.5);
+  return { width, height };
+}
+
+function SizePrint({
+  product,
+  material,
+  size,
+}: {
+  product: ShopProduct;
+  material: BagMaterial;
+  size: (typeof sizeSteps)[number];
+}) {
+  const isMetal = material === "metal";
+  const { width, height } = parseSize(size);
+  return (
+    <div
+      className={[
+        "relative w-full overflow-hidden bg-secondary shadow-sm",
+        isMetal ? "px-gloss" : "px-weave",
+      ].join(" ")}
+      style={{ aspectRatio: `${width}/${height}` }}
+    >
+      <img
+        src={product.image}
+        alt={`${product.name} shown at ${size.label}`}
+        loading="lazy"
+        className="block h-full w-full object-cover"
+      />
+      <span aria-hidden className={isMetal ? "px-edge" : "px-canvas-edge"} />
+    </div>
+  );
+}
+
 export function ProductDetail({ product }: { product: ShopProduct }) {
   const materials = useMemo(() => materialsFor(product), [product]);
   const [material, setMaterial] = useState<BagMaterial>(materials[0]!);
