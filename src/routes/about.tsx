@@ -53,11 +53,11 @@ function AboutPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/20 to-transparent" />
             <div className="absolute inset-0 flex items-end">
               <div className="mx-auto w-full max-w-[1440px] px-6 pb-14 md:px-10 md:pb-20">
-                <p className="px-label text-white/80">About photoX</p>
+                <p className="px-label normal-case text-white/80">ABOUT photoX</p>
                 <h1 className="px-serif mt-4 max-w-[14ch] text-[2.8rem] leading-[0.95] text-white md:text-[5rem]">
-                  Art,
+                  ART,
                   <br />
-                  made physical.
+                  MADE PHYSICAL.
                 </h1>
                 <p className="px-meta mt-6 max-w-[46ch] text-white/85">
                   photoX turns photography, artwork and personal images into objects made for the
@@ -73,11 +73,11 @@ function AboutPage() {
           <div className="px-rule grid gap-10 pt-6 md:grid-cols-[0.9fr_1fr] md:gap-16">
             <div>
               <h2 className="px-serif max-w-[14ch] text-[2.2rem] leading-[1.05] md:text-[3.2rem]">
-                Built on
+                BUILT ON
                 <br />
-                print experience.
+                PRINT EXPERIENCE.
               </h2>
-              <p className="px-label mt-10 text-muted-foreground">
+              <p className="px-label normal-case mt-10 text-muted-foreground">
                 LinkPrint <span className="px-2 opacity-50">×</span> photoX
               </p>
 
@@ -112,9 +112,9 @@ function AboutPage() {
         {/* 03 Material matters */}
         <Shell label="Material matters" className="pb-20 md:pb-28">
           <h2 className="px-serif max-w-[12ch] text-[2.2rem] leading-[1.05] md:text-[3.4rem]">
-            Material
+            MATERIAL
             <br />
-            matters.
+            MATTERS.
           </h2>
 
           {/* Metal — dominant */}
@@ -201,9 +201,9 @@ function AboutPage() {
           <div className="px-rule grid gap-8 pt-6 md:grid-cols-12 md:items-end md:gap-16">
             <div className="md:col-span-4">
               <h2 className="px-serif text-[2rem] leading-[1.05] md:text-[2.8rem]">
-                Made in
+                MADE IN
                 <br />
-                the USA.
+                THE USA.
               </h2>
               <p className="px-meta mt-6 max-w-[40ch] text-muted-foreground">
                 Every photoX print — metal, frameless canvas and custom — is produced in the United
@@ -231,9 +231,9 @@ function AboutPage() {
           <div className="px-rule grid gap-10 pt-6 md:grid-cols-12 md:gap-16">
             <div className="md:col-span-5">
               <h2 className="px-serif max-w-[14ch] text-[2rem] leading-[1.05] md:text-[3rem]">
-                The work stays
+                THE WORK STAYS
                 <br />
-                the work.
+                THE WORK.
               </h2>
               <p className="px-meta mt-8 max-w-[46ch] text-muted-foreground">
                 Whether it begins as an artist’s work, a photograph or a personal image, our role is
@@ -241,7 +241,7 @@ function AboutPage() {
                 stays in service of the work.
               </p>
               <a href="/custom" className="px-label px-underline mt-8 inline-block">
-                Artwork &amp; image policy →
+                ARTWORK &amp; IMAGE POLICY →
               </a>
             </div>
 
@@ -264,9 +264,9 @@ function AboutPage() {
         {/* 07 Made for real spaces */}
         <Shell label="Made for real spaces" className="pb-20 md:pb-28">
           <h2 className="px-serif max-w-[12ch] text-[2.2rem] leading-[1.05] md:text-[3.4rem]">
-            Made for
+            MADE FOR
             <br />
-            real spaces.
+            REAL SPACES.
           </h2>
 
           <div className="mt-12 grid gap-x-8 gap-y-14 md:grid-cols-12">
@@ -313,16 +313,16 @@ function AboutPage() {
           <div className="px-rule grid items-center gap-10 pt-6 md:grid-cols-2 md:gap-16">
             <div>
               <h2 className="px-serif max-w-[12ch] text-[2.2rem] leading-[1.05] md:text-[3.2rem]">
-                Yours,
+                YOURS,
                 <br />
-                on the wall.
+                ON THE WALL.
               </h2>
               <p className="px-meta mt-6 max-w-[46ch] text-muted-foreground">
                 Bring your own photograph, artwork or personal image. Choose the surface. Choose the
                 size. Prepare it if needed. Make it physical.
               </p>
               <a href="/custom" className="px-label px-underline mt-8 inline-block">
-                Custom prints →
+                CUSTOM PRINTS →
               </a>
             </div>
 
