@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
 import {
   materialLabel,
   angleView,
@@ -130,20 +131,13 @@ export function ShopProductCard({
             aria-hidden
             ref={cursorRef}
             className={[
-              "pointer-events-none absolute left-0 top-0 z-20 hidden h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-background text-foreground md:flex",
+              "pointer-events-none absolute left-0 top-0 z-20 hidden h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground md:flex",
               "transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)]",
               cursorOn ? "scale-100 opacity-100" : "scale-75 opacity-0",
             ].join(" ")}
             style={{ willChange: "transform, opacity" }}
           >
-            <span
-              className={[
-                "text-[22px] leading-none transition-transform duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)]",
-                cursorOn ? "translate-x-[2px] -translate-y-[2px]" : "translate-x-0 translate-y-0",
-              ].join(" ")}
-            >
-              ↗
-            </span>
+            <ArrowUpRight size={21} strokeWidth={1.6} className="m-0 p-0" />
           </div>
 
         </div>
