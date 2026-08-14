@@ -46,7 +46,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   return (
     <>
       {/* ---------- First screen: product + purchase ---------- */}
-      <Shell className="pt-6 md:pt-8">
+      <Shell className="pt-[calc(var(--site-header-height)+1.5rem)]">
         <nav className="px-meta text-muted-foreground">
           <Link to="/shop" className="px-underline">
             Shop
