@@ -79,7 +79,13 @@ function AboutPage() {
               <p className="px-label mt-10 text-muted-foreground">
                 LinkPrint <span className="px-2 opacity-50">×</span> photoX
               </p>
+
+              <div className="mt-12">
+                <p className="px-serif text-[3.4rem] leading-none md:text-[5.5rem]">12+</p>
+                <p className="px-label mt-3 text-muted-foreground">Years of print experience</p>
+              </div>
             </div>
+
 
             <div>
               <p className="px-meta max-w-[52ch] text-foreground/90">
