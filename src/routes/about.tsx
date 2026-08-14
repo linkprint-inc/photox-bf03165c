@@ -5,6 +5,7 @@ import { Shell } from "@/components/photox/Section";
 
 import aboutHero from "@/assets/about-hero.jpg";
 import aboutProduction from "@/assets/about-production.jpg";
+import arrivesPrint from "@/assets/metal-arrives-print.jpg";
 import aboutCommercial from "@/assets/about-commercial.jpg";
 import metalSurface from "@/assets/metal-surface.jpg";
 import metalEdge from "@/assets/metal-edge.jpg";
@@ -247,14 +248,14 @@ function AboutPage() {
             <figure className="md:col-span-6 md:col-start-7">
               <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "4 / 3" }}>
                 <img
-                  src={aboutProduction}
-                  alt="Gloved hands inspecting the edge of a finished aluminium print panel on a clean workbench"
+                  src={arrivesPrint}
+                  alt="A finished photographic print standing against a warm white wall"
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
               <figcaption className="px-meta mt-4 text-muted-foreground">
-                Finished panels are checked by hand before they ship.
+                The image stays the subject; the print is how it becomes an object.
               </figcaption>
             </figure>
           </div>
