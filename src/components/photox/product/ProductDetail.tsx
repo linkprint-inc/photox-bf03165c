@@ -357,7 +357,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                 <div
                   key={s.label}
                   className="flex flex-shrink-0 flex-col items-center"
-                  style={{ width: `${s.inches * 9}px` }}}
+                  style={{ width: `${s.inches * 9}px` }}
                 >
                   <SizePrint product={product} material={material} size={s} />
                   <div className="mt-4 text-center">
