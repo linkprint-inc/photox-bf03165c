@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Shell, SectionHead } from "../Section";
 import { ShopProductCard } from "../shop/ShopProductCard";
-import { MainVisual, PrintFace, RoomScene, type ViewMode } from "./ProductVisual";
+import { MainVisual, PrintFace, type ViewMode } from "./ProductVisual";
 import {
   categoryLabel,
   closeUps,
@@ -26,7 +26,6 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const [material, setMaterial] = useState<BagMaterial>(materials[0]!);
   const [sizeIndex, setSizeIndex] = useState(2);
   const [view, setView] = useState<ViewMode>("artwork");
-  const [scaleIndex, setScaleIndex] = useState(2);
   const [openInfo, setOpenInfo] = useState<string | null>(null);
   const { addToBag, toggleSaved, isSaved, hydrated } = useStore();
 
@@ -34,14 +33,13 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
     setMaterial(materials[0]!);
     setSizeIndex(2);
     setView("artwork");
-    setScaleIndex(2);
   }, [product.id, materials]);
 
   const size = sizeSteps[sizeIndex]!;
   const price = unitPrice(material, sizeIndex);
   const saved = hydrated && isSaved(product.id);
   const related = useMemo(() => relatedProducts(product), [product]);
-  const scale = sizeSteps[scaleIndex]!;
+
 
   return (
     <>
