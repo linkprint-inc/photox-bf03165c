@@ -8,6 +8,7 @@ import { SizeScene } from "@/components/photox/SizeScene";
 import { LargeFormat } from "@/components/photox/LargeFormat";
 import { MaterialExplorer } from "@/components/photox/MaterialExplorer";
 import { RoomSection } from "@/components/photox/RoomSection";
+import { CreatorReel } from "@/components/photox/video/CreatorReel";
 import { CustomSection } from "@/components/photox/CustomSection";
 import { PhotoTools } from "@/components/photox/PhotoTools";
 import { HelpTopics } from "@/components/photox/HelpTopics";
@@ -49,6 +50,7 @@ function Index() {
         <LargeFormat />
         <MaterialExplorer />
         <RoomSection />
+        <CreatorReel />
         <CustomSection />
         <PhotoTools />
         <HelpTopics />
