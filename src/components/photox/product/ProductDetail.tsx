@@ -300,13 +300,16 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           title="See the difference in size"
           note="Compare every available format at a glance."
         />
-        <div className="mt-10">
+        <div className="mt-10 rounded-sm bg-secondary/20 p-6 md:p-10">
           {/* Desktop */}
           <div
-            className="hidden md:grid md:items-end gap-x-8 border-b border-hairline pb-8"
+            className="hidden md:grid md:items-end gap-x-6 border-b border-hairline pb-6"
             style={{
               gridTemplateColumns: sizeSteps
-                .map((s) => `minmax(0, ${s.inches}fr)`)
+                .map((s) => {
+                  const { width } = parsePhysicalSize(s);
+                  return `minmax(0, ${width}fr)`;
+                })
                 .join(" "),
             }}
           >
@@ -317,10 +320,13 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
             ))}
           </div>
           <div
-            className="mt-5 hidden md:grid gap-x-8"
+            className="mt-5 hidden md:grid gap-x-6"
             style={{
               gridTemplateColumns: sizeSteps
-                .map((s) => `minmax(0, ${s.inches}fr)`)
+                .map((s) => {
+                  const { width } = parsePhysicalSize(s);
+                  return `minmax(0, ${width}fr)`;
+                })
                 .join(" "),
             }}
           >
@@ -356,11 +362,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           <div className="flex md:hidden items-end gap-6 overflow-x-auto border-b border-hairline pb-6">
             {sizeSteps.map((s, i) => {
               const selected = sizeIndex === i;
+              const { width } = parsePhysicalSize(s);
               return (
                 <div
                   key={s.label}
                   className="flex flex-shrink-0 flex-col items-center"
-                  style={{ width: `${s.inches * 9}px` }}
+                  style={{ width: `${width * 7}px` }}
                 >
                   <SizePrint product={product} material={material} size={s} />
                   <div className="mt-4 text-center">
