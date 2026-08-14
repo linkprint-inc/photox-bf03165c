@@ -153,50 +153,59 @@ export function ShopCatalog({ query }: { query?: string }) {
         </div>
       </Shell>
 
-      {/* 03 — category navigation */}
+      {/* 03 — editorial category index */}
       <Shell label="Categories">
-        <nav aria-label="Categories" className="overflow-x-auto pb-8 md:pb-10">
-          <ul className="flex min-w-max gap-10 md:gap-14">
-            {primaryCategories.map((c) => (
-              <li key={c.key}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCategory(c.key);
-                    setCount(PAGE);
-                  }}
-                  aria-pressed={category === c.key}
-                  className={[
-                    "relative whitespace-nowrap pb-2.5 text-[0.95rem] font-medium uppercase tracking-[0.03em] transition-colors duration-300",
-                    "after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-foreground after:transition-transform after:duration-300 after:origin-left",
-                    category === c.key
-                      ? "text-foreground after:scale-x-100"
-                      : "text-foreground/55 hover:text-foreground after:scale-x-0 hover:after:scale-x-100",
-                  ].join(" ")}
-                >
-                  {c.label}
-                </button>
-              </li>
-            ))}
+        <nav aria-label="Categories" className="overflow-x-auto pb-10 md:pb-12">
+          <ul className="flex min-w-max items-baseline gap-x-10 md:gap-x-14">
+            {primaryCategories.map((c) => {
+              const on = category === c.key;
+              return (
+                <li key={c.key}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCategory(c.key);
+                      setCount(PAGE);
+                    }}
+                    aria-pressed={on}
+                    className={[
+                      "group whitespace-nowrap text-[0.95rem] uppercase tracking-[0.05em] transition-colors duration-300",
+                      on
+                        ? "font-semibold text-foreground"
+                        : "font-normal text-muted-foreground hover:text-foreground",
+                    ].join(" ")}
+                  >
+                    {c.label}
+                    <span
+                      aria-hidden
+                      className="ml-1 inline-block translate-x-[-2px] text-[0.7em] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-60"
+                    >
+                      ↗
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </Shell>
 
-      {/* 04 — toolbar */}
+      {/* 04 — toolbar (secondary) */}
       <Shell label="Shop controls">
-        <div className="px-rule flex items-center justify-between gap-x-8 py-3.5">
+        <div className="flex items-center justify-between gap-x-8 py-3">
           <button
             type="button"
             onClick={() => setPanelOpen((v) => !v)}
-            className="text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-foreground/70 transition-colors hover:text-foreground"
+            className="text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
           >
             {active > 0 ? `Filter (${active})` : "Filter +"}
           </button>
 
-          <div className="flex items-center gap-x-6 text-[0.8125rem] uppercase tracking-[0.04em]">
-            <span className="text-foreground/50">
+          <div className="flex items-center gap-x-6 text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground">
+            <span>
               {results.length === shopProducts.length ? totalWorks : results.length} works
             </span>
+
 
             <div className="flex items-center gap-2.5">
               {(["grid", "room"] as const).map((v) => (
