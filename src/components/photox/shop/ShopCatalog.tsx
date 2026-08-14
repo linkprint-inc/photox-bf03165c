@@ -238,11 +238,11 @@ export function ShopCatalog({ query }: { query?: string }) {
             </div>
 
             <label className="flex items-center gap-1.5">
-              <span className="text-foreground/50">Sort</span>
+              <span>Sort</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortOption)}
-                className="cursor-pointer appearance-none bg-transparent pr-1 text-[0.8125rem] uppercase tracking-[0.04em] text-foreground outline-none"
+                className="cursor-pointer appearance-none bg-transparent pr-1 text-[0.75rem] uppercase tracking-[0.06em] text-foreground/80 outline-none"
               >
                 {sortOptions.map((o) => (
                   <option key={o} value={o}>
@@ -251,6 +251,7 @@ export function ShopCatalog({ query }: { query?: string }) {
                 ))}
               </select>
             </label>
+
           </div>
         </div>
       </Shell>
