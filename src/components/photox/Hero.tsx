@@ -5,7 +5,11 @@ export function Hero() {
   const [lit, setLit] = useState(false);
 
   return (
-    <section id="hero" className="relative h-[92vh] min-h-[640px] w-full overflow-hidden bg-ink">
+    <section
+      id="hero"
+      className="relative h-screen min-h-screen w-full overflow-hidden bg-ink"
+      style={{ height: "100dvh" }}
+    >
       <img
         src={heroImage}
         width={1920}

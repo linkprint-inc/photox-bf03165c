@@ -39,7 +39,7 @@ const topics: Topic[] = [
     descriptor: "Material, size and finish.",
     image: helpChoosing,
     alt: "Glossy metal print beside a textured frameless canvas print",
-    destination: { label: "View size guide", href: "/shop#sizes" },
+    destination: { label: "View all help", href: "/help" },
     answers: [
       {
         q: "Metal or canvas?",
@@ -57,22 +57,6 @@ const topics: Topic[] = [
         ],
         visual: { kind: "sizes" },
       },
-      {
-        q: "Which finish works best for photography?",
-        lines: [
-          { term: "Metal", body: "Holds fine detail and deep contrast — best for architecture, night and high-colour work." },
-          { term: "Canvas", body: "Softens grain and glare — best for portraits, film scans and quieter tones." },
-        ],
-        visual: { kind: "materials" },
-      },
-      {
-        q: "Can I see how it looks in a room?",
-        lines: [
-          { body: "Yes. Shop by Size on this page places one artwork in a fixed interior so only the print scale changes." },
-          { body: "In the shop, Room view shows each artwork hung in a real space." },
-        ],
-        visual: { kind: "sizes" },
-      },
     ],
   },
   {
@@ -83,7 +67,7 @@ const topics: Topic[] = [
     descriptor: "Custom prints and image quality.",
     image: helpImage,
     alt: "A photograph on a screen beside the same photograph as a physical print",
-    destination: { label: "Prepare an image", href: "/custom" },
+    destination: { label: "Go to Custom", href: "/custom" },
     answers: [
       {
         q: "Can I print my own photo or artwork?",
@@ -101,20 +85,6 @@ const topics: Topic[] = [
         ],
         visual: { kind: "resolution" },
       },
-      {
-        q: "Can an old photo be restored first?",
-        lines: [
-          { body: "Yes. Restore Old Photo repairs fading, marks and damage before the file goes to print." },
-        ],
-        visual: { kind: "image", src: helpImage, alt: "Prepared image ready for printing" },
-      },
-      {
-        q: "Can I add text before printing?",
-        lines: [
-          { body: "Yes. Add Text places a name, date or short message on the image before it is printed." },
-        ],
-        visual: { kind: "image", src: helpImage, alt: "Image prepared with text before printing" },
-      },
     ],
   },
   {
@@ -125,7 +95,7 @@ const topics: Topic[] = [
     descriptor: "Production, shipping and returns.",
     image: helpOrders,
     alt: "A print packed flat with corner protection and surface film",
-    destination: { label: "Shipping & returns", href: "/shipping-returns" },
+    destination: { label: "View all help", href: "/help" },
     answers: [
       {
         q: "How long does production take?",
@@ -133,20 +103,6 @@ const topics: Topic[] = [
           { body: "Every print is made to order. The production time for your material and size is confirmed at checkout and in your order confirmation." },
         ],
         visual: { kind: "packaging" },
-      },
-      {
-        q: "How will my print be packaged?",
-        lines: [
-          { body: "Prints ship flat, with the surface filmed, the corners protected and the whole panel held inside a rigid outer carton." },
-        ],
-        visual: { kind: "packaging" },
-      },
-      {
-        q: "How much is shipping?",
-        lines: [
-          { body: "Shipping is calculated from your destination and the size of the print, and is shown before you pay." },
-        ],
-        visual: { kind: "image", src: helpOrders, alt: "Packed print ready for shipping" },
       },
       {
         q: "What if my print arrives damaged?",
@@ -165,7 +121,7 @@ const topics: Topic[] = [
     descriptor: "Uploads, ownership and privacy.",
     image: helpPrivacy,
     alt: "Close detail of a fine art print edge",
-    destination: { label: "Image & privacy policy", href: "/privacy" },
+    destination: { label: "View all help", href: "/help" },
     answers: [
       {
         q: "Who owns the image I upload?",
@@ -180,20 +136,6 @@ const topics: Topic[] = [
           { body: "It is used to prepare and produce the print you ordered. Full retention details are set out in the image and privacy policy." },
         ],
         visual: { kind: "image", src: helpPrivacy, alt: "Print surface detail" },
-      },
-      {
-        q: "Will my artwork ever be displayed publicly?",
-        lines: [
-          { body: "Not without your permission. Uploaded images are not published or added to the photoX collection." },
-        ],
-        visual: { kind: "image", src: helpPrivacy, alt: "Print surface detail" },
-      },
-      {
-        q: "How is my image used to fulfill my order?",
-        lines: [
-          { body: "The file is prepared for the material and size you chose, printed, checked and packed — then handed to the carrier." },
-        ],
-        visual: { kind: "packaging" },
       },
     ],
   },
@@ -356,14 +298,14 @@ function QuestionList({
   onPick: (i: number) => void;
 }) {
   return (
-    <div className="mt-8">
+    <div className="mt-5">
       <div className="border-t border-foreground/20">
         {topic.answers.map((a, i) => (
           <button
             key={a.q}
             type="button"
             onClick={() => onPick(i)}
-            className="group flex w-full items-baseline justify-between gap-6 border-b border-foreground/15 py-4 text-left"
+            className="group flex min-h-[52px] w-full items-center justify-between gap-6 border-b border-foreground/15 py-3 text-left"
           >
             <span className="px-serif text-[1.15rem] leading-tight transition-opacity duration-300 group-hover:opacity-70 md:text-[1.35rem]">
               {a.q}
@@ -377,7 +319,7 @@ function QuestionList({
           </button>
         ))}
       </div>
-      <div className="mt-6 flex justify-end">
+      <div className="mt-3">
         <a href={topic.destination.href} className="px-meta px-underline text-foreground/80 hover:text-foreground">
           {topic.destination.label} <span aria-hidden>→</span>
         </a>
@@ -433,7 +375,11 @@ export function HelpTopics() {
   };
 
   return (
-    <Shell id="help" className="py-16 md:py-24" label="Help topics">
+    <Shell
+      id="help"
+      className={active === null ? "py-16 md:py-24" : "py-14 md:py-16"}
+      label="Help topics"
+    >
       <div className="px-rule grid gap-y-3 pt-4 md:grid-cols-12 md:items-baseline md:gap-x-8">
         <h2 className="px-serif text-[2rem] leading-[1.05] md:col-span-6 md:text-[3rem]">
           What do you want to know?
@@ -444,7 +390,7 @@ export function HelpTopics() {
       </div>
 
       {/* Desktop: horizontal expansion */}
-      <div className="mt-12 hidden md:flex md:items-stretch md:gap-8">
+      <div className="mt-8 hidden md:flex md:items-stretch md:gap-8">
         {topics.map((t, i) => {
           const isActive = active === i;
           const quiet = active !== null && !isActive;
@@ -464,7 +410,7 @@ export function HelpTopics() {
               >
                 <div
                   className={`relative overflow-hidden bg-muted transition-all duration-700 ${
-                    isActive ? "h-[380px]" : "aspect-square"
+                    isActive ? "h-[270px]" : "aspect-square"
                   }`}
                 >
                   <img
@@ -478,11 +424,11 @@ export function HelpTopics() {
                     }`}
                   />
                 </div>
-                <div className="mt-5 flex items-start justify-between gap-4">
+                <div className="mt-3 flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <span className="px-meta text-muted-foreground">{t.num}</span>
                     <h3
-                      className={`px-serif mt-2 text-[1.35rem] leading-[1.1] transition-colors duration-300 ${
+                      className={`px-serif mt-1 text-[1.35rem] leading-[1.1] transition-colors duration-300 ${
                         quiet ? "text-foreground/60" : "text-foreground/85 group-hover:text-foreground"
                       }`}
                     >
@@ -491,7 +437,7 @@ export function HelpTopics() {
                       {t.titleBottom}
                     </h3>
                     <p
-                      className={`px-meta mt-3 text-muted-foreground transition-opacity duration-500 ${
+                      className={`px-meta mt-2 text-muted-foreground transition-opacity duration-500 ${
                         quiet ? "opacity-0" : "opacity-100"
                       }`}
                     >

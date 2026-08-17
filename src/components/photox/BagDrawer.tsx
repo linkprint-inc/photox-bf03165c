@@ -10,7 +10,7 @@ import {
 import { usePreparedImage } from "@/lib/prepared-image";
 
 export function BagDrawer() {
-  const { drawerOpen, closeDrawer, bag, subtotal, bagCount } = useStore();
+  const { drawerOpen, closeDrawer, bag, subtotal, updateBag, removeFromBag } = useStore();
   const { image: prepared } = usePreparedImage();
 
   useEffect(() => {
@@ -59,7 +59,7 @@ export function BagDrawer() {
             type="button"
             onClick={closeDrawer}
             aria-label="Close"
-            className="px-label text-base leading-none opacity-60 transition-opacity hover:opacity-100"
+            className="flex h-11 w-11 items-center justify-center text-[1.375rem] font-light leading-none text-muted-foreground transition-colors hover:text-foreground"
           >
             ×
           </button>
@@ -84,24 +84,61 @@ export function BagDrawer() {
               {bag.map((item) => {
                 const p = productById(item.productId);
                 if (!p) return null;
+                const productHref = item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
+                const lineTotal = unitPrice(item.material, item.sizeIndex) * item.qty;
                 return (
-                  <li key={item.key} className="px-rule flex gap-4 py-5 first:border-t-0">
-                    <Link to="/shop" onClick={closeDrawer} className="block w-16 shrink-0">
+                  <li key={item.key} className="px-rule grid grid-cols-[4rem_minmax(0,1fr)_2.25rem] items-start gap-4 py-7 first:border-t-0">
+                    <a href={productHref} onClick={closeDrawer} className="block w-16 shrink-0">
                       <img
                         src={item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image}
                         alt={p.name}
                         className="aspect-square w-16 object-cover"
                         loading="lazy"
                       />
-                    </Link>
+                    </a>
                     <div className="min-w-0 flex-1">
-                      <p className="px-label">{p.name}</p>
+                      <a href={productHref} onClick={closeDrawer} className="px-label px-underline">
+                        {p.name}
+                      </a>
                       <p className="px-meta mt-1 text-muted-foreground">
                         {materialName[item.material]} · {sizeLabel(item.sizeIndex)}
                       </p>
-                      <p className="px-price mt-2">
-                        {item.qty} × ${unitPrice(item.material, item.sizeIndex)}
-                      </p>
+                      <div className="mt-3 flex items-center">
+                        <div className="flex items-center gap-0">
+                          <button
+                            type="button"
+                            aria-label={`Decrease ${p.name} quantity`}
+                            onClick={() => updateBag(item.key, { qty: Math.max(1, item.qty - 1) })}
+                            className="px-label flex h-9 w-9 items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                          >
+                            −
+                          </button>
+                          <span className="px-price w-6 text-center">{item.qty}</span>
+                          <button
+                            type="button"
+                            aria-label={`Increase ${p.name} quantity`}
+                            onClick={() => updateBag(item.key, { qty: item.qty + 1 })}
+                            className="px-label flex h-9 w-9 items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex self-stretch flex-col items-end justify-between">
+                      <button
+                        type="button"
+                        aria-label={`Remove ${p.name} from bag`}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          removeFromBag(item.key);
+                        }}
+                        className="flex h-9 w-9 shrink-0 items-center justify-center text-base font-light leading-none text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        ×
+                      </button>
+                      <p className="px-price whitespace-nowrap">${lineTotal}</p>
                     </div>
                   </li>
                 );
@@ -111,23 +148,25 @@ export function BagDrawer() {
         </div>
 
         {bag.length > 0 && (
-          <div className="px-rule px-6 py-5">
+          <div className="px-rule shrink-0 px-6 py-5">
             <div className="flex items-baseline justify-between">
               <span className="px-label">Subtotal</span>
               <span className="px-price">${subtotal}</span>
             </div>
-            <button
-              type="button"
+            <p className="px-meta mt-2 text-muted-foreground">Shipping and taxes calculated at checkout.</p>
+            <Link
+              to="/checkout"
+              onClick={closeDrawer}
               className="mt-5 block w-full bg-ink px-6 py-3.5 text-center text-[0.7rem] font-medium uppercase tracking-[0.18em] text-paper transition-opacity hover:opacity-90"
             >
               Checkout
-            </button>
+            </Link>
             <Link
               to="/bag"
               onClick={closeDrawer}
               className="px-label px-underline mt-4 inline-block"
             >
-              View bag ({bagCount}) →
+              View bag →
             </Link>
           </div>
         )}

@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as BagRouteImport } from './routes/bag'
+import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CustomRouteImport } from './routes/custom'
 import { Route as MetalRouteImport } from './routes/metal'
 import { Route as PhotoToolsRouteImport } from './routes/photo-tools'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -39,6 +41,11 @@ const BagRoute = BagRouteImport.update({
   path: '/bag',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CustomRoute = CustomRouteImport.update({
   id: '/custom',
   path: '/custom',
@@ -59,6 +66,11 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/success',
+  path: '/success',
+  getParentRoute: () => CheckoutRoute,
+} as any)
 const ProductsSlugRoute = ProductsSlugRouteImport.update({
   id: '/products/$slug',
   path: '/products/$slug',
@@ -70,10 +82,12 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -81,10 +95,12 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRoutesById {
@@ -93,10 +109,12 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
+  '/checkout': typeof CheckoutRouteWithChildren
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
   '/shop': typeof ShopRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
 export interface FileRouteTypes {
@@ -106,10 +124,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/bag'
+    | '/checkout'
     | '/custom'
     | '/metal'
     | '/photo-tools'
     | '/shop'
+    | '/checkout/success'
     | '/products/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,10 +137,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/bag'
+    | '/checkout'
     | '/custom'
     | '/metal'
     | '/photo-tools'
     | '/shop'
+    | '/checkout/success'
     | '/products/$slug'
   id:
     | '__root__'
@@ -128,10 +150,12 @@ export interface FileRouteTypes {
     | '/about'
     | '/account'
     | '/bag'
+    | '/checkout'
     | '/custom'
     | '/metal'
     | '/photo-tools'
     | '/shop'
+    | '/checkout/success'
     | '/products/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -140,6 +164,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AccountRoute: typeof AccountRoute
   BagRoute: typeof BagRoute
+  CheckoutRoute: typeof CheckoutRouteWithChildren
   CustomRoute: typeof CustomRoute
   MetalRoute: typeof MetalRoute
   PhotoToolsRoute: typeof PhotoToolsRoute
@@ -177,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BagRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/custom': {
       id: '/custom'
       path: '/custom'
@@ -205,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof CheckoutRoute
+    }
     '/products/$slug': {
       id: '/products/$slug'
       path: '/products/$slug'
@@ -215,11 +254,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface CheckoutRouteChildren {
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+}
+
+const CheckoutRouteChildren: CheckoutRouteChildren = {
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
+}
+
+const CheckoutRouteWithChildren = CheckoutRoute._addFileChildren(
+  CheckoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AccountRoute: AccountRoute,
   BagRoute: BagRoute,
+  CheckoutRoute: CheckoutRouteWithChildren,
   CustomRoute: CustomRoute,
   MetalRoute: MetalRoute,
   PhotoToolsRoute: PhotoToolsRoute,

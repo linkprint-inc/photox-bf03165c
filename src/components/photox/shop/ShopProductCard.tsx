@@ -31,18 +31,29 @@ export function ShopProductCard({
   const price = size !== null ? sizeSteps[size]!.price : product.from;
 
   const cursorRef = useRef<HTMLDivElement | null>(null);
+  const heartRef = useRef<HTMLButtonElement | null>(null);
   const target = useRef({ x: 0, y: 0 });
   const pos = useRef({ x: 0, y: 0 });
   const raf = useRef<number | null>(null);
+  const lastFrame = useRef(0);
+  const finePointer = useRef(false);
+  const reducedMotion = useRef(false);
+  const magnetAttachedRef = useRef(false);
   const [cursorOn, setCursorOn] = useState(false);
+  const [magnetStrength, setMagnetStrength] = useState(0);
+  const [magnetAttached, setMagnetAttached] = useState(false);
 
-  const loop = useCallback(() => {
+  const loop = useCallback((time: number) => {
     const el = cursorRef.current;
     if (el) {
-      pos.current.x += (target.current.x - pos.current.x) * 0.18;
-      pos.current.y += (target.current.y - pos.current.y) * 0.18;
-      el.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`;
+      const delta = Math.min((time - lastFrame.current) / 1000 || 1 / 60, 0.05);
+      const followRate = magnetAttachedRef.current ? 15 : 13;
+      const easing = 1 - Math.exp(-followRate * delta);
+      pos.current.x += (target.current.x - pos.current.x) * easing;
+      pos.current.y += (target.current.y - pos.current.y) * easing;
+      el.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0) translate(-50%, -50%)`;
     }
+    lastFrame.current = time;
     raf.current = requestAnimationFrame(loop);
   }, []);
 
@@ -54,25 +65,75 @@ export function ShopProductCard({
     };
   }, [cursorOn, loop]);
 
+  const updateCursor = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
+    if (!finePointer.current) return;
+
+    const imageBounds = event.currentTarget.getBoundingClientRect();
+    const pointer = { x: event.clientX - imageBounds.left, y: event.clientY - imageBounds.top };
+    const heartBounds = heartRef.current?.getBoundingClientRect();
+
+    if (!heartBounds) {
+      target.current = pointer;
+      return;
+    }
+
+    const heart = {
+      x: heartBounds.left + heartBounds.width / 2 - imageBounds.left,
+      y: heartBounds.top + heartBounds.height / 2 - imageBounds.top,
+    };
+    const distance = Math.hypot(pointer.x - heart.x, pointer.y - heart.y);
+    const radius = 58;
+    const attachRadius = 22;
+    const attached = distance <= attachRadius;
+    const proximity = Math.max(0, Math.min(1, (radius - distance) / (radius - attachRadius)));
+    const strength = proximity * (2 - proximity);
+
+    magnetAttachedRef.current = attached;
+    setMagnetAttached(attached);
+    setMagnetStrength(strength);
+
+    if (reducedMotion.current && attached) {
+      pos.current = heart;
+      target.current = heart;
+      return;
+    }
+
+    target.current = {
+      x: pointer.x + (heart.x - pointer.x) * strength,
+      y: pointer.y + (heart.y - pointer.y) * strength,
+    };
+  }, []);
+
   return (
     <article className="group">
       <a href={link} className="block" aria-label={`${product.name} — view artwork`}>
         <div
-          onMouseEnter={(e) => {
-            if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+          onPointerEnter={(e) => {
+            finePointer.current = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+            reducedMotion.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            if (!finePointer.current) return;
             const r = e.currentTarget.getBoundingClientRect();
             pos.current = { x: e.clientX - r.left, y: e.clientY - r.top };
             target.current = { ...pos.current };
+            lastFrame.current = performance.now();
             setCursorOn(true);
             if (cursorRef.current) cursorRef.current.style.opacity = "1";
+            updateCursor(e);
           }}
-          onMouseMove={(e) => {
-            const r = e.currentTarget.getBoundingClientRect();
-            target.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-          }}
-          onMouseLeave={() => {
+          onPointerMove={updateCursor}
+          onPointerLeave={() => {
+            finePointer.current = false;
+            magnetAttachedRef.current = false;
             setCursorOn(false);
+            setMagnetAttached(false);
+            setMagnetStrength(0);
             if (cursorRef.current) cursorRef.current.style.opacity = "0";
+          }}
+          onClick={(e) => {
+            if (!magnetAttachedRef.current) return;
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSaved(product.id);
           }}
           className={[
             "relative aspect-square w-full overflow-hidden bg-secondary md:cursor-none",
@@ -95,10 +156,8 @@ export function ShopProductCard({
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[380ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-100 group-focus-within:opacity-100"
           />
 
-
-
-          {/* Mobile: small standalone heart in lower-right */}
           <button
+            ref={heartRef}
             type="button"
             aria-label={action === "remove" ? "Remove from saved" : saved ? "Saved" : "Save"}
             aria-pressed={saved}
@@ -107,7 +166,11 @@ export function ShopProductCard({
               e.stopPropagation();
               toggleSaved(product.id);
             }}
-            className={["absolute right-2 top-2 z-30 flex h-9 w-9 cursor-pointer items-center justify-center text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-opacity duration-300 hover:opacity-100", saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70"].join(" ")}
+            className={[
+              "absolute right-2 top-2 z-30 flex h-9 w-9 cursor-pointer items-center justify-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-[opacity,color,transform] duration-[160ms] md:cursor-none hover:opacity-100",
+              magnetAttached ? "scale-[1.08] text-foreground !opacity-100" : "text-white",
+              saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70",
+            ].join(" ")}
           >
             <svg
               width="16"
@@ -121,20 +184,27 @@ export function ShopProductCard({
             </svg>
           </button>
 
-          {/* Desktop: follow-cursor arrow cue */}
           <div
             aria-hidden
             ref={cursorRef}
             className={[
-              "pointer-events-none absolute left-0 top-0 z-20 hidden h-[52px] w-[52px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-foreground md:flex",
-              "transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,0.61,0.36,1)]",
+              "pointer-events-none absolute left-0 top-0 z-20 hidden items-center justify-center rounded-full bg-white/90 text-foreground md:flex",
+              "transition-[transform,opacity,width,height] duration-[180ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
               cursorOn ? "scale-100 opacity-100" : "scale-75 opacity-0",
             ].join(" ")}
-            style={{ willChange: "transform, opacity" }}
+            style={{
+              width: magnetAttached ? 46 : 52,
+              height: magnetAttached ? 46 : 52,
+              willChange: "transform, opacity, width, height",
+            }}
           >
-            <ArrowUpRight size={21} strokeWidth={1.6} className="m-0 p-0" />
+            <ArrowUpRight
+              size={21}
+              strokeWidth={1.6}
+              className="m-0 p-0 transition-opacity duration-[160ms]"
+              style={{ opacity: 1 - magnetStrength }}
+            />
           </div>
-
         </div>
       </a>
 

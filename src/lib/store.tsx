@@ -37,6 +37,11 @@ export type Order = {
   shippingAddress: string[];
 };
 
+export type CheckoutDetails = {
+  email: string;
+  shippingAddress: string[];
+};
+
 const STORAGE = "photox-store-v1";
 
 export const finishLabel: Record<BagMaterial, string> = {
@@ -116,6 +121,7 @@ type Ctx = State & {
   addToBag: (item: Omit<BagItem, "key">) => void;
   updateBag: (key: string, patch: Partial<Omit<BagItem, "key">>) => void;
   removeFromBag: (key: string) => void;
+  placeOrder: (details: CheckoutDetails) => Order;
   drawerOpen: boolean;
   openDrawer: () => void;
   closeDrawer: () => void;
@@ -195,6 +201,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, bag: s.bag.filter((b) => b.key !== key) }));
   }, []);
 
+  const placeOrder = useCallback((details: CheckoutDetails) => {
+    const order: Order = {
+      id: `PX-${String(Date.now()).slice(-5)}`,
+      placed: new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit", year: "numeric" }).format(new Date()),
+      status: "Order received",
+      items: [],
+      shippingAddress: details.shippingAddress,
+    };
+    setState((s) => {
+      order.items = s.bag.map(({ productId, material, sizeIndex, qty }) => ({
+        productId,
+        material,
+        sizeIndex,
+        qty,
+      }));
+      return { ...s, orders: [order, ...s.orders], bag: [] };
+    });
+    return order;
+  }, []);
+
   const value = useMemo<Ctx>(() => {
     const bagCount = state.bag.reduce((n, b) => n + b.qty, 0);
     const subtotal = state.bag.reduce((n, b) => n + unitPrice(b.material, b.sizeIndex) * b.qty, 0);
@@ -210,11 +236,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addToBag,
       updateBag,
       removeFromBag,
+      placeOrder,
       drawerOpen,
       openDrawer: () => setDrawerOpen(true),
       closeDrawer: () => setDrawerOpen(false),
     };
-  }, [state, hydrated, drawerOpen, signIn, signOut, toggleSaved, addToBag, updateBag, removeFromBag]);
+  }, [state, hydrated, drawerOpen, signIn, signOut, toggleSaved, addToBag, updateBag, removeFromBag, placeOrder]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

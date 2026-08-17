@@ -69,6 +69,7 @@ function BagRow({ item }: { item: BagItem }) {
   const { image: prepared } = usePreparedImage();
   const src = item.productId === "custom-print" && prepared ? prepared.dataUrl : p?.image;
   if (!p) return null;
+  const productHref = item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
 
   const materials: BagMaterial[] =
     p.material === "both" ? ["metal", "canvas"] : [p.material as BagMaterial];
@@ -76,8 +77,8 @@ function BagRow({ item }: { item: BagItem }) {
   return (
     <li className="px-rule py-8">
       <div className="flex gap-6">
-        <Link
-          to="/shop"
+        <a
+          href={productHref}
           className="group relative block w-24 shrink-0 overflow-hidden sm:w-32"
           aria-label={`${p.name} — view artwork`}
         >
@@ -85,15 +86,15 @@ function BagRow({ item }: { item: BagItem }) {
           <span className="px-reveal absolute inset-x-0 bottom-0 bg-paper/92 py-1.5 text-center text-[0.6rem] font-medium uppercase tracking-[0.14em] group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
             View →
           </span>
-        </Link>
+        </a>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-4">
             <div>
               <h2 className="px-label">
-                <Link to="/shop" className="px-underline">
+                <a href={productHref} className="px-underline">
                   {p.name}
-                </Link>
+                </a>
               </h2>
               <p className="px-meta mt-1 text-muted-foreground">{materialName[item.material]}</p>
               <p className="px-meta text-muted-foreground">{sizeLabel(item.sizeIndex)}</p>
@@ -195,12 +196,12 @@ function OrderSummary({ subtotal }: { subtotal: number }) {
         </div>
       </dl>
 
-      <button
-        type="button"
+      <Link
+        to="/checkout"
         className="mt-6 block w-full bg-ink px-6 py-4 text-center text-[0.7rem] font-medium uppercase tracking-[0.18em] text-paper transition-opacity hover:opacity-90"
       >
         Checkout
-      </button>
+      </Link>
       <p className="px-meta mt-4 text-muted-foreground">Secure checkout.</p>
 
       <div className="mt-8">
@@ -312,12 +313,12 @@ function BagPage() {
       {!empty && (
         <div className="px-rule sticky bottom-0 z-40 flex items-center justify-between gap-4 bg-paper/95 px-6 py-3 backdrop-blur-sm lg:hidden">
           <span className="px-price">Total ${subtotal}</span>
-          <button
-            type="button"
+          <Link
+            to="/checkout"
             className="bg-ink px-6 py-3 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-paper"
           >
             Checkout
-          </button>
+          </Link>
         </div>
       )}
 
