@@ -94,13 +94,8 @@ export function ShopProductCard({
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-[380ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] group-hover:opacity-100 group-focus-within:opacity-100"
           />
-          <span
-            aria-hidden
-            className={[
-              isMetal ? "px-edge" : "px-canvas-edge",
-              "group-hover:w-[6px] group-focus-within:w-[6px]",
-            ].join(" ")}
-          />
+
+
 
           {/* Mobile: small standalone heart in lower-right */}
           <button
