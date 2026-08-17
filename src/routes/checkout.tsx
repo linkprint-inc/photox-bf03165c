@@ -42,7 +42,15 @@ function CheckoutHeader() {
         >
           photoX
         </Link>
-        <span className="px-label text-muted-foreground">Secure checkout</span>
+        <div className="flex items-center gap-6">
+          <Link
+            to="/bag"
+            className="px-label px-underline text-muted-foreground hover:text-foreground"
+          >
+            ← Return to bag
+          </Link>
+          <span className="px-label text-muted-foreground">Secure checkout</span>
+        </div>
       </div>
     </header>
   );

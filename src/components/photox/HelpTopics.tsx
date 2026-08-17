@@ -39,23 +39,42 @@ const topics: Topic[] = [
     descriptor: "Material, size and finish.",
     image: helpChoosing,
     alt: "Glossy metal print beside a textured frameless canvas print",
-    destination: { label: "View all help", href: "/help" },
+    destination: { label: "Shop prints", href: "/shop" },
     answers: [
       {
         q: "Metal or canvas?",
         lines: [
-          { term: "Metal", body: "Glossy, luminous and crisp. Ideal when you want colour, detail and reflected light." },
-          { term: "Canvas", body: "Matte, tactile and softer. Ideal for a more traditional, textured finish." },
+          {
+            term: "Metal",
+            body: "Glossy, luminous and crisp. Ideal when you want colour, detail and reflected light.",
+          },
+          {
+            term: "Canvas",
+            body: "Matte, tactile and softer. Ideal for a more traditional, textured finish.",
+          },
         ],
         visual: { kind: "materials" },
       },
       {
         q: "What size should I choose?",
         lines: [
-          { body: "Match the print to the wall, not the room. On the same wall, each size reads very differently." },
-          { body: "Every artwork lists its available sizes and price before you add it to the bag." },
+          {
+            body: "Match the print to the wall, not the room. On the same wall, each size reads very differently.",
+          },
+          {
+            body: "Every artwork lists its available sizes and price before you add it to the bag.",
+          },
         ],
         visual: { kind: "sizes" },
+      },
+      {
+        q: "Which finish is right for my image?",
+        lines: [
+          {
+            body: "Metal suits crisp detail and reflected light. Canvas gives images a softer, matte finish.",
+          },
+        ],
+        visual: { kind: "materials" },
       },
     ],
   },
@@ -72,18 +91,37 @@ const topics: Topic[] = [
       {
         q: "Can I print my own photo or artwork?",
         lines: [
-          { body: "Yes. Custom prints use your own file on the same metal and frameless canvas as the collection." },
-          { body: "Upload the image, choose material and size, and the price updates with the size you pick." },
+          {
+            body: "Yes. Custom prints use your own file on the same metal and frameless canvas as the collection.",
+          },
+          {
+            body: "Upload the image, choose material and size, and the price updates with the size you pick.",
+          },
         ],
-        visual: { kind: "image", src: helpImage, alt: "A photograph moving from screen to printed panel" },
+        visual: {
+          kind: "image",
+          src: helpImage,
+          alt: "A photograph moving from screen to printed panel",
+        },
       },
       {
         q: "Is my image large enough to print?",
         lines: [
-          { body: "Larger prints need more pixels. As a guide, the longest edge of your file sets the comfortable print size." },
+          {
+            body: "Larger prints need more pixels. As a guide, the longest edge of your file sets the comfortable print size.",
+          },
           { body: "If the file is small, Enhance Resolution can prepare it before printing." },
         ],
         visual: { kind: "resolution" },
+      },
+      {
+        q: "Can an old photo be restored first?",
+        lines: [
+          {
+            body: "Yes. Restore Old Photo can prepare faded, marked or damaged images before printing.",
+          },
+        ],
+        visual: { kind: "image", src: helpImage, alt: "Prepared image ready for printing" },
       },
     ],
   },
@@ -95,19 +133,32 @@ const topics: Topic[] = [
     descriptor: "Production, shipping and returns.",
     image: helpOrders,
     alt: "A print packed flat with corner protection and surface film",
-    destination: { label: "View all help", href: "/help" },
+    destination: { label: "Shipping & returns", href: "/shipping-returns" },
     answers: [
       {
         q: "How long does production take?",
         lines: [
-          { body: "Every print is made to order. The production time for your material and size is confirmed at checkout and in your order confirmation." },
+          {
+            body: "Every print is made to order. The production time for your material and size is confirmed at checkout and in your order confirmation.",
+          },
+        ],
+        visual: { kind: "packaging" },
+      },
+      {
+        q: "How will my print be packaged?",
+        lines: [
+          {
+            body: "Prints ship flat with surface film, protected corners and a rigid outer carton.",
+          },
         ],
         visual: { kind: "packaging" },
       },
       {
         q: "What if my print arrives damaged?",
         lines: [
-          { body: "Contact us with a photo of the packaging and the print, and we will resolve it under our returns terms." },
+          {
+            body: "Contact us with a photo of the packaging and the print, and we will resolve it under our returns terms.",
+          },
         ],
         visual: { kind: "image", src: helpOrders, alt: "Protective packaging detail" },
       },
@@ -121,19 +172,30 @@ const topics: Topic[] = [
     descriptor: "Uploads, ownership and privacy.",
     image: helpPrivacy,
     alt: "Close detail of a fine art print edge",
-    destination: { label: "View all help", href: "/help" },
+    destination: { label: "Artwork & image policy", href: "/privacy" },
     answers: [
       {
-        q: "Who owns the image I upload?",
+        q: "Can I print my own artwork?",
         lines: [
-          { body: "You do. Uploading an image to photoX does not transfer any ownership of it." },
+          {
+            body: "Yes. Custom prints use your own image or artwork on metal or frameless canvas.",
+          },
         ],
-        visual: { kind: "image", src: helpPrivacy, alt: "Print surface detail" },
+        visual: { kind: "image", src: helpPrivacy, alt: "Fine art print surface detail" },
       },
       {
         q: "What happens to my uploaded image?",
         lines: [
-          { body: "It is used to prepare and produce the print you ordered. Full retention details are set out in the image and privacy policy." },
+          {
+            body: "It is used to prepare and produce the print you ordered. Full retention details are set out in the image and privacy policy.",
+          },
+        ],
+        visual: { kind: "image", src: helpPrivacy, alt: "Print surface detail" },
+      },
+      {
+        q: "Who owns the image I upload?",
+        lines: [
+          { body: "You do. Uploading an image to photoX does not transfer any ownership of it." },
         ],
         visual: { kind: "image", src: helpPrivacy, alt: "Print surface detail" },
       },
@@ -155,7 +217,9 @@ function MaterialsVisual() {
             className="h-full w-full origin-left scale-[2] object-cover"
           />
         </div>
-        <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Metal — gloss</figcaption>
+        <figcaption className="px-meta px-rule pt-2 text-muted-foreground">
+          Metal — gloss
+        </figcaption>
       </figure>
       <figure className="bg-background">
         <div className="px-weave relative aspect-square overflow-hidden">
@@ -168,7 +232,9 @@ function MaterialsVisual() {
             className="h-full w-full origin-right scale-[2] object-cover"
           />
         </div>
-        <figcaption className="px-meta px-rule pt-2 text-muted-foreground">Canvas — matte</figcaption>
+        <figcaption className="px-meta px-rule pt-2 text-muted-foreground">
+          Canvas — matte
+        </figcaption>
       </figure>
     </div>
   );
@@ -219,11 +285,15 @@ function ResolutionVisual() {
           className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-4 border-b border-foreground/15 py-4"
         >
           <span className="px-label">{r.px}</span>
-          <span aria-hidden className="px-meta text-muted-foreground">→</span>
+          <span aria-hidden className="px-meta text-muted-foreground">
+            →
+          </span>
           <span className="px-meta text-right text-muted-foreground">{r.size}</span>
         </div>
       ))}
-      <p className="px-meta mt-3 text-muted-foreground">Longest edge of your file → comfortable print size.</p>
+      <p className="px-meta mt-3 text-muted-foreground">
+        Longest edge of your file → comfortable print size.
+      </p>
     </div>
   );
 }
@@ -290,13 +360,7 @@ function PlusMark({ open }: { open: boolean }) {
   );
 }
 
-function QuestionList({
-  topic,
-  onPick,
-}: {
-  topic: Topic;
-  onPick: (i: number) => void;
-}) {
+function QuestionList({ topic, onPick }: { topic: Topic; onPick: (i: number) => void }) {
   return (
     <div className="mt-5">
       <div className="border-t border-foreground/20">
@@ -320,7 +384,10 @@ function QuestionList({
         ))}
       </div>
       <div className="mt-3">
-        <a href={topic.destination.href} className="px-meta px-underline text-foreground/80 hover:text-foreground">
+        <a
+          href={topic.destination.href}
+          className="px-meta px-underline text-foreground/80 hover:text-foreground"
+        >
           {topic.destination.label} <span aria-hidden>→</span>
         </a>
       </div>
@@ -328,13 +395,7 @@ function QuestionList({
   );
 }
 
-function AnswerView({
-  answer,
-  onBack,
-}: {
-  answer: Answer;
-  onBack: () => void;
-}) {
+function AnswerView({ answer, onBack }: { answer: Answer; onBack: () => void }) {
   return (
     <div className="mt-8">
       <div className="grid gap-8 border-t border-foreground/20 pt-8 md:grid-cols-2 md:gap-12">
@@ -353,7 +414,12 @@ function AnswerView({
             onClick={onBack}
             className="px-meta px-underline group mt-8 inline-flex items-center gap-2 text-foreground/80 hover:text-foreground"
           >
-            <span aria-hidden className="transition-transform duration-300 group-hover:-translate-x-[3px]">←</span>
+            <span
+              aria-hidden
+              className="transition-transform duration-300 group-hover:-translate-x-[3px]"
+            >
+              ←
+            </span>
             Back to questions
           </button>
         </div>
@@ -429,7 +495,9 @@ export function HelpTopics() {
                     <span className="px-meta text-muted-foreground">{t.num}</span>
                     <h3
                       className={`px-serif mt-1 text-[1.35rem] leading-[1.1] transition-colors duration-300 ${
-                        quiet ? "text-foreground/60" : "text-foreground/85 group-hover:text-foreground"
+                        quiet
+                          ? "text-foreground/60"
+                          : "text-foreground/85 group-hover:text-foreground"
                       }`}
                     >
                       {t.titleTop}
@@ -482,7 +550,9 @@ export function HelpTopics() {
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <span className="px-serif min-w-0 flex-1 text-[1.2rem] leading-tight">{t.title}</span>
+                <span className="px-serif min-w-0 flex-1 text-[1.2rem] leading-tight">
+                  {t.title}
+                </span>
                 <PlusMark open={isActive} />
               </button>
               {isActive ? (
@@ -498,16 +568,6 @@ export function HelpTopics() {
             </div>
           );
         })}
-      </div>
-
-      <div className="px-rule mt-14 flex flex-wrap items-baseline justify-between gap-4 pt-6">
-        <p className="px-label text-foreground/70">Still looking for something?</p>
-        <a href="/help" className="px-meta px-underline group text-foreground/80 hover:text-foreground">
-          View all help{" "}
-          <span aria-hidden className="inline-block transition-transform duration-300 group-hover:translate-x-[3px]">
-            →
-          </span>
-        </a>
       </div>
     </Shell>
   );
