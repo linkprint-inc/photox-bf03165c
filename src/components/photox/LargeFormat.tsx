@@ -9,7 +9,7 @@ export function LargeFormat() {
       <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
         {largeWorks.map((w) => (
           <article key={w.id}>
-            <a href="/shop" className="group block">
+            <a href={`/products/${w.id}`} className="group block">
               <div className="relative aspect-square w-full overflow-hidden bg-secondary">
                 <img
                   src={w.image}

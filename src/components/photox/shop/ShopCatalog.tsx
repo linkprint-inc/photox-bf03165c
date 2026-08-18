@@ -1,17 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { Shell } from "../Section";
 import { ShopProductCard } from "./ShopProductCard";
-import {
-  ShopFilterPanel,
-  emptyFilters,
-  countFilters,
-  type FilterState,
-} from "./ShopFilterPanel";
+import { ShopFilterPanel, emptyFilters, countFilters, type FilterState } from "./ShopFilterPanel";
 import metalDetail from "@/assets/metal-detail.jpg";
 import {
   materialLabel,
   priceBands,
   shopProducts,
+  sizeLabelsFromSearch,
+  sizeSearchValue,
   sortOptions,
   totalWorks,
   type ShopProduct,
@@ -34,16 +32,27 @@ function matchesCategory(p: ShopProduct, cat: string) {
   return (p.styles as string[]).includes(cat);
 }
 
-export function ShopCatalog({ query }: { query?: string }) {
+export function ShopCatalog({ query, size }: { query?: string; size?: string }) {
+  const navigate = useNavigate();
+  const requestedSizes = useMemo(() => sizeLabelsFromSearch(size), [size]);
+  const restoredShopState = useRef(false);
   const [category, setCategory] = useState<string>("All");
-  const [filters, setFilters] = useState<FilterState>(emptyFilters);
+  const [filters, setFilters] = useState<FilterState>(() => ({
+    ...emptyFilters,
+    sizes: requestedSizes,
+  }));
   const [panelOpen, setPanelOpen] = useState(false);
   const [view, setView] = useState<"grid" | "room">("grid");
   const [sort, setSort] = useState<SortOption>("Featured");
+  const [sortOpen, setSortOpen] = useState(false);
   const [count, setCount] = useState(PAGE);
+  const sortRef = useRef<HTMLDivElement>(null);
 
   // Preserve browsing state when returning from a product detail page.
   useEffect(() => {
+    if (restoredShopState.current) return;
+    restoredShopState.current = true;
+    if (requestedSizes.length) return;
     try {
       const raw = sessionStorage.getItem(SHOP_STATE);
       if (!raw) return;
@@ -64,7 +73,7 @@ export function ShopCatalog({ query }: { query?: string }) {
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [requestedSizes.length]);
 
   useEffect(() => {
     const save = () => {
@@ -84,6 +93,22 @@ export function ShopCatalog({ query }: { query?: string }) {
     };
   }, [category, filters, view, sort, count]);
 
+  useEffect(() => {
+    if (!sortOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSortOpen(false);
+    };
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!sortRef.current?.contains(event.target as Node)) setSortOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("pointerdown", closeOnOutsidePointer);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("pointerdown", closeOnOutsidePointer);
+    };
+  }, [sortOpen]);
+
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
 
@@ -101,6 +126,9 @@ export function ShopCatalog({ query }: { query?: string }) {
       list = list.filter((p) =>
         filters.materials.some((m) => materialLabel[p.material] === m || p.material === "both"),
       );
+    }
+    if (filters.sizes.length) {
+      list = list.filter((p) => filters.sizes.some((size) => p.availableSizes.includes(size)));
     }
     if (filters.orientations.length) {
       list = list.filter((p) => filters.orientations.includes(p.orientation));
@@ -129,16 +157,35 @@ export function ShopCatalog({ query }: { query?: string }) {
 
   const shown = results.slice(0, count);
   const active = countFilters(filters);
+  const isFullCollection = category === "All" && !query?.trim() && active === 0;
+
+  const syncSizeSearch = (sizes: string[]) => {
+    navigate({
+      to: "/shop",
+      search: (previous) => ({
+        ...previous,
+        ...(sizes.length
+          ? { size: sizes.map((label) => sizeSearchValue(label)).join(",") }
+          : { size: undefined }),
+      }),
+      replace: true,
+    });
+  };
 
   const toggle = (group: keyof FilterState, value: string) => {
     setCount(PAGE);
-    setFilters((prev) => {
-      const arr = prev[group];
-      return {
-        ...prev,
-        [group]: arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value],
-      };
-    });
+    const values = filters[group];
+    const nextValues = values.includes(value)
+      ? values.filter((entry) => entry !== value)
+      : [...values, value];
+    if (group === "sizes") syncSizeSearch(nextValues);
+    setFilters((previous) => ({ ...previous, [group]: nextValues }));
+  };
+
+  const clearFilters = () => {
+    setCount(PAGE);
+    setFilters(emptyFilters);
+    syncSizeSearch([]);
   };
 
   return (
@@ -155,8 +202,8 @@ export function ShopCatalog({ query }: { query?: string }) {
 
       {/* 03 — category row */}
       <Shell label="Categories">
-        <nav aria-label="Categories" className="-mx-6 overflow-x-auto px-6 md:mx-0 md:px-0">
-          <ul className="flex min-w-max items-baseline gap-x-9 md:gap-x-12">
+        <nav aria-label="Categories">
+          <ul className="flex flex-wrap items-baseline gap-x-7 gap-y-4 md:flex-nowrap md:gap-x-12 md:gap-y-0">
             {primaryCategories.map((c) => {
               const on = category === c.key;
               return (
@@ -182,26 +229,35 @@ export function ShopCatalog({ query }: { query?: string }) {
             })}
           </ul>
         </nav>
-        <div className="mt-8 border-t border-hairline md:mt-9" />
+        <div className="mt-6 border-t border-hairline md:mt-9" />
       </Shell>
-
 
       {/* 04 — toolbar (secondary) */}
       <Shell label="Shop controls">
-        <div className="flex items-center justify-between gap-x-8 py-3">
-          <button
-            type="button"
-            onClick={() => setPanelOpen((v) => !v)}
-            className="text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            {active > 0 ? `Filter (${active})` : "Filter +"}
-          </button>
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-3">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <button
+              type="button"
+              onClick={() => setPanelOpen((v) => !v)}
+              className="text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {active > 0 ? `Filter (${active})` : "Filter +"}
+            </button>
+            {filters.sizes.map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => toggle("sizes", label)}
+                aria-label={`Remove ${label} size filter`}
+                className="px-label px-underline text-foreground"
+              >
+                {label} ×
+              </button>
+            ))}
+          </div>
 
           <div className="flex items-center gap-x-6 text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground">
-            <span>
-              {results.length === shopProducts.length ? totalWorks : results.length} works
-            </span>
-
+            <span>{isFullCollection ? totalWorks : results.length} works</span>
 
             <div className="flex items-center gap-2.5">
               {(["grid", "room"] as const).map((v) => (
@@ -213,18 +269,34 @@ export function ShopCatalog({ query }: { query?: string }) {
                   aria-label={v === "grid" ? "Grid view" : "Room view"}
                   className={[
                     "transition-opacity duration-300",
-                    view === v ? "opacity-100 text-foreground" : "opacity-40 hover:opacity-100 text-foreground",
+                    view === v
+                      ? "opacity-100 text-foreground"
+                      : "opacity-40 hover:opacity-100 text-foreground",
                   ].join(" ")}
                 >
                   {v === "grid" ? (
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    >
                       <rect x="1.5" y="1.5" width="6" height="6" />
                       <rect x="10.5" y="1.5" width="6" height="6" />
                       <rect x="1.5" y="10.5" width="6" height="6" />
                       <rect x="10.5" y="10.5" width="6" height="6" />
                     </svg>
                   ) : (
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.2">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.2"
+                    >
                       <rect x="1.5" y="3" width="15" height="12" />
                       <path d="M5 15V9h8v6" />
                     </svg>
@@ -233,33 +305,70 @@ export function ShopCatalog({ query }: { query?: string }) {
               ))}
             </div>
 
-            <label className="flex items-center gap-1.5">
-              <span>Sort</span>
-              <select
-                value={sort}
-                onChange={(e) => setSort(e.target.value as SortOption)}
-                className="cursor-pointer appearance-none bg-transparent pr-1 text-[0.75rem] uppercase tracking-[0.06em] text-foreground/80 outline-none"
+            <div ref={sortRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setSortOpen((open) => !open)}
+                aria-expanded={sortOpen}
+                aria-controls="shop-sort-menu"
+                className="flex items-center gap-1.5 text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground transition-colors hover:text-foreground"
               >
-                {sortOptions.map((o) => (
-                  <option key={o} value={o}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            </label>
-
+                Sort
+                <span
+                  aria-hidden
+                  className={`inline-block text-[0.95rem] leading-none transition-transform duration-200 ${sortOpen ? "rotate-45" : "rotate-0"}`}
+                >
+                  +
+                </span>
+              </button>
+              <div
+                id="shop-sort-menu"
+                role="menu"
+                aria-label="Sort artwork"
+                aria-hidden={!sortOpen}
+                className={[
+                  "absolute right-0 top-full z-30 mt-2 w-60 border border-hairline bg-paper px-4 py-1.5 shadow-[0_6px_18px_rgba(30,25,20,0.05)] transition-[opacity,transform] duration-200 ease-out",
+                  sortOpen
+                    ? "pointer-events-auto translate-y-0 opacity-100"
+                    : "pointer-events-none -translate-y-1 opacity-0",
+                ].join(" ")}
+              >
+                {sortOptions.map((option, index) => {
+                  const selected = sort === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={selected}
+                      tabIndex={sortOpen ? 0 : -1}
+                      onClick={() => {
+                        setSort(option);
+                        setSortOpen(false);
+                      }}
+                      className={[
+                        "flex h-10 w-full items-center text-left text-[0.8rem] uppercase tracking-[0.055em] transition-colors duration-150",
+                        index > 0 ? "border-t border-hairline" : "",
+                        selected
+                          ? "font-medium text-foreground"
+                          : "font-normal text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </Shell>
-
 
       {/* 05 + 06 — filters and grid */}
       <Shell label="Products" className="pb-24">
         <div
           className={
-            panelOpen
-              ? "grid gap-10 pt-6 md:grid-cols-[220px_minmax(0,1fr)]"
-              : "grid gap-10 pt-6"
+            panelOpen ? "grid gap-10 pt-6 md:grid-cols-[220px_minmax(0,1fr)]" : "grid gap-10 pt-6"
           }
         >
           <ShopFilterPanel
@@ -267,7 +376,7 @@ export function ShopCatalog({ query }: { query?: string }) {
             filters={filters}
             results={results.length}
             onToggle={toggle}
-            onClear={() => setFilters(emptyFilters)}
+            onClear={clearFilters}
             onClose={() => setPanelOpen(false)}
           />
 
@@ -281,7 +390,7 @@ export function ShopCatalog({ query }: { query?: string }) {
                 <button
                   type="button"
                   onClick={() => {
-                    setFilters(emptyFilters);
+                    clearFilters();
                     setCategory("All");
                   }}
                   className="px-label px-underline mt-6"
@@ -344,7 +453,7 @@ export function ShopCatalog({ query }: { query?: string }) {
                 {/* 16 — load more */}
                 <div className="mt-20 text-center">
                   <p className="px-meta text-muted-foreground">
-                    Showing {shown.length} of {results.length === shopProducts.length ? totalWorks : results.length}
+                    Showing {shown.length} of {isFullCollection ? totalWorks : results.length}
                   </p>
                   {count < results.length ? (
                     <button

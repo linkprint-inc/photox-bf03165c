@@ -2,12 +2,18 @@ import { useState } from "react";
 import { filterMap, filters, products, sizeRange, type Product } from "@/lib/photox-data";
 import { Shell, SectionHead } from "./Section";
 
+const detailSlugByProductId: Record<string, string> = {
+  "concrete-light": "brutal-form",
+  "red-field-no-2": "red-field-02",
+};
+
 function ProductCell({ product }: { product: Product }) {
   const isMetal = product.material === "Metal Print";
+  const detailHref = `/products/${detailSlugByProductId[product.id] ?? product.id}`;
 
   return (
     <article>
-      <a href="/shop" className="group block">
+      <a href={detailHref} className="group block">
         <div
           className={[
             "relative aspect-square w-full overflow-hidden bg-secondary",

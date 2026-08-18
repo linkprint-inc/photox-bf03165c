@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { ArrowLeftRight } from "lucide-react";
 import customOriginal from "@/assets/custom-original.jpg";
 import customPrint from "@/assets/custom-print.jpg";
 import { createFileRoute } from "@tanstack/react-router";
@@ -36,13 +37,22 @@ export const Route = createFileRoute("/custom")({
 
 function CustomIntro() {
   const ref = useRef<HTMLDivElement>(null);
-  const [pos, setPos] = useState(46);
+  const dragPointer = useRef<number | null>(null);
+  const [pos, setPos] = useState(50);
+  const [interacted, setInteracted] = useState(false);
 
   const move = (clientX: number) => {
     const el = ref.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
     setPos(Math.max(6, Math.min(94, ((clientX - r.left) / r.width) * 100)));
+  };
+
+  const adjust = (amount: number) =>
+    setPos((current) => Math.max(6, Math.min(94, current + amount)));
+
+  const endDrag = (pointerId: number) => {
+    if (dragPointer.current === pointerId) dragPointer.current = null;
   };
 
   return (
@@ -69,9 +79,21 @@ function CustomIntro() {
 
         <div
           ref={ref}
-          onMouseMove={(e) => move(e.clientX)}
-          onTouchMove={(e) => move(e.touches[0]!.clientX)}
-          className="relative aspect-[16/10] w-full touch-pan-y select-none overflow-hidden bg-secondary md:col-span-7"
+          onPointerEnter={() => setInteracted(true)}
+          onPointerDown={(e) => {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            setInteracted(true);
+            dragPointer.current = e.pointerId;
+            e.currentTarget.setPointerCapture(e.pointerId);
+            move(e.clientX);
+          }}
+          onPointerMove={(e) => {
+            if (dragPointer.current === e.pointerId) move(e.clientX);
+          }}
+          onPointerUp={(e) => endDrag(e.pointerId)}
+          onPointerCancel={(e) => endDrag(e.pointerId)}
+          onLostPointerCapture={(e) => endDrag(e.pointerId)}
+          className="relative aspect-[16/10] w-full cursor-ew-resize touch-pan-y select-none overflow-hidden bg-secondary md:col-span-7"
         >
           <img
             src={customOriginal}
@@ -90,6 +112,46 @@ function CustomIntro() {
             className="absolute inset-y-0 w-px bg-white/85"
             style={{ left: `${pos}%` }}
           />
+          <button
+            type="button"
+            role="slider"
+            aria-label="Drag to compare digital image and physical print"
+            aria-valuemin={6}
+            aria-valuemax={94}
+            aria-valuenow={Math.round(pos)}
+            aria-valuetext={`${Math.round(pos)} percent digital image visible`}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                setInteracted(true);
+                adjust(-2);
+              }
+              if (event.key === "ArrowRight") {
+                event.preventDefault();
+                setInteracted(true);
+                adjust(2);
+              }
+              if (event.key === "Home") {
+                event.preventDefault();
+                setInteracted(true);
+                setPos(6);
+              }
+              if (event.key === "End") {
+                event.preventDefault();
+                setInteracted(true);
+                setPos(94);
+              }
+            }}
+            className="absolute top-1/2 z-10 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-foreground/15 bg-paper/90 text-foreground shadow-[0_2px_10px_rgba(30,25,20,0.08)] outline-none transition-transform duration-200 focus-visible:ring-1 focus-visible:ring-foreground cursor-ew-resize"
+            style={{ left: `${pos}%` }}
+          >
+            <ArrowLeftRight
+              aria-hidden
+              size={19}
+              strokeWidth={1.5}
+              className={!interacted ? "px-drag-hint motion-reduce:animate-none" : ""}
+            />
+          </button>
           <span className="px-label absolute left-5 top-5 text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]">
             Digital image
           </span>

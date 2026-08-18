@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 import { ShopCatalog } from "@/components/photox/shop/ShopCatalog";
+import { sizeLabelsFromSearch } from "@/lib/shop-data";
 
 export const Route = createFileRoute("/shop")({
   head: () => ({
@@ -22,20 +23,26 @@ export const Route = createFileRoute("/shop")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { q?: string } =>
-    typeof search["q"] === "string" && search["q"] ? { q: search["q"] as string } : {},
+  validateSearch: (search: Record<string, unknown>): { q?: string; size?: string } => {
+    const q = typeof search["q"] === "string" && search["q"] ? (search["q"] as string) : undefined;
+    const size =
+      typeof search["size"] === "string" && sizeLabelsFromSearch(search["size"] as string).length
+        ? (search["size"] as string)
+        : undefined;
+    return { ...(q ? { q } : {}), ...(size ? { size } : {}) };
+  },
 
   component: ShopPage,
 });
 
 function ShopPage() {
-  const { q } = Route.useSearch();
+  const { q, size } = Route.useSearch();
 
   return (
     <div className="bg-background text-foreground">
       <SiteNav variant="light" />
       <main>
-        <ShopCatalog query={q ?? ""} />
+        <ShopCatalog query={q ?? ""} size={size} />
       </main>
       <SiteFooter />
     </div>

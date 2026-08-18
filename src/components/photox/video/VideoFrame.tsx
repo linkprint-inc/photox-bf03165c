@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type Clip = {
   src: string;
@@ -12,17 +12,38 @@ export type Clip = {
  * hover, full playback with native controls on click. No media loads until the
  * viewer hovers or clicks.
  */
-export function VideoFrame({ clip, className = "" }: { clip: Clip; className?: string }) {
+export function VideoFrame({
+  clip,
+  className = "",
+  active = true,
+}: {
+  clip: Clip;
+  className?: string;
+  active?: boolean;
+}) {
   const ref = useRef<HTMLVideoElement>(null);
+  const activeRef = useRef(active);
   const [armed, setArmed] = useState(false);
   const [playing, setPlaying] = useState(false);
 
+  activeRef.current = active;
+
+  useEffect(() => {
+    if (active) return;
+
+    const video = ref.current;
+    video?.pause();
+    if (video) video.currentTime = 0;
+    setPlaying(false);
+    setArmed(false);
+  }, [active]);
+
   const preview = () => {
-    if (window.matchMedia("(hover: none)").matches || playing) return;
+    if (!active || window.matchMedia("(hover: none)").matches || playing) return;
     setArmed(true);
     requestAnimationFrame(() => {
       const v = ref.current;
-      if (!v) return;
+      if (!v || !activeRef.current) return;
       v.muted = true;
       void v.play().catch(() => {});
     });
@@ -38,11 +59,12 @@ export function VideoFrame({ clip, className = "" }: { clip: Clip; className?: s
   };
 
   const start = () => {
+    if (!active) return;
     setArmed(true);
     setPlaying(true);
     requestAnimationFrame(() => {
       const v = ref.current;
-      if (!v) return;
+      if (!v || !activeRef.current) return;
       v.muted = false;
       v.currentTime = 0;
       void v.play().catch(() => {});

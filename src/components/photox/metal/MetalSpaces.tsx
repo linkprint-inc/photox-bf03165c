@@ -21,7 +21,7 @@ export function MetalSpaces() {
           return (
             <article key={s.room} className="group">
               <a
-                href={`/shop?q=${encodeURIComponent(s.product.name)}`}
+                href={`/products/${s.product.id}`}
                 className="block"
                 aria-label={`${s.product.name} — view artwork`}
               >

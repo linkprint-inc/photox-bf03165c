@@ -101,7 +101,7 @@ function CheckoutSuccess() {
           </section>
         </div>
         <div className="mt-12 flex flex-wrap gap-x-8 gap-y-4">
-          <a href="/account?tab=orders" className="px-label px-underline">
+          <a href="/account?tab=Orders" className="px-label px-underline">
             View order →
           </a>
           <Link to="/shop" className="px-label px-underline">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { productById, materialName, sizeLabel, unitPrice, useStore } from "@/lib/store";
 import { usePreparedImage } from "@/lib/prepared-image";
 
@@ -140,6 +140,7 @@ function CheckoutSummary() {
 }
 
 function CheckoutPage() {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { bag, account, hydrated, placeOrder } = useStore();
   const [fields, setFields] = useState<CheckoutFields>({
@@ -149,9 +150,23 @@ function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFields, string>>>({});
 
   useEffect(() => {
-    if (account?.email)
-      setFields((current) => (current.email ? current : { ...current, email: account.email }));
+    if (!account) return;
+    const savedAddress = account.shippingAddress;
+    setFields((current) => ({
+      ...current,
+      email: current.email || account.email,
+      firstName: current.firstName || savedAddress?.firstName || "",
+      lastName: current.lastName || savedAddress?.lastName || "",
+      address: current.address || savedAddress?.address || "",
+      apartment: current.apartment || savedAddress?.apartment || "",
+      city: current.city || savedAddress?.city || "",
+      region: current.region || savedAddress?.region || "",
+      postalCode: current.postalCode || savedAddress?.postalCode || "",
+      country: current.country || savedAddress?.country || "",
+    }));
   }, [account]);
+
+  if (pathname === "/checkout/success") return <Outlet />;
 
   const setField = (field: keyof CheckoutFields, value: string) => {
     setFields((current) => ({ ...current, [field]: value }));
@@ -224,7 +239,7 @@ function CheckoutPage() {
             <section className="px-rule mt-10 pt-8">
               <p className="px-label text-muted-foreground">02</p>
               <h2 className="px-label mt-2">Delivery</h2>
-              <div className="mt-5 grid max-w-xl gap-5 sm:grid-cols-2">
+              <div className="mt-5 grid max-w-xl gap-5 md:grid-cols-2">
                 <Field
                   label="First name"
                   value={fields.firstName}

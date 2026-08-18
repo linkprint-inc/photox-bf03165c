@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import sizeRoom from "@/assets/size-room.jpg";
 import artNorthsea from "@/assets/art-northsea.jpg";
 import { sizes } from "@/lib/photox-data";
+import { sizeSearchValue } from "@/lib/shop-data";
 import { Shell, SectionHead } from "./Section";
 
 const WALL_INCHES = 96;
@@ -74,9 +76,13 @@ export function SizeScene() {
             <p className="px-meta mt-1 text-muted-foreground">Metal Print</p>
             <p className="px-meta text-muted-foreground">{size.label}</p>
             <p className="px-price mt-2">${size.price}</p>
-            <a href="/shop" className="px-label px-underline mt-6 inline-block">
+            <Link
+              to="/shop"
+              search={{ size: sizeSearchValue(size.label) }}
+              className="px-label px-underline mt-6 inline-block"
+            >
               Shop this size →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

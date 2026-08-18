@@ -210,7 +210,7 @@ export function CustomToolPanel({
             onClick={onApply}
             className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
           >
-            {tool === "enhance" ? "Use enhanced image" : "Use this image"}
+            {tool === "enhance" ? "Keep enhanced image" : "Keep edited image"}
           </button>
         )}
 

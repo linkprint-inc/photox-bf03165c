@@ -76,6 +76,11 @@ export function GlobalSearch() {
     navigate({ to: "/shop", search: query ? { q: query } : {} });
   };
 
+  const goToProduct = (slug: string) => {
+    closeSearch();
+    navigate({ to: "/products/$slug", params: { slug } });
+  };
+
   const results = matches.slice(0, MAX_RESULTS);
   const empty = term && results.length === 0 && categoryHits.length === 0;
 
@@ -173,7 +178,7 @@ export function GlobalSearch() {
                   <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-7 sm:gap-y-9 lg:grid-cols-4">
                     {(term ? results : popularArtwork).map((p) => (
                       <li key={p.id}>
-                        <ResultCard product={p} onSelect={() => goToShop(p.name)} />
+                        <ResultCard product={p} onSelect={() => goToProduct(p.id)} />
                       </li>
                     ))}
                   </ul>

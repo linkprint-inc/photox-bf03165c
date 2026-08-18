@@ -169,7 +169,7 @@ export function ShopProductCard({
             className={[
               "absolute right-2 top-2 z-30 flex h-9 w-9 cursor-pointer items-center justify-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.35)] transition-[opacity,color,transform] duration-[160ms] md:cursor-none hover:opacity-100",
               magnetAttached ? "scale-[1.08] text-foreground !opacity-100" : "text-white",
-              saved ? "opacity-90" : "opacity-45 md:opacity-0 md:group-hover:opacity-70",
+              saved ? "opacity-90" : "opacity-45 lg:opacity-0 lg:group-hover:opacity-70",
             ].join(" ")}
           >
             <svg
@@ -227,7 +227,7 @@ export function ShopProductCard({
         </p>
 
         <ul
-          className="px-reveal mt-2 hidden gap-3 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:flex"
+          className="px-reveal mt-2 hidden gap-x-3 gap-y-1 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 md:flex md:flex-wrap"
           onMouseLeave={() => setSize(null)}
         >
           {sizeSteps.map((s, i) => (

@@ -166,6 +166,42 @@
   }
 }
 
+/* Homepage mobile width guard: keep every homepage layer tied to the viewport,
+   while leaving the desktop and tablet layout untouched. */
+@media (max-width: 767px) {
+  html:has(.homepage),
+  body:has(.homepage) {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .homepage,
+  .homepage main,
+  .homepage main > section,
+  .homepage main > section > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .homepage img,
+  .homepage video {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767px) {
+  .account-page,
+  .account-page main,
+  .account-page main > section,
+  .account-page main > section > div {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
 /* ---- PhotoX typographic system ---- */
 
 @utility px-serif {
@@ -209,6 +245,49 @@
   &:hover::after,
   &:focus-visible::after {
     transform: scaleX(1);
+  }
+}
+
+/* The mobile menu trigger retains the navigation underline for keyboard users
+   without inheriting the browser's rectangular focus treatment after a tap. */
+@utility px-menu-trigger {
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+@utility px-next-trigger {
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+@utility px-scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility px-drag-hint {
+  animation: px-drag-hint 2.1s ease-in-out infinite;
+}
+
+@keyframes px-drag-hint {
+  0%,
+  100% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
   }
 }
 

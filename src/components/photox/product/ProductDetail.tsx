@@ -80,7 +80,6 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const saved = hydrated && isSaved(product.id);
   const related = useMemo(() => relatedProducts(product), [product]);
 
-
   return (
     <>
       {/* ---------- First screen: product + purchase ---------- */}
@@ -93,9 +92,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           <span>{product.name}</span>
         </nav>
 
-        <div className="mt-5 grid gap-10 md:grid-cols-12 md:gap-12">
+        <div className="mt-5 grid gap-10 lg:grid-cols-12 lg:gap-12">
           {/* LEFT — product visual */}
-          <div className="md:col-span-7 lg:col-span-7">
+          <div className="lg:col-span-7">
             <MainVisual
               product={product}
               material={material}
@@ -126,20 +125,42 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           </div>
 
           {/* RIGHT — purchase configuration */}
-          <div className="md:col-span-5">
-            <div className="md:sticky md:top-24">
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
               <p className="px-meta text-muted-foreground">{categoryLabel(product)}</p>
-              <h1 className="px-serif mt-2 text-[2rem] leading-[1.05] md:text-[2.6rem]">
-                {product.name}
-              </h1>
-              <p className="px-meta mt-3 text-muted-foreground">
+              <div className="mt-2 flex items-center justify-between gap-4">
+                <h1 className="px-serif text-[2rem] leading-[1.05] md:text-[2.6rem]">
+                  {product.name}
+                </h1>
+                <button
+                  type="button"
+                  onClick={() => toggleSaved(product.id)}
+                  aria-label={
+                    saved ? `Remove ${product.name} from saved artwork` : `Save ${product.name}`
+                  }
+                  aria-pressed={saved}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground/75 transition-colors hover:text-foreground"
+                >
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill={saved ? "currentColor" : "none"}
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  >
+                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+                  </svg>
+                </button>
+              </div>
+              <p className="px-meta mt-2 text-muted-foreground">
                 {product.orientation} · {materials.map((m) => materialName[m]).join(" / ")}
               </p>
 
               {/* Surface */}
-              <div className="px-rule mt-8 pt-6">
+              <div className="px-rule mt-7 pt-5">
                 <h2 className="px-label text-muted-foreground">Choose your surface</h2>
-                <ul className="mt-4">
+                <ul className="mt-3">
                   {materials.map((m) => {
                     const active = material === m;
                     return (
@@ -148,7 +169,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                           type="button"
                           onClick={() => setMaterial(m)}
                           aria-pressed={active}
-                          className="flex w-full items-baseline justify-between gap-6 py-3 text-left transition-opacity duration-[420ms]"
+                          className="flex w-full items-baseline justify-between gap-6 py-[10px] text-left transition-opacity duration-[420ms]"
                         >
                           <span className={active ? "opacity-100" : "opacity-50 hover:opacity-100"}>
                             <span
@@ -179,9 +200,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               </div>
 
               {/* Size */}
-              <div className="mt-8">
+              <div className="mt-7">
                 <h2 className="px-label text-muted-foreground">Choose your size</h2>
-                <ul className="mt-4 border-t border-hairline">
+                <ul className="mt-3 border-t border-hairline">
                   {sizeSteps.map((s, i) => {
                     const active = sizeIndex === i;
                     return (
@@ -191,7 +212,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                           onClick={() => setSizeIndex(i)}
                           aria-pressed={active}
                           className={[
-                            "flex w-full items-baseline justify-between gap-6 py-3 transition-opacity duration-[420ms]",
+                            "flex w-full items-baseline justify-between gap-6 py-[9px] transition-opacity duration-[420ms]",
                             active ? "opacity-100" : "opacity-50 hover:opacity-100",
                           ].join(" ")}
                         >
@@ -204,41 +225,19 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                 </ul>
               </div>
 
-              {/* Selection */}
-              <div className="mt-8">
-                <h2 className="px-label text-muted-foreground">Your selection</h2>
-                <p className="px-label mt-3">{product.name}</p>
-                <p className="px-meta mt-1 text-muted-foreground">{materialName[material]}</p>
-                <p className="px-meta text-muted-foreground">{size.label}</p>
-                <p className="px-price mt-2">${price}</p>
+              <div className="mt-4 flex items-baseline justify-between gap-6">
+                <p className="px-label text-muted-foreground">
+                  {materialName[material]} · {size.label}
+                </p>
+                <p className="px-price">${price}</p>
               </div>
 
               <button
                 type="button"
                 onClick={() => addToBag({ productId: product.id, material, sizeIndex, qty: 1 })}
-                className="px-label mt-6 w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
+                className="px-label mt-5 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
               >
                 Add to bag
-              </button>
-
-              <button
-                type="button"
-                onClick={() => toggleSaved(product.id)}
-                aria-pressed={saved}
-                className="px-label mt-4 flex items-center text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <svg
-                  className="mr-2"
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill={saved ? "currentColor" : "none"}
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                >
-                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
-                </svg>
-                {saved ? "Saved" : "Save"}
               </button>
             </div>
           </div>

@@ -20,7 +20,24 @@ export type BagItem = {
   qty: number;
 };
 
-export type Account = { firstName: string; lastName: string; email: string };
+export type ShippingAddress = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  apartment: string;
+  city: string;
+  region: string;
+  postalCode: string;
+  country: string;
+};
+
+export type Account = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  shippingAddress?: ShippingAddress;
+  password?: string;
+};
 
 export type OrderItem = {
   productId: string;
@@ -91,14 +108,24 @@ function seedOrders(): Order[] {
         { productId: "north-sea", material: "metal", sizeIndex: 3, qty: 1 },
         { productId: "blue-hour", material: "canvas", sizeIndex: 1, qty: 1 },
       ],
-      shippingAddress: ["Anna Ferrell", "148 Warren Street, Apt 4", "Brooklyn, NY 11201", "United States"],
+      shippingAddress: [
+        "Anna Ferrell",
+        "148 Warren Street, Apt 4",
+        "Brooklyn, NY 11201",
+        "United States",
+      ],
     },
     {
       id: "PX-10231",
       placed: "Jun 21, 2026",
       status: "Delivered",
       items: [{ productId: "concrete-planes", material: "metal", sizeIndex: 2, qty: 1 }],
-      shippingAddress: ["Anna Ferrell", "148 Warren Street, Apt 4", "Brooklyn, NY 11201", "United States"],
+      shippingAddress: [
+        "Anna Ferrell",
+        "148 Warren Street, Apt 4",
+        "Brooklyn, NY 11201",
+        "United States",
+      ],
     },
   ];
 }
@@ -116,6 +143,8 @@ type Ctx = State & {
   subtotal: number;
   signIn: (a: Account) => void;
   signOut: () => void;
+  updateAccount: (patch: Partial<Account>) => void;
+  updatePassword: (currentPassword: string, newPassword: string) => boolean;
   toggleSaved: (id: string) => void;
   isSaved: (id: string) => boolean;
   addToBag: (item: Omit<BagItem, "key">) => void;
@@ -163,6 +192,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, account: null }));
   }, []);
 
+  const updateAccount = useCallback((patch: Partial<Account>) => {
+    setState((s) => (s.account ? { ...s, account: { ...s.account, ...patch } } : s));
+  }, []);
+
+  const updatePassword = useCallback((currentPassword: string, newPassword: string) => {
+    if (!currentPassword || !newPassword) return false;
+    setState((s) => (s.account ? { ...s, account: { ...s.account, password: newPassword } } : s));
+    return true;
+  }, []);
+
   const toggleSaved = useCallback((id: string) => {
     setState((s) => ({
       ...s,
@@ -204,7 +243,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const placeOrder = useCallback((details: CheckoutDetails) => {
     const order: Order = {
       id: `PX-${String(Date.now()).slice(-5)}`,
-      placed: new Intl.DateTimeFormat("en-US", { month: "short", day: "2-digit", year: "numeric" }).format(new Date()),
+      placed: new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      }).format(new Date()),
       status: "Order received",
       items: [],
       shippingAddress: details.shippingAddress,
@@ -231,6 +274,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       subtotal,
       signIn,
       signOut,
+      updateAccount,
+      updatePassword,
       toggleSaved,
       isSaved: (id: string) => state.saved.includes(id),
       addToBag,
@@ -241,7 +286,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       openDrawer: () => setDrawerOpen(true),
       closeDrawer: () => setDrawerOpen(false),
     };
-  }, [state, hydrated, drawerOpen, signIn, signOut, toggleSaved, addToBag, updateBag, removeFromBag, placeOrder]);
+  }, [
+    state,
+    hydrated,
+    drawerOpen,
+    signIn,
+    signOut,
+    updateAccount,
+    updatePassword,
+    toggleSaved,
+    addToBag,
+    updateBag,
+    removeFromBag,
+    placeOrder,
+  ]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

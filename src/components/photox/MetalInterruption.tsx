@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import metalDetail from "@/assets/metal-detail.jpg";
 import { sizes } from "@/lib/photox-data";
 import { Shell } from "./Section";
@@ -73,9 +74,9 @@ export function MetalInterruption() {
             <p className="px-price">
               <span className="px-label mr-1 opacity-70">From</span>$79
             </p>
-            <a href="/metal" className="px-label px-underline">
+            <Link to="/metal" className="px-label px-underline">
               Explore metal →
-            </a>
+            </Link>
           </div>
         </div>
       </div>

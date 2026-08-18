@@ -11,6 +11,13 @@ export function MetalSize() {
   const size = metalSizes[i]!;
   const widthPct = (size.inches * 1.5 * 100) / WALL_INCHES;
 
+  const selectSize = (index: number, target: HTMLButtonElement) => {
+    setI(index);
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
+    }
+  };
+
   return (
     <Shell id="metal-size" label="Find your size" className="pb-20 md:pb-28">
       <SectionHead title="Find your size" note={`${work.name} · Metal Print`} />
@@ -50,16 +57,21 @@ export function MetalSize() {
         <div className="min-w-0 md:col-span-4">
           <p className="px-label text-muted-foreground">Select a size</p>
 
-          <ul className="mt-4 flex gap-3 overflow-x-auto pb-2 md:mt-6 md:block md:gap-0 md:overflow-visible md:border-t md:border-hairline md:pb-0">
+          <ul className="px-scrollbar-hidden mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 md:mt-6 md:block md:snap-none md:gap-0 md:overflow-visible md:border-t md:border-hairline md:pb-0">
             {metalSizes.map((s, idx) => (
-              <li key={s.label} className="shrink-0 md:border-b md:border-hairline">
+              <li
+                key={s.label}
+                className="w-[42%] shrink-0 snap-start md:w-auto md:border-b md:border-hairline"
+              >
                 <button
                   type="button"
-                  onClick={() => setI(idx)}
+                  onClick={(event) => selectSize(idx, event.currentTarget)}
                   aria-pressed={i === idx}
                   className={[
-                    "flex w-full items-baseline justify-between gap-6 whitespace-nowrap border border-hairline px-4 py-3 transition-opacity duration-[420ms] md:border-0 md:px-0",
-                    i === idx ? "opacity-100" : "opacity-50 hover:opacity-100",
+                    "flex w-full items-baseline justify-between gap-6 whitespace-nowrap border border-hairline px-4 py-3 transition-opacity duration-[420ms] max-md:gap-3 max-md:border-x-0 max-md:border-t-0 max-md:border-b-2 max-md:border-transparent max-md:px-0 max-md:text-muted-foreground max-md:transition-[border-color,color] md:border-0 md:px-0",
+                    i === idx
+                      ? "opacity-100 max-md:border-foreground max-md:text-foreground"
+                      : "opacity-50 hover:opacity-100 max-md:text-muted-foreground",
                   ].join(" ")}
                 >
                   <span className="px-label">{s.label}</span>

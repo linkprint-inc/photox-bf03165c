@@ -1,12 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  useStore,
-  productById,
-  unitPrice,
-  sizeLabel,
-  materialName,
-} from "@/lib/store";
+import { useStore, productById, unitPrice, sizeLabel, materialName } from "@/lib/store";
 import { usePreparedImage } from "@/lib/prepared-image";
 
 export function BagDrawer() {
@@ -49,7 +43,7 @@ export function BagDrawer() {
       <aside
         aria-label="Your bag"
         className={[
-          "absolute right-0 top-0 flex h-full w-full flex-col bg-paper transition-transform duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] sm:w-[410px]",
+          "absolute right-0 top-0 flex h-full w-full flex-col bg-paper transition-transform duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] md:w-[60vw] lg:w-[410px]",
           drawerOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
       >
@@ -84,13 +78,19 @@ export function BagDrawer() {
               {bag.map((item) => {
                 const p = productById(item.productId);
                 if (!p) return null;
-                const productHref = item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
+                const productHref =
+                  item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
                 const lineTotal = unitPrice(item.material, item.sizeIndex) * item.qty;
                 return (
-                  <li key={item.key} className="px-rule grid grid-cols-[4rem_minmax(0,1fr)_2.25rem] items-start gap-4 py-7 first:border-t-0">
+                  <li
+                    key={item.key}
+                    className="px-rule grid grid-cols-[4rem_minmax(0,1fr)_2.25rem] items-start gap-4 py-7 first:border-t-0"
+                  >
                     <a href={productHref} onClick={closeDrawer} className="block w-16 shrink-0">
                       <img
-                        src={item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image}
+                        src={
+                          item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image
+                        }
                         alt={p.name}
                         className="aspect-square w-16 object-cover"
                         loading="lazy"
@@ -153,7 +153,9 @@ export function BagDrawer() {
               <span className="px-label">Subtotal</span>
               <span className="px-price">${subtotal}</span>
             </div>
-            <p className="px-meta mt-2 text-muted-foreground">Shipping and taxes calculated at checkout.</p>
+            <p className="px-meta mt-2 text-muted-foreground">
+              Shipping and taxes calculated at checkout.
+            </p>
             <Link
               to="/checkout"
               onClick={closeDrawer}

@@ -38,6 +38,7 @@ export type ShopProduct = {
   id: string;
   name: string;
   material: ShopMaterial;
+  availableSizes: string[];
   orientation: Orientation;
   styles: ShopStyle[];
   from: number;
@@ -63,6 +64,18 @@ export const angleView: Record<ShopMaterial, string> = {
 export const sizeRangeShort = '12×18" — 30×40"';
 export const sizeRangeLong = '12 × 18" — 30 × 40"';
 export const sizeSteps = sizes;
+
+export function sizeSearchValue(label: string) {
+  return label.replace(/[\s"]/g, "").replace("×", "x");
+}
+
+export function sizeLabelsFromSearch(value?: string) {
+  if (!value) return [];
+  const requested = value.split(",");
+  return sizeSteps
+    .filter((size) => requested.includes(sizeSearchValue(size.label)))
+    .map((size) => size.label);
+}
 
 const rooms = [roomLiving, roomLivingArch, roomBedroom, roomWorkspace, roomDining];
 
@@ -351,6 +364,7 @@ const source: Omit<ShopProduct, "room">[] = [
 
 export const shopProducts: ShopProduct[] = source.map((p, i) => ({
   ...p,
+  availableSizes: sizeSteps.map((size) => size.label),
   room: rooms[i % rooms.length]!,
 }));
 

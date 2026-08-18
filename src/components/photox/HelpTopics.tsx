@@ -133,7 +133,7 @@ const topics: Topic[] = [
     descriptor: "Production, shipping and returns.",
     image: helpOrders,
     alt: "A print packed flat with corner protection and surface film",
-    destination: { label: "Shipping & returns", href: "/shipping-returns" },
+    destination: { label: "Shop prints", href: "/shop" },
     answers: [
       {
         q: "How long does production take?",
@@ -172,7 +172,7 @@ const topics: Topic[] = [
     descriptor: "Uploads, ownership and privacy.",
     image: helpPrivacy,
     alt: "Close detail of a fine art print edge",
-    destination: { label: "Artwork & image policy", href: "/privacy" },
+    destination: { label: "Go to Custom", href: "/custom" },
     answers: [
       {
         q: "Can I print my own artwork?",
@@ -351,10 +351,10 @@ function PlusMark({ open }: { open: boolean }) {
       className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-foreground/30 transition-colors duration-300 group-hover:border-foreground/70"
     >
       <span
-        className={`absolute h-px w-3.5 bg-current transition-transform duration-500 ${open ? "rotate-45" : ""}`}
+        className={`absolute h-px w-3.5 bg-current transition-transform duration-500 max-md:duration-[250ms] ${open ? "rotate-45" : ""}`}
       />
       <span
-        className={`absolute h-px w-3.5 bg-current transition-transform duration-500 ${open ? "-rotate-45" : "rotate-90"}`}
+        className={`absolute h-px w-3.5 bg-current transition-transform duration-500 max-md:duration-[250ms] ${open ? "-rotate-45" : "rotate-90"}`}
       />
     </span>
   );
@@ -555,16 +555,25 @@ export function HelpTopics() {
                 </span>
                 <PlusMark open={isActive} />
               </button>
-              {isActive ? (
-                <div className="pb-8">
-                  <p className="px-meta text-muted-foreground">{t.descriptor}</p>
-                  {question === null ? (
-                    <QuestionList topic={t} onPick={setQuestion} />
-                  ) : (
-                    <AnswerView answer={t.answers[question]!} onBack={() => setQuestion(null)} />
-                  )}
+              <div
+                className="grid transition-[grid-template-rows] duration-[340ms] ease-out motion-reduce:transition-none"
+                style={{ gridTemplateRows: isActive ? "1fr" : "0fr" }}
+              >
+                <div className="min-h-0 overflow-hidden" aria-hidden={!isActive} inert={!isActive}>
+                  <div
+                    className={`pb-8 transition-[opacity,transform] duration-[340ms] ease-out motion-reduce:transition-none ${
+                      isActive ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+                    }`}
+                  >
+                    <p className="px-meta text-muted-foreground">{t.descriptor}</p>
+                    {question === null ? (
+                      <QuestionList topic={t} onPick={setQuestion} />
+                    ) : (
+                      <AnswerView answer={t.answers[question]!} onBack={() => setQuestion(null)} />
+                    )}
+                  </div>
                 </div>
-              ) : null}
+              </div>
             </div>
           );
         })}

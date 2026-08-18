@@ -39,9 +39,9 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <div className="bg-background text-foreground">
+    <div className="homepage w-full max-w-full min-w-0 overflow-x-clip bg-background text-foreground">
       <SiteNav />
-      <main>
+      <main className="w-full max-w-full min-w-0">
         <Hero />
         <CommerceIndex />
         <ProductWall />

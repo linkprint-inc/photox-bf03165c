@@ -7,7 +7,7 @@ import { Shell } from "./Section";
 export function CustomSection() {
   const [pos, setPos] = useState(45);
   const ref = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
+  const dragPointer = useRef<number | null>(null);
 
   const move = useCallback((clientX: number) => {
     const el = ref.current;
@@ -16,21 +16,28 @@ export function CustomSection() {
     setPos(Math.max(4, Math.min(96, ((clientX - r.left) / r.width) * 100)));
   }, []);
 
+  const endDrag = (pointerId: number) => {
+    if (dragPointer.current === pointerId) dragPointer.current = null;
+  };
+
   return (
     <Shell id="custom" className="pb-28 md:pb-40">
       <div className="grid gap-10 md:grid-cols-12 md:gap-8">
         <div
           ref={ref}
           className="relative aspect-[4/3] w-full touch-pan-y select-none overflow-hidden bg-secondary md:col-span-6"
-          onMouseMove={(e) => dragging.current && move(e.clientX)}
-          onMouseDown={(e) => {
-            dragging.current = true;
+          onPointerDown={(e) => {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            dragPointer.current = e.pointerId;
+            e.currentTarget.setPointerCapture(e.pointerId);
             move(e.clientX);
           }}
-          onMouseUp={() => (dragging.current = false)}
-          onMouseLeave={() => (dragging.current = false)}
-          onTouchStart={(e) => move(e.touches[0]!.clientX)}
-          onTouchMove={(e) => move(e.touches[0]!.clientX)}
+          onPointerMove={(e) => {
+            if (dragPointer.current === e.pointerId) move(e.clientX);
+          }}
+          onPointerUp={(e) => endDrag(e.pointerId)}
+          onPointerCancel={(e) => endDrag(e.pointerId)}
+          onLostPointerCapture={(e) => endDrag(e.pointerId)}
         >
           <img
             src={customOriginal}

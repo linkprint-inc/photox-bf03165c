@@ -82,7 +82,12 @@ function BagRow({ item }: { item: BagItem }) {
           className="group relative block w-24 shrink-0 overflow-hidden sm:w-32"
           aria-label={`${p.name} — view artwork`}
         >
-          <img src={src} alt={p.name} loading="lazy" className="aspect-square w-full object-cover" />
+          <img
+            src={src}
+            alt={p.name}
+            loading="lazy"
+            className="aspect-square w-full object-cover"
+          />
           <span className="px-reveal absolute inset-x-0 bottom-0 bg-paper/92 py-1.5 text-center text-[0.6rem] font-medium uppercase tracking-[0.14em] group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
             View →
           </span>
@@ -124,7 +129,7 @@ function BagRow({ item }: { item: BagItem }) {
           </div>
 
           {editing && (
-            <div className="px-rule mt-6 grid gap-6 pt-5 sm:grid-cols-2">
+            <div className="px-rule mt-6 grid gap-6 pt-5 md:grid-cols-2">
               <div>
                 <p className="px-label text-muted-foreground">Size</p>
                 <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
@@ -135,7 +140,9 @@ function BagRow({ item }: { item: BagItem }) {
                         onClick={() => updateBag(item.key, { sizeIndex: i })}
                         className={[
                           "px-meta transition-opacity",
-                          i === item.sizeIndex ? "opacity-100 underline" : "opacity-45 hover:opacity-100",
+                          i === item.sizeIndex
+                            ? "opacity-100 underline"
+                            : "opacity-45 hover:opacity-100",
                         ].join(" ")}
                       >
                         {s.label}
@@ -154,7 +161,9 @@ function BagRow({ item }: { item: BagItem }) {
                         onClick={() => updateBag(item.key, { material: m })}
                         className={[
                           "px-meta transition-opacity",
-                          m === item.material ? "opacity-100 underline" : "opacity-45 hover:opacity-100",
+                          m === item.material
+                            ? "opacity-100 underline"
+                            : "opacity-45 hover:opacity-100",
                         ].join(" ")}
                       >
                         {materialName[m]} · {finishLabel[m]}
@@ -172,8 +181,6 @@ function BagRow({ item }: { item: BagItem }) {
 }
 
 function OrderSummary({ subtotal }: { subtotal: number }) {
-  const [promoOpen, setPromoOpen] = useState(false);
-
   return (
     <div>
       <h2 className="px-label">Order summary</h2>
@@ -203,31 +210,6 @@ function OrderSummary({ subtotal }: { subtotal: number }) {
         Checkout
       </Link>
       <p className="px-meta mt-4 text-muted-foreground">Secure checkout.</p>
-
-      <div className="mt-8">
-        <button
-          type="button"
-          onClick={() => setPromoOpen((v) => !v)}
-          aria-expanded={promoOpen}
-          className="px-label px-underline text-muted-foreground"
-        >
-          Have a promo code? {promoOpen ? "−" : "+"}
-        </button>
-        {promoOpen && (
-          <form className="mt-4 flex gap-3" onSubmit={(e) => e.preventDefault()}>
-            <input
-              aria-label="Promo code"
-              className="h-10 min-w-0 flex-1 rounded-none border border-[color:var(--hairline)] bg-transparent px-3 text-[0.8125rem] focus:border-ink focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="px-label border border-[color:var(--hairline)] px-4 transition-colors hover:border-ink"
-            >
-              Apply
-            </button>
-          </form>
-        )}
-      </div>
     </div>
   );
 }
@@ -250,7 +232,7 @@ function EmptyBag() {
           <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-4">
             {items.map((p) => (
               <article key={p!.id}>
-                <Link to="/shop" className="block">
+                <Link to="/products/$slug" params={{ slug: p!.id }} className="block">
                   <img
                     src={p!.image}
                     alt={p!.name}

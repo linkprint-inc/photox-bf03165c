@@ -1,20 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 import { Shell } from "@/components/photox/Section";
 import { ShopProductCard } from "@/components/photox/shop/ShopProductCard";
 import { shopProducts, materialLabel } from "@/lib/shop-data";
-import {
-  useStore,
-  productById,
-  unitPrice,
-  sizeLabel,
-  materialName,
-  type Order,
-} from "@/lib/store";
+import { useStore, productById, unitPrice, sizeLabel, materialName, type Order } from "@/lib/store";
 
 export const Route = createFileRoute("/account")({
+  validateSearch: (search: Record<string, unknown>): { tab?: string } =>
+    typeof search.tab === "string" ? { tab: search.tab } : {},
   head: () => ({
     meta: [
       { title: "Account — Orders, Saved Artwork & Profile | photoX" },
@@ -146,14 +141,30 @@ function AuthScreen() {
             }}
           >
             {view === "create" && (
-              <div className="grid gap-6 sm:grid-cols-2">
-                <Field label="First name" value={first} onChange={setFirst} autoComplete="given-name" />
-                <Field label="Last name" value={last} onChange={setLast} autoComplete="family-name" />
+              <div className="grid gap-6 md:grid-cols-2">
+                <Field
+                  label="First name"
+                  value={first}
+                  onChange={setFirst}
+                  autoComplete="given-name"
+                />
+                <Field
+                  label="Last name"
+                  value={last}
+                  onChange={setLast}
+                  autoComplete="family-name"
+                />
               </div>
             )}
 
             <div className={view === "create" ? "mt-6" : ""}>
-              <Field label="Email" type="email" value={email} onChange={setEmail} autoComplete="email" />
+              <Field
+                label="Email"
+                type="email"
+                value={email}
+                onChange={setEmail}
+                autoComplete="email"
+              />
             </div>
 
             {view !== "forgot" && (
@@ -183,13 +194,18 @@ function AuthScreen() {
 
             <div className="mt-8">
               <DarkButton type="submit">
-                {view === "signin" ? "Sign in" : view === "create" ? "Create account" : "Send reset link"}
+                {view === "signin"
+                  ? "Sign in"
+                  : view === "create"
+                    ? "Create account"
+                    : "Send reset link"}
               </DarkButton>
             </div>
 
             {view === "forgot" && sent && (
               <p className="px-meta mt-5 text-muted-foreground">
-                If an account exists for {email || "that address"}, reset instructions are on their way.
+                If an account exists for {email || "that address"}, reset instructions are on their
+                way.
               </p>
             )}
           </form>
@@ -240,6 +256,10 @@ function AuthScreen() {
 const tabs = ["Overview", "Orders", "Saved artwork", "Profile"] as const;
 type Tab = (typeof tabs)[number];
 
+function isAccountTab(value: unknown): value is Tab {
+  return typeof value === "string" && tabs.includes(value as Tab);
+}
+
 function orderTotal(order: Order) {
   return order.items.reduce((n, i) => n + unitPrice(i.material, i.sizeIndex) * i.qty, 0);
 }
@@ -258,19 +278,19 @@ function ItemRow({
   const p = productById(productId);
   if (!p) return null;
   return (
-    <div className="px-rule flex items-start gap-6 py-6 md:gap-7">
+    <div className="px-rule grid grid-cols-[72px_minmax(0,1fr)_auto] items-start gap-4 py-6 md:flex md:gap-7">
       <img
         src={p.image}
         alt={p.name}
         loading="lazy"
         className="aspect-square w-[72px] shrink-0 object-cover md:w-[84px]"
       />
-      <div className="flex-1">
-        <p className="px-label">{p.name}</p>
+      <div className="min-w-0 md:flex-1">
+        <p className="px-label break-words">{p.name}</p>
         <p className="px-meta mt-1 text-muted-foreground">{materialName[material]}</p>
         <p className="px-meta text-muted-foreground">{sizeLabel(sizeIndex)}</p>
       </div>
-      <div className="text-right">
+      <div className="shrink-0 text-right">
         <p className="px-price">${unitPrice(material, sizeIndex) * qty}</p>
         {qty > 1 && <p className="px-meta mt-1 text-muted-foreground">Qty {qty}</p>}
       </div>
@@ -281,10 +301,10 @@ function ItemRow({
 function SavedRow({ ids, limit }: { ids: string[]; limit: number }) {
   const items = ids.map(productById).filter(Boolean).slice(0, limit);
   return (
-    <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-3">
+    <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-3">
       {items.map((p) => (
         <article key={p!.id}>
-          <Link to="/shop" className="block">
+          <Link to="/products/$slug" params={{ slug: p!.id }} className="block">
             <img
               src={p!.image}
               alt={p!.name}
@@ -322,10 +342,10 @@ function EmptySaved() {
 
       <div>
         <p className="px-label text-muted-foreground">You might like</p>
-        <div className="mt-5 grid grid-cols-2 gap-x-6">
+        <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2">
           {suggestions.map((p) => (
             <article key={p!.id}>
-              <Link to="/shop" className="block">
+              <Link to="/products/$slug" params={{ slug: p!.id }} className="block">
                 <img
                   src={p!.image}
                   alt={p!.name}
@@ -355,7 +375,7 @@ function Overview({ onTab }: { onTab: (t: Tab) => void }) {
         <h2 className="px-label">Recent order</h2>
         {recent ? (
           <div className="mt-6">
-            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <div className="flex flex-col items-start gap-1 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-6">
               <p className="px-label">Order #{recent.id}</p>
               <p className="px-meta text-muted-foreground">Placed {recent.placed}</p>
             </div>
@@ -488,14 +508,16 @@ function Orders() {
   return (
     <div>
       <h2 className="px-serif text-[2rem]">Orders</h2>
-      <p className="px-meta mt-3 text-muted-foreground">View your current and past photoX orders.</p>
+      <p className="px-meta mt-3 text-muted-foreground">
+        View your current and past photoX orders.
+      </p>
 
       <div className="mt-10">
         {orders.length === 0 && <p className="px-meta text-muted-foreground">No orders yet.</p>}
         {orders.map((o) => (
           <div
             key={o.id}
-            className="px-rule grid grid-cols-2 items-baseline gap-x-6 gap-y-2 py-6 md:grid-cols-[1.1fr_1fr_0.8fr_0.7fr_1fr_auto]"
+            className="px-rule grid min-w-0 grid-cols-1 items-baseline gap-x-6 gap-y-2 py-6 md:grid-cols-[1.1fr_1fr_0.8fr_0.7fr_1fr_auto]"
           >
             <p className="px-label">Order #{o.id}</p>
             <p className="px-meta text-muted-foreground">{o.placed.toUpperCase()}</p>
@@ -527,7 +549,7 @@ function SavedArtwork() {
       <h2 className="px-serif text-[2rem]">Saved artwork</h2>
       <p className="px-meta mt-3 text-muted-foreground">Pieces you've saved while browsing.</p>
       {items.length ? (
-        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3">
+        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-3">
           {items.map((p) => (
             <ShopProductCard key={p!.id} product={p!} view="grid" action="remove" />
           ))}
@@ -540,11 +562,43 @@ function SavedArtwork() {
 }
 
 function Profile() {
-  const { account, signIn } = useStore();
+  const { account, updateAccount, updatePassword } = useStore();
   const [first, setFirst] = useState(account?.firstName ?? "");
   const [last, setLast] = useState(account?.lastName ?? "");
   const [email, setEmail] = useState(account?.email ?? "");
+  const [address, setAddress] = useState(
+    account?.shippingAddress ?? {
+      firstName: "",
+      lastName: "",
+      address: "",
+      apartment: "",
+      city: "",
+      region: "",
+      postalCode: "",
+      country: "",
+    },
+  );
   const [savedMsg, setSavedMsg] = useState(false);
+  const [addressSaved, setAddressSaved] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordUpdated, setPasswordUpdated] = useState(false);
+
+  const setAddressField = (field: keyof typeof address, value: string) => {
+    setAddress((current) => ({ ...current, [field]: value }));
+    setAddressSaved(false);
+  };
+
+  const closePassword = () => {
+    setPasswordOpen(false);
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordError("");
+  };
 
   return (
     <div>
@@ -556,11 +610,11 @@ function Profile() {
           className="mt-6 max-w-[460px]"
           onSubmit={(e) => {
             e.preventDefault();
-            signIn({ firstName: first, lastName: last, email });
+            updateAccount({ firstName: first, lastName: last, email });
             setSavedMsg(true);
           }}
         >
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-2">
             <Field label="First name" value={first} onChange={setFirst} />
             <Field label="Last name" value={last} onChange={setLast} />
           </div>
@@ -575,11 +629,150 @@ function Profile() {
       </section>
 
       <section className="px-rule mt-12 pt-8">
+        <h3 className="px-label">Default shipping address</h3>
+        <form
+          className="mt-6 max-w-[620px]"
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateAccount({ shippingAddress: address });
+            setAddressSaved(true);
+          }}
+        >
+          <div className="grid gap-6 md:grid-cols-2">
+            <Field
+              label="First name"
+              value={address.firstName}
+              onChange={(value) => setAddressField("firstName", value)}
+              autoComplete="shipping given-name"
+            />
+            <Field
+              label="Last name"
+              value={address.lastName}
+              onChange={(value) => setAddressField("lastName", value)}
+              autoComplete="shipping family-name"
+            />
+          </div>
+          <div className="mt-6">
+            <Field
+              label="Address"
+              value={address.address}
+              onChange={(value) => setAddressField("address", value)}
+              autoComplete="shipping street-address"
+            />
+          </div>
+          <div className="mt-6">
+            <Field
+              label="Apartment / suite · optional"
+              value={address.apartment}
+              onChange={(value) => setAddressField("apartment", value)}
+              autoComplete="shipping address-line2"
+            />
+          </div>
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
+            <Field
+              label="City"
+              value={address.city}
+              onChange={(value) => setAddressField("city", value)}
+              autoComplete="shipping address-level2"
+            />
+            <Field
+              label="State / region"
+              value={address.region}
+              onChange={(value) => setAddressField("region", value)}
+              autoComplete="shipping address-level1"
+            />
+            <Field
+              label="Zip / postal code"
+              value={address.postalCode}
+              onChange={(value) => setAddressField("postalCode", value)}
+              autoComplete="shipping postal-code"
+            />
+            <Field
+              label="Country"
+              value={address.country}
+              onChange={(value) => setAddressField("country", value)}
+              autoComplete="shipping country-name"
+            />
+          </div>
+          <div className="mt-8 flex items-center gap-5">
+            <DarkButton type="submit">Save address</DarkButton>
+            {addressSaved && <span className="px-meta text-muted-foreground">Address saved.</span>}
+          </div>
+        </form>
+      </section>
+
+      <section className="px-rule mt-12 pt-8">
         <h3 className="px-label">Password</h3>
         <p className="px-meta mt-3 tracking-[0.3em] text-muted-foreground">••••••••</p>
-        <button type="button" className="px-label px-underline mt-5 inline-block">
-          Change password →
-        </button>
+        {!passwordOpen ? (
+          <button
+            type="button"
+            onClick={() => {
+              setPasswordOpen(true);
+              setPasswordUpdated(false);
+            }}
+            className="px-label px-underline mt-5 inline-block"
+          >
+            Change password →
+          </button>
+        ) : (
+          <form
+            className="mt-6 max-w-[460px]"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!currentPassword || !newPassword || !confirmPassword) {
+                setPasswordError("Complete all password fields.");
+                return;
+              }
+              if (newPassword !== confirmPassword) {
+                setPasswordError("Passwords do not match.");
+                return;
+              }
+              if (!updatePassword(currentPassword, newPassword)) {
+                setPasswordError("Unable to update password.");
+                return;
+              }
+              closePassword();
+              setPasswordUpdated(true);
+            }}
+          >
+            <div className="space-y-6">
+              <Field
+                label="Current password"
+                type="password"
+                value={currentPassword}
+                onChange={setCurrentPassword}
+                autoComplete="current-password"
+              />
+              <Field
+                label="New password"
+                type="password"
+                value={newPassword}
+                onChange={setNewPassword}
+                autoComplete="new-password"
+              />
+              <Field
+                label="Confirm new password"
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                autoComplete="new-password"
+              />
+            </div>
+            {passwordError && <p className="px-meta mt-4 text-foreground">{passwordError}</p>}
+            <div className="mt-8 flex flex-wrap items-center gap-5">
+              <DarkButton type="submit">Update password</DarkButton>
+              <button
+                type="button"
+                onClick={closePassword}
+                className="px-label px-underline text-muted-foreground"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+        {passwordUpdated && <p className="px-meta mt-5 text-muted-foreground">Password updated.</p>}
       </section>
     </div>
   );
@@ -589,31 +782,42 @@ function Profile() {
 
 function AccountPage() {
   const { account, signOut, hydrated } = useStore();
-  const [tab, setTab] = useState<Tab>("Overview");
+  const { tab: requestedTab } = Route.useSearch();
+  const [tab, setTab] = useState<Tab>(() =>
+    isAccountTab(requestedTab) ? requestedTab : "Overview",
+  );
+
+  useEffect(() => {
+    if (isAccountTab(requestedTab)) setTab(requestedTab);
+  }, [requestedTab]);
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="account-page w-full max-w-full min-w-0 overflow-x-clip bg-background text-foreground">
       <SiteNav variant="light" />
-      <main>
+      <main className="w-full max-w-full min-w-0">
         {!hydrated || !account ? (
           <AuthScreen />
         ) : (
           <Shell className="pb-28 pt-[108px] md:pt-[132px]">
             <div className="flex flex-wrap items-baseline justify-between gap-4">
-              <div>
+              <div className="min-w-0">
                 <p className="px-label text-muted-foreground">Account</p>
                 <h1 className="px-serif mt-3 text-[2.15rem] md:text-[2.6rem]">
                   Welcome back, {account.firstName}.
                 </h1>
               </div>
-              <button type="button" onClick={signOut} className="px-label px-underline text-muted-foreground">
+              <button
+                type="button"
+                onClick={signOut}
+                className="px-label px-underline shrink-0 text-muted-foreground"
+              >
                 Sign out
               </button>
             </div>
 
-            <div className="px-rule mt-10 grid gap-12 pt-10 md:grid-cols-[23fr_77fr] md:gap-16">
+            <div className="px-rule mt-10 grid gap-12 pt-10 lg:grid-cols-[23fr_77fr] lg:gap-16">
               <nav aria-label="Account sections">
-                <ul className="-mx-6 flex gap-6 overflow-x-auto px-6 md:mx-0 md:block md:space-y-3 md:overflow-visible md:px-0">
+                <ul className="-mx-6 flex gap-6 overflow-x-auto px-6 max-md:mx-0 max-md:grid max-md:grid-cols-2 max-md:gap-x-6 max-md:gap-y-4 max-md:overflow-visible max-md:px-0 lg:mx-0 lg:block lg:space-y-3 lg:overflow-visible lg:px-0">
                   {tabs.map((t) => (
                     <li key={t} className="shrink-0">
                       <button
@@ -622,7 +826,9 @@ function AccountPage() {
                         aria-current={tab === t ? "page" : undefined}
                         className={[
                           "px-label px-underline whitespace-nowrap transition-opacity duration-300",
-                          tab === t ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100",
+                          tab === t
+                            ? "opacity-100 after:scale-x-100"
+                            : "opacity-45 hover:opacity-100",
                         ].join(" ")}
                       >
                         {t}

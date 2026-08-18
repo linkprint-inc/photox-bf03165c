@@ -31,13 +31,20 @@ export function CustomExtras() {
   return (
     <>
       <Shell label="How it works" className="pb-14 md:pb-16">
-        <div className="px-rule flex flex-wrap items-baseline gap-x-10 gap-y-3 pt-5">
+        <div className="px-rule pt-5 md:flex md:flex-wrap md:items-baseline md:gap-x-10 md:gap-y-3">
           <p className="px-label">How it works</p>
-          <ol className="flex flex-wrap gap-x-8 gap-y-2">
+          <ol className="mt-6 grid grid-cols-5 md:mt-0 md:flex md:flex-wrap md:gap-x-8 md:gap-y-2">
             {steps.map((s) => (
-              <li key={s.num} className="flex items-baseline gap-2">
-                <span className="px-meta text-muted-foreground">{s.num}</span>
-                <span className="px-label">{s.label}</span>
+              <li
+                key={s.num}
+                className="flex min-w-0 flex-col items-start gap-1 md:flex-row md:items-baseline md:gap-2"
+              >
+                <span className="px-meta max-md:text-[0.65rem] max-md:leading-none text-muted-foreground">
+                  {s.num}
+                </span>
+                <span className="px-label whitespace-nowrap max-md:tracking-[0.13em]">
+                  {s.label}
+                </span>
               </li>
             ))}
           </ol>
