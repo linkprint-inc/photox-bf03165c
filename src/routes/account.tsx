@@ -9,7 +9,7 @@ import { useStore, productById, unitPrice, sizeLabel, materialName, type Order }
 
 export const Route = createFileRoute("/account")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } =>
-    typeof search.tab === "string" ? { tab: search.tab } : {},
+    typeof search['tab'] === "string" ? { tab: search['tab'] } : {},
   head: () => ({
     meta: [
       { title: "Account — Orders, Saved Artwork & Profile | photoX" },
