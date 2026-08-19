@@ -1,5 +1,5 @@
 import sizeRoom from "@/assets/size-room.jpg";
-import { detailView } from "@/lib/product-detail";
+import { detailFor } from "@/lib/product-detail";
 import { materialName, type BagMaterial } from "@/lib/store";
 import type { ShopProduct } from "@/lib/shop-data";
 
@@ -108,8 +108,8 @@ export function MainVisual({
     return (
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
         <img
-          src={detailView[material]}
-          alt={`Three-quarter physical view of a ${materialName[material].toLowerCase()}`}
+          src={detailFor(product, material)}
+          alt={`${product.name} as a ${materialName[material].toLowerCase()}, seen at an angle`}
           className="block h-full w-full object-cover"
         />
       </div>

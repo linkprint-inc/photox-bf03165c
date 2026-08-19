@@ -4,6 +4,40 @@ import metalDetailCrop from "@/assets/metal-detail-crop.jpg";
 import canvasTexture from "@/assets/canvas-texture.jpg";
 import canvasEdge from "@/assets/canvas-edge.jpg";
 import canvasFinish from "@/assets/canvas-finish.jpg";
+import artRain from "@/assets/art-rain.jpg";
+import artSaltflat from "@/assets/art-saltflat.jpg";
+import artBrutal from "@/assets/art-brutal.jpg";
+import artRedfield from "@/assets/art-redfield.jpg";
+import artConcretePlanes from "@/assets/art-concrete-planes.jpg";
+import artFigure from "@/assets/art-figure.jpg";
+import artSignal from "@/assets/art-signal.jpg";
+import artCanopy from "@/assets/art-canopy.jpg";
+import artBluehour from "@/assets/art-bluehour.jpg";
+import artNightcity from "@/assets/art-nightcity.jpg";
+import artTideline from "@/assets/art-tideline.jpg";
+import artChroma from "@/assets/art-chroma.jpg";
+import artNorthsea from "@/assets/art-northsea.jpg";
+import artMonolith from "@/assets/art-monolith.jpg";
+import dRainMetal from "@/assets/detail/rain-metal.jpg";
+import dSaltflatCanvas from "@/assets/detail/saltflat-canvas.jpg";
+import dBrutalMetal from "@/assets/detail/brutal-metal.jpg";
+import dRedfieldCanvas from "@/assets/detail/redfield-canvas.jpg";
+import dConcretePlanesMetal from "@/assets/detail/concrete-planes-metal.jpg";
+import dFigureCanvas from "@/assets/detail/figure-canvas.jpg";
+import dSignalMetal from "@/assets/detail/signal-metal.jpg";
+import dSignalCanvas from "@/assets/detail/signal-canvas.jpg";
+import dCanopyMetal from "@/assets/detail/canopy-metal.jpg";
+import dBluehourMetal from "@/assets/detail/bluehour-metal.jpg";
+import dBluehourCanvas from "@/assets/detail/bluehour-canvas.jpg";
+import dNightcityMetal from "@/assets/detail/nightcity-metal.jpg";
+import dNightcityCanvas from "@/assets/detail/nightcity-canvas.jpg";
+import dTidelineMetal from "@/assets/detail/tideline-metal.jpg";
+import dTidelineCanvas from "@/assets/detail/tideline-canvas.jpg";
+import dChromaMetal from "@/assets/detail/chroma-metal.jpg";
+import dChromaCanvas from "@/assets/detail/chroma-canvas.jpg";
+import dNorthseaMetal from "@/assets/detail/northsea-metal.jpg";
+import dNorthseaCanvas from "@/assets/detail/northsea-canvas.jpg";
+import dMonolithMetal from "@/assets/detail/monolith-metal.jpg";
 import idxMetal from "@/assets/idx-metal.jpg";
 import idxCanvas from "@/assets/idx-canvas.jpg";
 import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
@@ -30,11 +64,33 @@ export const materialBlurb: Record<BagMaterial, string> = {
   canvas: "Matte · textured · soft",
 };
 
-/** Angled, physical three-quarter view per material. */
-export const detailView: Record<BagMaterial, string> = {
+/** Physical three-quarter close-up of the exact artwork, per material. */
+const artworkDetail = new Map<string, Partial<Record<BagMaterial, string>>>([
+  [artRain, { metal: dRainMetal }],
+  [artSaltflat, { canvas: dSaltflatCanvas }],
+  [artBrutal, { metal: dBrutalMetal }],
+  [artRedfield, { canvas: dRedfieldCanvas }],
+  [artConcretePlanes, { metal: dConcretePlanesMetal }],
+  [artFigure, { canvas: dFigureCanvas }],
+  [artSignal, { metal: dSignalMetal, canvas: dSignalCanvas }],
+  [artCanopy, { metal: dCanopyMetal }],
+  [artBluehour, { metal: dBluehourMetal, canvas: dBluehourCanvas }],
+  [artNightcity, { metal: dNightcityMetal, canvas: dNightcityCanvas }],
+  [artTideline, { metal: dTidelineMetal, canvas: dTidelineCanvas }],
+  [artChroma, { metal: dChromaMetal, canvas: dChromaCanvas }],
+  [artNorthsea, { metal: dNorthseaMetal, canvas: dNorthseaCanvas }],
+  [artMonolith, { metal: dMonolithMetal }],
+]);
+
+const fallbackDetail: Record<BagMaterial, string> = {
   metal: idxMetal,
   canvas: idxCanvas,
 };
+
+/** Material-specific detail image for a product, falling back to a generic view. */
+export function detailFor(p: ShopProduct, material: BagMaterial) {
+  return artworkDetail.get(p.image)?.[material] ?? fallbackDetail[material];
+}
 
 export const closeUps: Record<
   BagMaterial,
