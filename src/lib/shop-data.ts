@@ -79,7 +79,7 @@ export function sizeLabelsFromSearch(value?: string) {
 
 const rooms = [roomLiving, roomLivingArch, roomBedroom, roomWorkspace, roomDining];
 
-const source: Omit<ShopProduct, "room">[] = [
+const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "north-sea",
     name: "North Sea",
