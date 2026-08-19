@@ -66,7 +66,7 @@ function Field({
 }: {
   label: string;
   value: string;
-  error?: string;
+  error?: string | undefined;
   optional?: boolean;
   type?: "email" | "text";
   onChange: (value: string) => void;

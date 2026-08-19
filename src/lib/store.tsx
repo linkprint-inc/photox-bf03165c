@@ -78,6 +78,7 @@ export const customPrintProduct: ShopProduct = {
   material: "both",
   orientation: "Landscape",
   styles: ["Photography"],
+  availableSizes: sizeSteps.map((size) => size.label),
   from: 69,
   image: customPrintImage,
   room: customPrintImage,

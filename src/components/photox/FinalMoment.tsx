@@ -56,7 +56,7 @@ export function FinalMoment() {
       return;
     }
 
-    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+    const observer = new IntersectionObserver(([entry]) => setInView(entry?.isIntersecting ?? false), {
       rootMargin: "160px 0px",
     });
     observer.observe(viewport);

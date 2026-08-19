@@ -4,8 +4,8 @@ import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/checkout/success")({
   validateSearch: (search: Record<string, unknown>) => ({
-    order: typeof search.order === "string" ? search.order : "",
-    email: typeof search.email === "string" ? search.email : "",
+    order: typeof search['order'] === "string" ? search['order'] : "",
+    email: typeof search['email'] === "string" ? search['email'] : "",
   }),
   head: () => ({ meta: [{ title: "Order received | photoX" }] }),
   component: CheckoutSuccess,

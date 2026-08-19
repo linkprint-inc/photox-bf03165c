@@ -32,7 +32,7 @@ function matchesCategory(p: ShopProduct, cat: string) {
   return (p.styles as string[]).includes(cat);
 }
 
-export function ShopCatalog({ query, size }: { query?: string; size?: string }) {
+export function ShopCatalog({ query, size }: { query?: string | undefined; size?: string | undefined }) {
   const navigate = useNavigate();
   const requestedSizes = useMemo(() => sizeLabelsFromSearch(size), [size]);
   const restoredShopState = useRef(false);
@@ -209,12 +209,12 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
   const syncSizeSearch = (sizes: string[]) => {
     navigate({
       to: "/shop",
-      search: (previous) => ({
-        ...previous,
-        ...(sizes.length
-          ? { size: sizes.map((label) => sizeSearchValue(label)).join(",") }
-          : { size: undefined }),
-      }),
+      search: (previous) => {
+        const { size: _size, ...rest } = previous;
+        return sizes.length
+          ? { ...rest, size: sizes.map((label) => sizeSearchValue(label)).join(",") }
+          : rest;
+      },
       replace: true,
     });
   };
@@ -424,7 +424,7 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
             onToggle={toggle}
             onClear={clearFilters}
             onClose={() => setPanelOpen(false)}
-            categories={categoryNavFits ? undefined : primaryCategories}
+            {...(categoryNavFits ? {} : { categories: primaryCategories })}
             category={category}
             onCategoryChange={(nextCategory) => {
               setCategory(nextCategory);
