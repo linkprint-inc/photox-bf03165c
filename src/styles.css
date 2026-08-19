@@ -218,6 +218,11 @@
   font-weight: 500;
 }
 
+@utility px-wordmark {
+  font-family: "Space Grotesk", sans-serif;
+  -webkit-text-stroke: 0.2px currentColor;
+}
+
 @utility px-meta {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
@@ -374,8 +379,6 @@
     scroll-behavior: auto !important;
   }
 }
-
-
 @utility px-price {
   font-size: 0.875rem;
   letter-spacing: 0.02em;

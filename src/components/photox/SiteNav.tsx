@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useStore } from "@/lib/store";
 import { useSearchUI } from "@/lib/search-ui";
+import photoxMark from "@/assets/photox-mark.png";
 
 const center = [
   { label: "Shop", href: "/shop" },
@@ -77,8 +78,14 @@ export function SiteNav({
       >
         <a
           href="/"
-          className="px-label px-underline shrink-0 text-[0.95rem] font-semibold tracking-[0.3em] normal-case"
+          className="px-label px-underline px-wordmark flex shrink-0 items-center gap-2 text-[18px] font-bold tracking-[0.12em] normal-case"
         >
+          <img
+            src={photoxMark}
+            alt=""
+            aria-hidden
+            className={`h-6 w-6 shrink-0 object-contain ${overHero ? "invert" : ""}`}
+          />
           photoX
         </a>
 
