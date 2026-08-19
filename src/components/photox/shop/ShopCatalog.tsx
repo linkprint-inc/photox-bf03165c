@@ -47,6 +47,9 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
   const [sortOpen, setSortOpen] = useState(false);
   const [count, setCount] = useState(PAGE);
   const sortRef = useRef<HTMLDivElement>(null);
+  const categoryFitRef = useRef<HTMLDivElement>(null);
+  const categoryMeasureRef = useRef<HTMLUListElement>(null);
+  const [categoryNavFits, setCategoryNavFits] = useState(false);
 
   // Preserve browsing state when returning from a product detail page.
   useEffect(() => {
@@ -109,6 +112,26 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
     };
   }, [sortOpen]);
 
+  useEffect(() => {
+    const container = categoryFitRef.current;
+    const measure = categoryMeasureRef.current;
+    if (!container || !measure) return;
+
+    const updateCategoryFit = () => {
+      const availableWidth = container.clientWidth;
+      const requiredWidth = measure.getBoundingClientRect().width;
+
+      setCategoryNavFits((fits) =>
+        fits ? availableWidth >= requiredWidth + 8 : availableWidth >= requiredWidth + 32,
+      );
+    };
+
+    const observer = new ResizeObserver(updateCategoryFit);
+    observer.observe(container);
+    updateCategoryFit();
+    return () => observer.disconnect();
+  }, []);
+
   const results = useMemo(() => {
     let list = shopProducts.filter((p) => matchesCategory(p, category));
 
@@ -159,6 +182,30 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
   const active = countFilters(filters);
   const isFullCollection = category === "All" && !query?.trim() && active === 0;
 
+  const renderCategory = (c: (typeof primaryCategories)[number]) => {
+    const on = category === c.key;
+    return (
+      <li key={c.key}>
+        <button
+          type="button"
+          onClick={() => {
+            setCategory(c.key);
+            setCount(PAGE);
+          }}
+          aria-pressed={on}
+          className={[
+            "whitespace-nowrap text-[0.95rem] leading-none transition-colors duration-300 max-md:px-underline max-md:outline-none max-md:focus:outline-none max-md:focus-visible:outline-none",
+            on
+              ? "font-medium text-foreground max-md:after:scale-x-100"
+              : "font-normal text-muted-foreground hover:text-foreground",
+          ].join(" ")}
+        >
+          {c.label}
+        </button>
+      </li>
+    );
+  };
+
   const syncSizeSearch = (sizes: string[]) => {
     navigate({
       to: "/shop",
@@ -202,40 +249,37 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
 
       {/* 03 — category row */}
       <Shell label="Categories">
-        <nav aria-label="Categories">
-          <ul className="flex flex-wrap items-baseline gap-x-7 gap-y-4 md:flex-nowrap md:gap-x-12 md:gap-y-0">
-            {primaryCategories.map((c) => {
-              const on = category === c.key;
-              return (
-                <li key={c.key}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCategory(c.key);
-                      setCount(PAGE);
-                    }}
-                    aria-pressed={on}
-                    className={[
-                      "whitespace-nowrap text-[0.95rem] leading-none transition-colors duration-300",
-                      on
-                        ? "font-medium text-foreground"
-                        : "font-normal text-muted-foreground hover:text-foreground",
-                    ].join(" ")}
-                  >
-                    {c.label}
-                  </button>
+        <div ref={categoryFitRef} className="relative">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-0 top-0 h-0 w-0 overflow-hidden"
+          >
+            <ul ref={categoryMeasureRef} className="flex w-max items-baseline gap-x-12">
+              {primaryCategories.map((item) => (
+                <li
+                  key={item.key}
+                  className="whitespace-nowrap text-[0.95rem] font-medium leading-none"
+                >
+                  {item.label}
                 </li>
-              );
-            })}
-          </ul>
-        </nav>
-        <div className="mt-6 border-t border-hairline md:mt-9" />
+              ))}
+            </ul>
+          </div>
+          {categoryNavFits ? (
+            <nav aria-label="Categories">
+              <ul className="flex items-baseline gap-x-12">
+                {primaryCategories.map(renderCategory)}
+              </ul>
+            </nav>
+          ) : null}
+        </div>
+        {categoryNavFits ? <div className="mt-9 border-t border-hairline" /> : null}
       </Shell>
 
       {/* 04 — toolbar (secondary) */}
       <Shell label="Shop controls">
-        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 py-3">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-5 gap-y-3 py-3 md:flex md:flex-wrap md:justify-between md:gap-x-8">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
             <button
               type="button"
               onClick={() => setPanelOpen((v) => !v)}
@@ -256,56 +300,58 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
             ))}
           </div>
 
-          <div className="flex items-center gap-x-6 text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground">
-            <span>{isFullCollection ? totalWorks : results.length} works</span>
+          <div className="flex items-center gap-x-5 text-[0.75rem] uppercase tracking-[0.06em] text-muted-foreground md:gap-x-6">
+            <div className="flex items-center gap-x-3 md:gap-x-6">
+              <span>{isFullCollection ? totalWorks : results.length} works</span>
 
-            <div className="flex items-center gap-2.5">
-              {(["grid", "room"] as const).map((v) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setView(v)}
-                  aria-pressed={view === v}
-                  aria-label={v === "grid" ? "Grid view" : "Room view"}
-                  className={[
-                    "transition-opacity duration-300",
-                    view === v
-                      ? "opacity-100 text-foreground"
-                      : "opacity-40 hover:opacity-100 text-foreground",
-                  ].join(" ")}
-                >
-                  {v === "grid" ? (
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                    >
-                      <rect x="1.5" y="1.5" width="6" height="6" />
-                      <rect x="10.5" y="1.5" width="6" height="6" />
-                      <rect x="1.5" y="10.5" width="6" height="6" />
-                      <rect x="10.5" y="10.5" width="6" height="6" />
-                    </svg>
-                  ) : (
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 18 18"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.2"
-                    >
-                      <rect x="1.5" y="3" width="15" height="12" />
-                      <path d="M5 15V9h8v6" />
-                    </svg>
-                  )}
-                </button>
-              ))}
+              <div className="flex items-center gap-2 md:gap-2.5">
+                {(["grid", "room"] as const).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setView(v)}
+                    aria-pressed={view === v}
+                    aria-label={v === "grid" ? "Grid view" : "Room view"}
+                    className={[
+                      "transition-opacity duration-300",
+                      view === v
+                        ? "opacity-100 text-foreground"
+                        : "opacity-40 hover:opacity-100 text-foreground",
+                    ].join(" ")}
+                  >
+                    {v === "grid" ? (
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.2"
+                      >
+                        <rect x="1.5" y="1.5" width="6" height="6" />
+                        <rect x="10.5" y="1.5" width="6" height="6" />
+                        <rect x="1.5" y="10.5" width="6" height="6" />
+                        <rect x="10.5" y="10.5" width="6" height="6" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.2"
+                      >
+                        <rect x="1.5" y="3" width="15" height="12" />
+                        <path d="M5 15V9h8v6" />
+                      </svg>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div ref={sortRef} className="relative">
+            <div ref={sortRef} className="relative max-md:ml-1">
               <button
                 type="button"
                 onClick={() => setSortOpen((open) => !open)}
@@ -378,9 +424,15 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
             onToggle={toggle}
             onClear={clearFilters}
             onClose={() => setPanelOpen(false)}
+            categories={categoryNavFits ? undefined : primaryCategories}
+            category={category}
+            onCategoryChange={(nextCategory) => {
+              setCategory(nextCategory);
+              setCount(PAGE);
+            }}
           />
 
-          <div>
+          <div className="min-w-0 max-w-full">
             {shown.length === 0 ? (
               <div className="py-24 text-center">
                 <h2 className="px-serif text-[2rem]">No works found.</h2>
@@ -402,7 +454,7 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
               <>
                 <div
                   className={[
-                    "grid grid-cols-2 gap-x-6 gap-y-12 md:gap-x-8",
+                    "grid w-full min-w-0 grid-cols-2 gap-x-6 gap-y-12 md:gap-x-8",
                     panelOpen ? "lg:grid-cols-3" : "md:grid-cols-3 lg:grid-cols-4",
                   ].join(" ")}
                 >
@@ -440,7 +492,7 @@ export function ShopCatalog({ query, size }: { query?: string; size?: string }) 
                 {shown.length > 12 ? (
                   <div
                     className={[
-                      "mt-16 grid grid-cols-2 gap-x-6 gap-y-12 md:gap-x-8",
+                      "mt-16 grid w-full min-w-0 grid-cols-2 gap-x-6 gap-y-12 md:gap-x-8",
                       panelOpen ? "lg:grid-cols-3" : "md:grid-cols-3 lg:grid-cols-4",
                     ].join(" ")}
                   >

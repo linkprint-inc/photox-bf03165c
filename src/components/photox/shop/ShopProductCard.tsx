@@ -105,7 +105,7 @@ export function ShopProductCard({
   }, []);
 
   return (
-    <article className="group">
+    <article className="group min-w-0 max-w-full">
       <a href={link} className="block" aria-label={`${product.name} — view artwork`}>
         <div
           onPointerEnter={(e) => {

@@ -39,9 +39,9 @@ function ShopPage() {
   const { q, size } = Route.useSearch();
 
   return (
-    <div className="bg-background text-foreground">
+    <div className="min-w-0 max-w-full bg-background text-foreground">
       <SiteNav variant="light" />
-      <main>
+      <main className="min-w-0 max-w-full">
         <ShopCatalog query={q ?? ""} size={size} />
       </main>
       <SiteFooter />

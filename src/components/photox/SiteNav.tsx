@@ -73,11 +73,11 @@ export function SiteNav({
     >
       <nav
         aria-label="Primary"
-        className="mx-auto flex max-w-[1440px] items-center justify-between gap-6 px-6 py-5 md:px-10"
+        className="mx-auto flex w-full min-w-0 flex-nowrap max-w-[1440px] items-center justify-between gap-4 px-6 py-5 md:gap-6 md:px-10"
       >
         <a
           href="/"
-          className="px-label px-underline text-[0.95rem] font-semibold tracking-[0.3em] normal-case"
+          className="px-label px-underline shrink-0 text-[0.95rem] font-semibold tracking-[0.3em] normal-case"
         >
           photoX
         </a>
@@ -92,8 +92,8 @@ export function SiteNav({
           ))}
         </ul>
 
-        <ul className="flex items-center gap-5">
-          <li className="hidden md:block">
+        <ul className="hidden shrink-0 items-center gap-5 whitespace-nowrap md:flex">
+          <li>
             <button
               type="button"
               onClick={() => {
@@ -105,28 +105,40 @@ export function SiteNav({
               Search
             </button>
           </li>
-          <li className="hidden sm:block">
+          <li>
             <Link to="/account" className="px-label px-underline opacity-90">
               Account
             </Link>
           </li>
           <li>
-            <button type="button" onClick={openDrawer} className="px-label px-underline">
+            <button
+              type="button"
+              onClick={openDrawer}
+              className="px-label px-underline whitespace-nowrap"
+            >
               Bag ({hydrated ? bagCount : 0})
             </button>
           </li>
-          <li className="md:hidden">
-            <button
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-controls="mobile-navigation"
-              className="px-label px-underline px-menu-trigger"
-            >
-              {menuOpen ? "Close" : "Menu"}
-            </button>
-          </li>
         </ul>
+
+        <div className="ml-auto flex shrink-0 items-center gap-5 whitespace-nowrap md:hidden">
+          <button
+            type="button"
+            onClick={openDrawer}
+            className="px-label px-underline whitespace-nowrap"
+          >
+            Bag ({hydrated ? bagCount : 0})
+          </button>
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            className="px-label px-underline px-menu-trigger whitespace-nowrap"
+          >
+            {menuOpen ? "Close" : "Menu"}
+          </button>
+        </div>
       </nav>
       {!overHero && !menuOpen && <div className="px-rule" />}
       {menuOpen ? (

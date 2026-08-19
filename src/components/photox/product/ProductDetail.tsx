@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Shell, SectionHead } from "../Section";
 import { ShopProductCard } from "../shop/ShopProductCard";
@@ -67,6 +67,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const [sizeIndex, setSizeIndex] = useState(2);
   const [view, setView] = useState<ViewMode>("artwork");
   const [openInfo, setOpenInfo] = useState<string | null>(null);
+  const [mainCtaVisible, setMainCtaVisible] = useState<boolean | null>(null);
+  const mainCtaRef = useRef<HTMLButtonElement>(null);
   const { addToBag, toggleSaved, isSaved, hydrated } = useStore();
 
   useEffect(() => {
@@ -74,6 +76,47 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
     setSizeIndex(2);
     setView("artwork");
   }, [product.id, materials]);
+
+  useEffect(() => {
+    const mainCta = mainCtaRef.current;
+    const mobile = window.matchMedia("(max-width: 767px)");
+    if (!mainCta) return;
+
+    let observer: IntersectionObserver | undefined;
+    const observe = () => {
+      observer?.disconnect();
+
+      if (!mobile.matches) {
+        setMainCtaVisible(null);
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          const ratio = entry?.intersectionRatio ?? 0;
+
+          if (ratio >= 0.85) {
+            setMainCtaVisible(true);
+          } else if (ratio <= 0.7) {
+            setMainCtaVisible(false);
+          } else {
+            setMainCtaVisible((visible) => visible ?? false);
+          }
+        },
+        {
+          threshold: [0, 0.7, 0.85],
+        },
+      );
+      observer.observe(mainCta);
+    };
+
+    observe();
+    mobile.addEventListener("change", observe);
+    return () => {
+      observer?.disconnect();
+      mobile.removeEventListener("change", observe);
+    };
+  }, [product.id]);
 
   const size = sizeSteps[sizeIndex]!;
   const price = unitPrice(material, sizeIndex);
@@ -233,6 +276,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               </div>
 
               <button
+                ref={mainCtaRef}
                 type="button"
                 onClick={() => addToBag({ productId: product.id, material, sizeIndex, qty: 1 })}
                 className="px-label mt-5 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
@@ -491,14 +535,22 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       </Shell>
 
       {/* ---------- Mobile sticky commerce bar ---------- */}
-      <div className="sticky bottom-0 z-30 border-t border-hairline bg-paper/95 backdrop-blur-sm md:hidden">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 py-3">
+      <div
+        aria-hidden={mainCtaVisible !== false}
+        className={`sticky bottom-0 z-30 border-t border-hairline bg-paper/95 backdrop-blur-sm transition-[opacity,transform] duration-[250ms] ease-in-out motion-reduce:transition-none md:hidden ${
+          mainCtaVisible === false
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-full opacity-0"
+        }`}
+      >
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <span className="px-meta text-muted-foreground">
             {size.label} · ${price}
           </span>
           <button
             type="button"
             onClick={() => addToBag({ productId: product.id, material, sizeIndex, qty: 1 })}
+            tabIndex={mainCtaVisible === false ? 0 : -1}
             className="px-label border border-foreground px-5 py-3"
           >
             Add to bag
