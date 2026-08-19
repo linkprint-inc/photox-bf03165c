@@ -32,7 +32,7 @@ function matchesCategory(p: ShopProduct, cat: string) {
   return (p.styles as string[]).includes(cat);
 }
 
-export function ShopCatalog({ query, size }: { query?: string; size?: string }) {
+export function ShopCatalog({ query, size }: { query?: string | undefined; size?: string | undefined }) {
   const navigate = useNavigate();
   const requestedSizes = useMemo(() => sizeLabelsFromSearch(size), [size]);
   const restoredShopState = useRef(false);
