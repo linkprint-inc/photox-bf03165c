@@ -27,7 +27,7 @@ export function ShopProductCard({
   const saved = hydrated && isSaved(product.id);
   const isMetal = product.material !== "canvas";
   const primary = view === "room" ? product.room : product.image;
-  const secondary = view === "room" ? product.image : angleView[product.material];
+  const secondary = view === "room" ? product.image : (product.room ?? angleView[product.material]);
   const price = size !== null ? sizeSteps[size]!.price : product.from;
 
   const cursorRef = useRef<HTMLDivElement | null>(null);

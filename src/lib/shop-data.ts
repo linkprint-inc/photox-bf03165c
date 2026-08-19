@@ -20,6 +20,7 @@ import roomDining from "@/assets/room-dining.jpg";
 import idxMetal from "@/assets/idx-metal.jpg";
 import idxCanvas from "@/assets/idx-canvas.jpg";
 import { sizes } from "./photox-data";
+import { hoverImages } from "./hover-images";
 
 export type ShopMaterial = "metal" | "canvas" | "both";
 export type Orientation = "Portrait" | "Landscape" | "Square";
@@ -365,7 +366,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
 export const shopProducts: ShopProduct[] = source.map((p, i) => ({
   ...p,
   availableSizes: sizeSteps.map((size) => size.label),
-  room: rooms[i % rooms.length]!,
+  room: hoverImages[p.id] ?? rooms[i % rooms.length]!,
 }));
 
 export const categories = [
