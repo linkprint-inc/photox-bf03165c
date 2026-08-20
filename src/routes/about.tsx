@@ -13,6 +13,7 @@ import metalDetailCrop from "@/assets/metal-detail-crop.jpg";
 import materialCanvas from "@/assets/material-canvas.jpg";
 import roomLiving from "@/assets/room-living-architectural.jpg";
 import roomWorkspace from "@/assets/room-workspace.jpg";
+import { customPrintExample } from "@/lib/photox-data";
 
 const title = "About photoX — Art, Made Physical";
 const description =
