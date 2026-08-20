@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeftRight } from "lucide-react";
-import customOriginal from "@/assets/custom-original.jpg";
-import customPrint from "@/assets/custom-print.jpg";
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
@@ -10,6 +8,7 @@ import { Shell } from "@/components/photox/Section";
 import { CustomBuilder } from "@/components/photox/custom/CustomBuilder";
 import { CustomExtras } from "@/components/photox/custom/CustomExtras";
 import type { ToolId } from "@/lib/image-tools";
+import { customPrintExample } from "@/lib/photox-data";
 
 const toolIds: ToolId[] = ["restore", "enhance", "text"];
 
@@ -96,14 +95,14 @@ function CustomIntro() {
           className="relative aspect-[16/10] w-full cursor-ew-resize touch-pan-y select-none overflow-hidden bg-secondary md:col-span-7"
         >
           <img
-            src={customOriginal}
-            alt="An original digital photograph before printing"
+            src={customPrintExample.sourceImage}
+            alt={customPrintExample.sourceAlt}
             className="absolute inset-0 h-full w-full object-cover"
           />
           <div className="absolute inset-0" style={{ clipPath: `inset(0 0 0 ${pos}%)` }}>
             <img
-              src={customPrint}
-              alt="The same photograph finished as a physical print on a wall"
+              src={customPrintExample.metalPrintImage}
+              alt={customPrintExample.metalPrintAlt}
               className="absolute inset-0 h-full w-full object-cover"
             />
           </div>
