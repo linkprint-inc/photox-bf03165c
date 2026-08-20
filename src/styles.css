@@ -386,6 +386,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Drawer quantity values deliberately remain control-sized, independent of
+   product-price typography or responsive utility classes. */
+.cart-drawer .cart-drawer-quantity-value {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1;
+}
+
 @utility px-fade {
   animation: px-fade-in 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }

@@ -43,7 +43,7 @@ export function BagDrawer() {
       <aside
         aria-label="Your bag"
         className={[
-          "absolute right-0 top-0 flex h-full w-full flex-col bg-paper transition-transform duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] md:w-[60vw] lg:w-[410px]",
+          "cart-drawer absolute right-0 top-0 flex h-full w-full flex-col bg-paper transition-transform duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)] md:w-[60vw] lg:w-[410px]",
           drawerOpen ? "translate-x-0" : "translate-x-full",
         ].join(" ")}
       >
@@ -84,61 +84,70 @@ export function BagDrawer() {
                 return (
                   <li
                     key={item.key}
-                    className="px-rule grid grid-cols-[4rem_minmax(0,1fr)_2.25rem] items-start gap-4 py-7 first:border-t-0"
+                    className="px-rule grid grid-cols-[3.5rem_minmax(0,1fr)_auto] grid-rows-[auto_auto] items-start gap-x-4 gap-y-7 py-8 first:border-t-0 sm:grid-cols-[4rem_minmax(0,1fr)_auto] sm:gap-x-6"
                   >
-                    <a href={productHref} onClick={closeDrawer} className="block w-16 shrink-0">
+                    <a
+                      href={productHref}
+                      onClick={closeDrawer}
+                      className="row-span-2 block w-14 shrink-0 sm:w-16"
+                    >
                       <img
                         src={
                           item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image
                         }
                         alt={p.name}
-                        className="aspect-square w-16 object-cover"
+                        className="aspect-square w-full object-cover"
                         loading="lazy"
                       />
                     </a>
-                    <div className="min-w-0 flex-1">
+
+                    <div className="min-w-0">
                       <a href={productHref} onClick={closeDrawer} className="px-label px-underline">
                         {p.name}
                       </a>
-                      <p className="px-meta mt-1 text-muted-foreground">
+                      <p className="px-meta mt-2 text-muted-foreground">
                         {materialName[item.material]} · {sizeLabel(item.sizeIndex)}
                       </p>
-                      <div className="mt-3 flex items-center">
-                        <div className="flex items-center gap-0">
-                          <button
-                            type="button"
-                            aria-label={`Decrease ${p.name} quantity`}
-                            onClick={() => updateBag(item.key, { qty: Math.max(1, item.qty - 1) })}
-                            className="px-label flex h-9 w-9 items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-                          >
-                            −
-                          </button>
-                          <span className="px-price w-6 text-center">{item.qty}</span>
-                          <button
-                            type="button"
-                            aria-label={`Increase ${p.name} quantity`}
-                            onClick={() => updateBag(item.key, { qty: item.qty + 1 })}
-                            className="px-label flex h-9 w-9 items-center justify-center text-base leading-none text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
                     </div>
-                    <div className="flex self-stretch flex-col items-end justify-between">
-                      <button
-                        type="button"
-                        aria-label={`Remove ${p.name} from bag`}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          removeFromBag(item.key);
-                        }}
-                        className="flex h-9 w-9 shrink-0 items-center justify-center text-base font-light leading-none text-muted-foreground transition-colors hover:text-foreground"
-                      >
-                        ×
-                      </button>
-                      <p className="px-price whitespace-nowrap">${lineTotal}</p>
+
+                    <button
+                      type="button"
+                      aria-label={`Remove ${p.name} from bag`}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        removeFromBag(item.key);
+                      }}
+                      className="flex h-4 w-4 shrink-0 items-center justify-center justify-self-end text-base font-light leading-none text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                      ×
+                    </button>
+
+                    <div className="col-span-2 col-start-2 flex items-center justify-between">
+                      <div className="inline-flex items-center gap-6 text-base font-normal leading-none">
+                        <button
+                          type="button"
+                          aria-label={`Decrease ${p.name} quantity`}
+                          onClick={() => updateBag(item.key, { qty: Math.max(1, item.qty - 1) })}
+                          className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                        >
+                          −
+                        </button>
+                        <span className="cart-drawer-quantity-value flex h-8 w-[3ch] shrink-0 items-center justify-center tabular-nums">
+                          {item.qty}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label={`Increase ${p.name} quantity`}
+                          onClick={() => updateBag(item.key, { qty: item.qty + 1 })}
+                          className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="shrink-0 text-base font-medium leading-none tracking-[0.06em]">
+                        ${lineTotal}
+                      </p>
                     </div>
                   </li>
                 );

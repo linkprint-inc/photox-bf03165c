@@ -40,23 +40,64 @@ export const Route = createFileRoute("/bag")({
 
 function QuantitySelector({ qty, onChange }: { qty: number; onChange: (n: number) => void }) {
   return (
-    <div className="flex items-center gap-4">
+    <div className="inline-flex w-fit items-center justify-center gap-5 text-[0.9375rem] font-normal leading-none">
       <button
         type="button"
         aria-label="Decrease quantity"
         onClick={() => onChange(Math.max(1, qty - 1))}
-        className="px-label flex h-8 w-8 items-center justify-center text-base leading-none opacity-60 transition-opacity hover:opacity-100"
+        className="flex h-8 w-8 items-center justify-center opacity-60 transition-opacity hover:opacity-100"
       >
         −
       </button>
-      <span className="px-price w-4 text-center">{qty}</span>
+      <span className="flex h-8 w-[3ch] shrink-0 items-center justify-center tabular-nums">
+        {qty}
+      </span>
       <button
         type="button"
         aria-label="Increase quantity"
         onClick={() => onChange(qty + 1)}
-        className="px-label flex h-8 w-8 items-center justify-center text-base leading-none opacity-60 transition-opacity hover:opacity-100"
+        className="flex h-8 w-8 items-center justify-center opacity-60 transition-opacity hover:opacity-100"
       >
         +
+      </button>
+    </div>
+  );
+}
+
+function ProductInformation({
+  name,
+  material,
+  size,
+  finish,
+  productHref,
+  editing,
+  onEdit,
+}: {
+  name: string;
+  material: string;
+  size: string;
+  finish: string;
+  productHref: string;
+  editing: boolean;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="min-w-0">
+      <h2 className="px-label">
+        <a href={productHref} className="px-underline">
+          {name}
+        </a>
+      </h2>
+      <p className="px-meta mt-1 text-muted-foreground">{material}</p>
+      <p className="px-meta text-muted-foreground">{size}</p>
+      <p className="px-meta text-muted-foreground">{finish}</p>
+      <button
+        type="button"
+        onClick={onEdit}
+        aria-expanded={editing}
+        className="px-label px-underline mt-3 inline-block text-muted-foreground"
+      >
+        Edit →
       </button>
     </div>
   );
@@ -75,8 +116,8 @@ function BagRow({ item }: { item: BagItem }) {
     p.material === "both" ? ["metal", "canvas"] : [p.material as BagMaterial];
 
   return (
-    <li className="px-rule py-8">
-      <div className="flex gap-6">
+    <li className="border-b border-hairline py-10">
+      <div className="flex gap-6 md:hidden">
         <a
           href={productHref}
           className="group relative block w-24 shrink-0 overflow-hidden sm:w-32"
@@ -95,24 +136,15 @@ function BagRow({ item }: { item: BagItem }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-4">
-            <div>
-              <h2 className="px-label">
-                <a href={productHref} className="px-underline">
-                  {p.name}
-                </a>
-              </h2>
-              <p className="px-meta mt-1 text-muted-foreground">{materialName[item.material]}</p>
-              <p className="px-meta text-muted-foreground">{sizeLabel(item.sizeIndex)}</p>
-              <p className="px-meta text-muted-foreground">{finishLabel[item.material]}</p>
-              <button
-                type="button"
-                onClick={() => setEditing((v) => !v)}
-                aria-expanded={editing}
-                className="px-label px-underline mt-3 inline-block text-muted-foreground"
-              >
-                Edit →
-              </button>
-            </div>
+            <ProductInformation
+              name={p.name}
+              material={materialName[item.material]}
+              size={sizeLabel(item.sizeIndex)}
+              finish={finishLabel[item.material]}
+              productHref={productHref}
+              editing={editing}
+              onEdit={() => setEditing((v) => !v)}
+            />
 
             <div className="flex flex-col items-start gap-3 sm:items-end">
               <span className="px-label text-muted-foreground">Quantity</span>
@@ -127,55 +159,101 @@ function BagRow({ item }: { item: BagItem }) {
               </button>
             </div>
           </div>
-
-          {editing && (
-            <div className="px-rule mt-6 grid gap-6 pt-5 md:grid-cols-2">
-              <div>
-                <p className="px-label text-muted-foreground">Size</p>
-                <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-                  {sizeSteps.map((s, i) => (
-                    <li key={s.label}>
-                      <button
-                        type="button"
-                        onClick={() => updateBag(item.key, { sizeIndex: i })}
-                        className={[
-                          "px-meta transition-opacity",
-                          i === item.sizeIndex
-                            ? "opacity-100 underline"
-                            : "opacity-45 hover:opacity-100",
-                        ].join(" ")}
-                      >
-                        {s.label}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="px-label text-muted-foreground">Material / finish</p>
-                <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-                  {materials.map((m) => (
-                    <li key={m}>
-                      <button
-                        type="button"
-                        onClick={() => updateBag(item.key, { material: m })}
-                        className={[
-                          "px-meta transition-opacity",
-                          m === item.material
-                            ? "opacity-100 underline"
-                            : "opacity-45 hover:opacity-100",
-                        ].join(" ")}
-                      >
-                        {materialName[m]} · {finishLabel[m]}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      <div className="hidden md:grid md:grid-cols-[120px_minmax(0,1fr)_96px_110px] md:items-start md:gap-x-6 lg:grid-cols-[140px_minmax(0,1fr)_120px_112px] xl:grid-cols-[minmax(160px,180px)_minmax(260px,1fr)_minmax(140px,180px)_minmax(120px,140px)] xl:gap-x-8 min-[1440px]:grid-cols-[180px_minmax(280px,1fr)_180px_140px]">
+        <a
+          href={productHref}
+          className="group relative block w-full overflow-hidden"
+          aria-label={`${p.name} — view artwork`}
+        >
+          <img
+            src={src}
+            alt={p.name}
+            loading="lazy"
+            className="aspect-square w-full object-cover"
+          />
+          <span className="px-reveal absolute inset-x-0 bottom-0 bg-paper/92 py-1.5 text-center text-[0.6rem] font-medium uppercase tracking-[0.14em] group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
+            View →
+          </span>
+        </a>
+
+        <ProductInformation
+          name={p.name}
+          material={materialName[item.material]}
+          size={sizeLabel(item.sizeIndex)}
+          finish={finishLabel[item.material]}
+          productHref={productHref}
+          editing={editing}
+          onEdit={() => setEditing((v) => !v)}
+        />
+
+        <div className="flex flex-col items-center gap-7">
+          <span className="px-label text-muted-foreground">Quantity</span>
+          <QuantitySelector qty={item.qty} onChange={(n) => updateBag(item.key, { qty: n })} />
+        </div>
+
+        <div className="flex flex-col items-end gap-10 text-right">
+          <p className="text-[1.125rem] font-medium leading-none tracking-normal">
+            ${unitPrice(item.material, item.sizeIndex) * item.qty}
+          </p>
+          <button
+            type="button"
+            onClick={() => removeFromBag(item.key)}
+            className="px-label px-underline text-muted-foreground"
+          >
+            Remove
+          </button>
+        </div>
+      </div>
+
+      {editing && (
+        <div className="px-rule mt-6 grid gap-6 pt-5 md:grid-cols-2">
+          <div>
+            <p className="px-label text-muted-foreground">Size</p>
+            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+              {sizeSteps.map((s, i) => (
+                <li key={s.label}>
+                  <button
+                    type="button"
+                    onClick={() => updateBag(item.key, { sizeIndex: i })}
+                    className={[
+                      "px-meta transition-opacity",
+                      i === item.sizeIndex
+                        ? "opacity-100 underline"
+                        : "opacity-45 hover:opacity-100",
+                    ].join(" ")}
+                  >
+                    {s.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="px-label text-muted-foreground">Material / finish</p>
+            <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+              {materials.map((m) => (
+                <li key={m}>
+                  <button
+                    type="button"
+                    onClick={() => updateBag(item.key, { material: m })}
+                    className={[
+                      "px-meta transition-opacity",
+                      m === item.material
+                        ? "opacity-100 underline"
+                        : "opacity-45 hover:opacity-100",
+                    ].join(" ")}
+                  >
+                    {materialName[m]} · {finishLabel[m]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </li>
   );
 }
@@ -263,7 +341,7 @@ function BagPage() {
       <SiteNav variant="light" />
       <main>
         <Shell className="pb-28 pt-32 md:pt-40">
-          <div className="px-rule flex flex-wrap items-baseline justify-between gap-4 pb-6">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-hairline pb-5">
             <h1 className="px-serif text-[2.5rem] md:text-[3rem]">Bag</h1>
             {!empty && (
               <p className="px-label text-muted-foreground">
@@ -271,19 +349,17 @@ function BagPage() {
               </p>
             )}
           </div>
-
           {empty ? (
             <div className="pt-16">
               <EmptyBag />
             </div>
           ) : (
-            <div className="grid gap-14 pt-2 lg:grid-cols-[66fr_4fr_30fr]">
+            <div className="grid gap-y-14 pt-2 lg:grid-cols-[minmax(0,68fr)_minmax(280px,32fr)] lg:gap-x-12">
               <ul>
                 {bag.map((item) => (
                   <BagRow key={item.key} item={item} />
                 ))}
               </ul>
-              <div className="hidden lg:block" />
               <aside className="lg:pt-8">
                 <OrderSummary subtotal={subtotal} />
               </aside>
