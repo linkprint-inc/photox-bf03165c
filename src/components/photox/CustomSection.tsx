@@ -1,7 +1,5 @@
 import { useCallback, useRef, useState } from "react";
-import customOriginal from "@/assets/custom-original.jpg";
-import customPrint from "@/assets/custom-print.jpg";
-import { sizes } from "@/lib/photox-data";
+import { customPrintExample, sizes } from "@/lib/photox-data";
 import { Shell } from "./Section";
 
 export function CustomSection() {
@@ -40,8 +38,8 @@ export function CustomSection() {
           onLostPointerCapture={(e) => endDrag(e.pointerId)}
         >
           <img
-            src={customOriginal}
-            alt="An original digital photograph of two walkers on a dune ridge"
+            src={customPrintExample.sourceImage}
+            alt={customPrintExample.sourceAlt}
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover"
           />
@@ -50,8 +48,8 @@ export function CustomSection() {
             style={{ clipPath: `inset(0 0 0 ${pos}%)` }}
           >
             <img
-              src={customPrint}
-              alt="The same photograph finished as a gloss metal print hanging on a wall"
+              src={customPrintExample.metalPrintImage}
+              alt={customPrintExample.metalPrintAlt}
               loading="lazy"
               className="absolute inset-0 h-full w-full object-cover"
             />

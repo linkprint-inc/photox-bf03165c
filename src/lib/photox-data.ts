@@ -194,3 +194,14 @@ export const largeWorks: LargeWork[] = [
 ];
 
 export { artBluehour, artNightcity, artTideline, artChroma };
+
+import customOriginalImage from "@/assets/custom-original.jpg";
+import customPrintImage from "@/assets/custom-print.jpg";
+
+/** Single source of truth for the "your image → metal print" before/after pair. */
+export const customPrintExample = {
+  sourceImage: customOriginalImage,
+  sourceAlt: "An original digital photograph of two walkers on a desert dune ridge",
+  metalPrintImage: customPrintImage,
+  metalPrintAlt: "The same desert photograph printed as a gloss metal print mounted on a wall",
+} as const;
