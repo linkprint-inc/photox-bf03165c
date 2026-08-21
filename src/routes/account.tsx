@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { SiteNav } from "@/components/photox/SiteNav";
 import { SiteFooter } from "@/components/photox/SiteFooter";
 import { Shell } from "@/components/photox/Section";
@@ -9,7 +10,7 @@ import { useStore, productById, unitPrice, sizeLabel, materialName, type Order }
 
 export const Route = createFileRoute("/account")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } =>
-    typeof search['tab'] === "string" ? { tab: search['tab'] } : {},
+    typeof search["tab"] === "string" ? { tab: search["tab"] } : {},
   head: () => ({
     meta: [
       { title: "Account — Orders, Saved Artwork & Profile | photoX" },
@@ -260,6 +261,164 @@ function isAccountTab(value: unknown): value is Tab {
   return typeof value === "string" && tabs.includes(value as Tab);
 }
 
+function AccountSectionNav({ tab, onTab }: { tab: Tab; onTab: (tab: Tab) => void }) {
+  const [open, setOpen] = useState(false);
+  const [fitsOnOneLine, setFitsOnOneLine] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    const container = navRef.current;
+    const measure = measureRef.current;
+    if (!container || !measure) return;
+
+    const updateFit = () => {
+      const availableWidth = container.clientWidth;
+      const requiredWidth = measure.getBoundingClientRect().width;
+      setFitsOnOneLine((fits) =>
+        fits ? availableWidth >= requiredWidth + 8 : availableWidth >= requiredWidth + 24,
+      );
+    };
+
+    const observer = new ResizeObserver(updateFit);
+    observer.observe(container);
+    updateFit();
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (fitsOnOneLine) setOpen(false);
+  }, [fitsOnOneLine]);
+
+  useEffect(() => {
+    if (!open) return;
+    const closeOnPointer = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("pointerdown", closeOnPointer);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      window.removeEventListener("pointerdown", closeOnPointer);
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [open]);
+
+  const selectTab = (next: Tab) => {
+    onTab(next);
+    setOpen(false);
+  };
+
+  const tabButtonClass = (item: Tab) =>
+    [
+      "px-label px-underline whitespace-nowrap transition-opacity duration-300",
+      tab === item ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100",
+    ].join(" ");
+
+  return (
+    <nav aria-label="Account sections">
+      <div ref={navRef} className="relative min-w-0 lg:hidden">
+        <div aria-hidden className="pointer-events-none absolute h-0 w-0 overflow-hidden">
+          <ul ref={measureRef} className="flex w-max gap-6">
+            {tabs.map((item) => (
+              <li key={item} className="px-label whitespace-nowrap">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {fitsOnOneLine ? (
+          <ul className="flex gap-6 whitespace-nowrap">
+            {tabs.map((item) => (
+              <li key={item}>
+                <button
+                  type="button"
+                  onClick={() => selectTab(item)}
+                  aria-current={tab === item ? "page" : undefined}
+                  className={tabButtonClass(item)}
+                >
+                  {item}
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="border-b border-hairline">
+            <button
+              type="button"
+              onClick={() => setOpen((isOpen) => !isOpen)}
+              aria-expanded={open}
+              aria-controls="account-section-list"
+              className="px-label flex h-14 w-full items-center justify-between text-left text-foreground"
+            >
+              {tab}
+              <ChevronDown
+                aria-hidden
+                className={[
+                  "h-3 w-3 shrink-0 transition-transform duration-200 ease-out",
+                  open ? "rotate-180" : "rotate-0",
+                ].join(" ")}
+                strokeWidth={1.5}
+              />
+            </button>
+
+            <div
+              id="account-section-list"
+              className={[
+                "grid overflow-hidden transition-[grid-template-rows,opacity,transform] duration-300 ease-out",
+                open
+                  ? "grid-rows-[1fr] translate-y-0 opacity-100"
+                  : "grid-rows-[0fr] -translate-y-1 opacity-0",
+              ].join(" ")}
+            >
+              <ul className="min-h-0 border-t border-hairline">
+                {tabs.map((item) => {
+                  const selected = tab === item;
+                  return (
+                    <li key={item} className="border-b border-hairline last:border-b-0">
+                      <button
+                        type="button"
+                        onClick={() => selectTab(item)}
+                        aria-current={selected ? "page" : undefined}
+                        className={[
+                          "px-label flex h-12 w-full items-center text-left transition-colors duration-200",
+                          selected
+                            ? "font-medium text-foreground"
+                            : "font-normal text-muted-foreground hover:text-foreground",
+                        ].join(" ")}
+                      >
+                        {item}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <ul className="hidden lg:block lg:space-y-3">
+        {tabs.map((item) => (
+          <li key={item}>
+            <button
+              type="button"
+              onClick={() => selectTab(item)}
+              aria-current={tab === item ? "page" : undefined}
+              className={tabButtonClass(item)}
+            >
+              {item}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 function orderTotal(order: Order) {
   return order.items.reduce((n, i) => n + unitPrice(i.material, i.sizeIndex) * i.qty, 0);
 }
@@ -374,14 +533,16 @@ function Overview({ onTab }: { onTab: (t: Tab) => void }) {
       <section>
         <h2 className="px-label">Recent order</h2>
         {recent ? (
-          <div className="mt-6">
-            <div className="flex flex-col items-start gap-1 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-6">
+          <div className="mt-8 md:mt-6">
+            <div className="flex flex-col items-start gap-2 md:flex-row md:flex-wrap md:items-baseline md:justify-between md:gap-x-6">
               <p className="px-label">Order #{recent.id}</p>
               <p className="px-meta text-muted-foreground">Placed {recent.placed}</p>
             </div>
-            {recent.items.map((i, idx) => (
-              <ItemRow key={idx} {...i} />
-            ))}
+            <div className="mt-2">
+              {recent.items.map((i, idx) => (
+                <ItemRow key={idx} {...i} />
+              ))}
+            </div>
             <div className="px-rule flex flex-wrap items-baseline justify-between gap-4 py-5">
               <div>
                 <p className="px-label text-muted-foreground">Status</p>
@@ -815,28 +976,8 @@ function AccountPage() {
               </button>
             </div>
 
-            <div className="px-rule mt-10 grid gap-12 pt-10 lg:grid-cols-[23fr_77fr] lg:gap-16">
-              <nav aria-label="Account sections">
-                <ul className="-mx-6 flex gap-6 overflow-x-auto px-6 max-md:mx-0 max-md:grid max-md:grid-cols-2 max-md:gap-x-6 max-md:gap-y-4 max-md:overflow-visible max-md:px-0 lg:mx-0 lg:block lg:space-y-3 lg:overflow-visible lg:px-0">
-                  {tabs.map((t) => (
-                    <li key={t} className="shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => setTab(t)}
-                        aria-current={tab === t ? "page" : undefined}
-                        className={[
-                          "px-label px-underline whitespace-nowrap transition-opacity duration-300",
-                          tab === t
-                            ? "opacity-100 after:scale-x-100"
-                            : "opacity-45 hover:opacity-100",
-                        ].join(" ")}
-                      >
-                        {t}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
+            <div className="px-rule mt-12 grid gap-12 lg:mt-10 lg:grid-cols-[23fr_77fr] lg:gap-16 lg:pt-10">
+              <AccountSectionNav tab={tab} onTab={setTab} />
 
               <div className="min-w-0">
                 {tab === "Overview" && <Overview onTab={setTab} />}

@@ -293,7 +293,7 @@ export function ShopCatalog({ query, size }: { query?: string | undefined; size?
                 type="button"
                 onClick={() => toggle("sizes", label)}
                 aria-label={`Remove ${label} size filter`}
-                className="px-label px-underline text-foreground"
+                className="px-label px-underline hidden text-foreground md:inline-block"
               >
                 {label} ×
               </button>

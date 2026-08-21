@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { filterMap, filters, products, sizeRange, type Product } from "@/lib/photox-data";
 import { Shell, SectionHead } from "./Section";
 
@@ -57,29 +57,121 @@ function ProductCell({ product }: { product: Product }) {
 
 export function ProductWall() {
   const [active, setActive] = useState<string>("All");
+  const [browseOpen, setBrowseOpen] = useState(false);
+  const [categoriesFit, setCategoriesFit] = useState(false);
+  const categoryFitRef = useRef<HTMLDivElement>(null);
+  const categoryMeasureRef = useRef<HTMLUListElement>(null);
   const tag = filterMap[active];
   const shown = tag ? products.filter((p) => p.tags.includes(tag)) : products;
+
+  useEffect(() => {
+    const container = categoryFitRef.current?.parentElement;
+    const measure = categoryMeasureRef.current;
+    if (!container || !measure) return;
+
+    const updateFit = () => {
+      const availableWidth = container.clientWidth;
+      const requiredWidth = measure.getBoundingClientRect().width;
+      setCategoriesFit((fits) =>
+        fits ? availableWidth >= requiredWidth + 8 : availableWidth >= requiredWidth + 24,
+      );
+    };
+
+    const observer = new ResizeObserver(updateFit);
+    observer.observe(container);
+    updateFit();
+    return () => observer.disconnect();
+  }, []);
+
+  const selectCategory = (category: string) => {
+    setActive(category);
+    setBrowseOpen(false);
+  };
 
   return (
     <Shell id="shop" className="pb-24 md:pb-32">
       <SectionHead title="Shop the collection">
-        <ul className="col-span-2 flex flex-wrap gap-x-6 gap-y-2 md:col-auto">
-          {filters.map((f) => (
-            <li key={f}>
-              <button
-                type="button"
-                onClick={() => setActive(f)}
-                aria-pressed={active === f}
+        <div ref={categoryFitRef} className="relative col-span-2 min-w-0 md:col-auto">
+          <div aria-hidden className="pointer-events-none absolute h-0 w-0 overflow-hidden">
+            <ul ref={categoryMeasureRef} className="flex w-max gap-x-6">
+              {filters.map((f) => (
+                <li key={f} className="px-label whitespace-nowrap">
+                  {f}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {categoriesFit ? (
+            <nav aria-label="Collection categories">
+              <ul className="flex items-center gap-x-6 whitespace-nowrap">
+                {filters.map((f) => (
+                  <li key={f}>
+                    <button
+                      type="button"
+                      onClick={() => selectCategory(f)}
+                      aria-pressed={active === f}
+                      className={[
+                        "px-label px-underline transition-opacity duration-[420ms]",
+                        active === f
+                          ? "opacity-100 after:scale-x-100"
+                          : "opacity-45 hover:opacity-100",
+                      ].join(" ")}
+                    >
+                      {f}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : (
+            <div className="w-full">
+              <div className="flex items-center justify-between gap-4">
+                <p className="px-label text-foreground">{active}</p>
+                <button
+                  type="button"
+                  onClick={() => setBrowseOpen((open) => !open)}
+                  aria-expanded={browseOpen}
+                  aria-controls="collection-category-browse"
+                  className="px-label text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  Browse {browseOpen ? "×" : "+"}
+                </button>
+              </div>
+
+              <div
+                id="collection-category-browse"
                 className={[
-                  "px-label px-underline transition-opacity duration-[420ms]",
-                  active === f ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100",
+                  "grid overflow-hidden transition-[grid-template-rows,opacity] duration-300 ease-out",
+                  browseOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
                 ].join(" ")}
               >
-                {f}
-              </button>
-            </li>
-          ))}
-        </ul>
+                <ul className="mt-4 min-h-0 border-t border-hairline">
+                  {filters.map((f) => {
+                    const selected = active === f;
+                    return (
+                      <li key={f} className="border-b border-hairline">
+                        <button
+                          type="button"
+                          onClick={() => selectCategory(f)}
+                          aria-pressed={selected}
+                          className={[
+                            "px-label flex h-12 w-full items-center text-left transition-colors duration-200",
+                            selected
+                              ? "font-medium text-foreground"
+                              : "font-normal text-muted-foreground hover:text-foreground",
+                          ].join(" ")}
+                        >
+                          {f}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
       </SectionHead>
 
       <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 md:gap-x-8 lg:grid-cols-4">
