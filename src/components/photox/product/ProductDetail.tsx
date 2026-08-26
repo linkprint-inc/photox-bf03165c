@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Shell, SectionHead } from "../Section";
 import { ShopProductCard } from "../shop/ShopProductCard";
+import { ProductReviews, RatingJump } from "./ProductReviews";
+import { ProductUploadModal } from "./ProductUploadModal";
 import { MainVisual, PrintFace, type ViewMode } from "./ProductVisual";
 import {
   categoryLabel,
@@ -67,9 +69,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const [sizeIndex, setSizeIndex] = useState(2);
   const [view, setView] = useState<ViewMode>("artwork");
   const [openInfo, setOpenInfo] = useState<string | null>(null);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [mainCtaVisible, setMainCtaVisible] = useState<boolean | null>(null);
   const mainCtaRef = useRef<HTMLButtonElement>(null);
-  const { addToBag, toggleSaved, isSaved, hydrated } = useStore();
+  const { toggleSaved, isSaved, hydrated } = useStore();
 
   useEffect(() => {
     setMaterial(materials[0]!);
@@ -199,6 +202,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <p className="px-meta mt-2 text-muted-foreground">
                 {product.orientation} · {materials.map((m) => materialName[m]).join(" / ")}
               </p>
+              <RatingJump productId={product.id} />
 
               {/* Surface */}
               <div className="px-rule mt-7 pt-5">
@@ -252,7 +256,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                       <li key={s.label} className="border-b border-hairline">
                         <button
                           type="button"
-                          onClick={() => setSizeIndex(i)}
+                          onClick={() => {
+                            setSizeIndex(i);
+                            setView("room");
+                          }}
                           aria-pressed={active}
                           className={[
                             "flex w-full items-baseline justify-between gap-6 py-[9px] transition-opacity duration-[420ms]",
@@ -278,10 +285,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <button
                 ref={mainCtaRef}
                 type="button"
-                onClick={() => addToBag({ productId: product.id, material, sizeIndex, qty: 1 })}
+                onClick={() => setUploadOpen(true)}
                 className="px-label mt-5 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
               >
-                Add to bag
+                Customize your print
               </button>
             </div>
           </div>
@@ -524,6 +531,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         </div>
       </Shell>
 
+      <ProductReviews product={product} />
+
       {/* ---------- You may also like ---------- */}
       <Shell className="pt-20 pb-28 md:pt-28 md:pb-36">
         <SectionHead title="You may also like" />
@@ -549,14 +558,24 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           </span>
           <button
             type="button"
-            onClick={() => addToBag({ productId: product.id, material, sizeIndex, qty: 1 })}
+            onClick={() => setUploadOpen(true)}
             tabIndex={mainCtaVisible === false ? 0 : -1}
             className="px-label border border-foreground px-5 py-3"
           >
-            Add to bag
+            Customize
           </button>
         </div>
       </div>
+      {uploadOpen ? (
+        <ProductUploadModal
+          product={product}
+          material={material}
+          sizeIndex={sizeIndex}
+          sizeLabel={size.label}
+          price={price}
+          onClose={() => setUploadOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

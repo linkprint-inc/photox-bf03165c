@@ -1,11 +1,12 @@
 const columns = [
   {
-    title: "Shop",
+    title: "Inspiration",
     links: [
       { label: "Metal Prints", href: "/metal" },
-      { label: "Frameless Canvas", href: "/shop" },
-      { label: "New Works", href: "/shop" },
-      { label: "Best Sellers", href: "/shop" },
+      { label: "All ideas", href: "/shop" },
+      { label: "Pets", href: "/shop?category=pets" },
+      { label: "Family", href: "/shop?category=family" },
+      { label: "Landscape", href: "/shop?category=landscape" },
     ],
   },
   {
@@ -29,7 +30,7 @@ const columns = [
     links: [
       { label: "About photoX", href: "/about" },
       { label: "Materials", href: "/about" },
-      { label: "Artists", href: "/shop" },
+      { label: "Print process", href: "/custom" },
     ],
   },
 ];
@@ -42,7 +43,7 @@ export function SiteFooter() {
           <div className="col-span-2 lg:col-span-1">
             <p className="px-label tracking-[0.3em] normal-case">photoX</p>
             <p className="px-meta mt-4 max-w-[24ch] text-muted-foreground">
-              Metal prints, frameless canvas and custom wall art.
+              Your photos, made physical.
             </p>
           </div>
 

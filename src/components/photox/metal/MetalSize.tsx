@@ -87,10 +87,10 @@ export function MetalSize() {
             <p className="px-meta text-muted-foreground">{size.label}</p>
             <p className="px-price mt-2">${size.price}</p>
             <a
-              href={`/shop?q=${encodeURIComponent(work.name)}`}
+              href={`/custom?inspiration=${encodeURIComponent(work.id)}`}
               className="px-label px-underline mt-6 inline-block"
             >
-              Shop this size →
+              Create this size →
             </a>
           </div>
         </div>

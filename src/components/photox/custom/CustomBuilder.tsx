@@ -105,13 +105,28 @@ function price(material: BagMaterial, sizeIndex: number) {
   return material === "canvas" ? base - 10 : base;
 }
 
-export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefined }) {
+export type InitialPrintConfiguration = {
+  material?: BagMaterial;
+  sizeIndex?: number;
+  startingPoint?: string;
+};
+
+export function CustomBuilder({
+  initialTool,
+  initialConfiguration,
+  startInEditor = false,
+}: {
+  initialTool?: ToolId | undefined;
+  initialConfiguration?: InitialPrintConfiguration;
+  startInEditor?: boolean;
+}) {
   const { image, setImage } = usePreparedImage();
   const { addToBag } = useStore();
   const inputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
-  const [material, setMaterial] = useState<BagMaterial>("metal");
-  const [sizeIndex, setSizeIndex] = useState(3);
+  const startEditorRef = useRef(startInEditor);
+  const [material, setMaterial] = useState<BagMaterial>(initialConfiguration?.material ?? "metal");
+  const [sizeIndex, setSizeIndex] = useState(initialConfiguration?.sizeIndex ?? 3);
   const [view, setView] = useState<"print" | "room">("print");
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -136,6 +151,13 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
     if (!image) return false;
     return size.inches > recommendedInches(image);
   }, [image, size.inches]);
+
+  useEffect(() => {
+    if (!startEditorRef.current || !image) return;
+    setDraft(image);
+    setEditorOpen(true);
+    startEditorRef.current = false;
+  }, [image]);
 
   // Tool links open the editor as soon as there is an image to prepare.
   useEffect(() => {
@@ -482,7 +504,7 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
                         className="px-label inline-flex min-h-11 items-center gap-2 border border-hairline px-4 transition-colors hover:border-foreground"
                       >
                         <span className="text-muted-foreground">{icons[tool]}</span>
-                        {toolMeta[tool].label}
+                        {toolMeta[tool].heading}
                         {applied.includes(tool) ? <span aria-label="Applied">✓</span> : null}
                       </button>
                     ))}
@@ -596,6 +618,11 @@ export function CustomBuilder({ initialTool }: { initialTool?: ToolId | undefine
                   <p className="px-meta text-muted-foreground">
                     {image ? image.name : "No image uploaded yet"}
                   </p>
+                  {initialConfiguration?.startingPoint ? (
+                    <p className="px-meta text-muted-foreground">
+                      Starting point: {initialConfiguration.startingPoint}
+                    </p>
+                  ) : null}
                   <p className="px-price mt-3 text-[1.05rem]">${total}</p>
 
                   {image ? (

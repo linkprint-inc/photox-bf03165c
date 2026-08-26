@@ -14,6 +14,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as BagRouteImport } from './routes/bag'
 import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CustomRouteImport } from './routes/custom'
 import { Route as MetalRouteImport } from './routes/metal'
 import { Route as PhotoToolsRouteImport } from './routes/photo-tools'
@@ -44,6 +45,11 @@ const BagRoute = BagRouteImport.update({
 const CheckoutRoute = CheckoutRouteImport.update({
   id: '/checkout',
   path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CustomRoute = CustomRouteImport.update({
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/community': typeof CommunityRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/community': typeof CommunityRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/bag': typeof BagRoute
   '/checkout': typeof CheckoutRouteWithChildren
+  '/community': typeof CommunityRoute
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/bag'
     | '/checkout'
+    | '/community'
     | '/custom'
     | '/metal'
     | '/photo-tools'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/bag'
     | '/checkout'
+    | '/community'
     | '/custom'
     | '/metal'
     | '/photo-tools'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/bag'
     | '/checkout'
+    | '/community'
     | '/custom'
     | '/metal'
     | '/photo-tools'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   BagRoute: typeof BagRoute
   CheckoutRoute: typeof CheckoutRouteWithChildren
+  CommunityRoute: typeof CommunityRoute
   CustomRoute: typeof CustomRoute
   MetalRoute: typeof MetalRoute
   PhotoToolsRoute: typeof PhotoToolsRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout'
       fullPath: '/checkout'
       preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/custom': {
@@ -272,6 +292,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   BagRoute: BagRoute,
   CheckoutRoute: CheckoutRouteWithChildren,
+  CommunityRoute: CommunityRoute,
   CustomRoute: CustomRoute,
   MetalRoute: MetalRoute,
   PhotoToolsRoute: PhotoToolsRoute,

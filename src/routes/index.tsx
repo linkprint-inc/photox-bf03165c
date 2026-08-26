@@ -18,17 +18,17 @@ import { SiteFooter } from "@/components/photox/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "photoX — Metal Prints & Frameless Canvas Wall Art" },
+      { title: "photoX — Custom Prints from Your Photos" },
       {
         name: "description",
         content:
-          "Premium metal prints, frameless canvas and custom wall art. Shop by artwork, material and size, or print your own image.",
+          "Turn your photos, artwork and personal moments into premium metal prints and frameless canvas, with simple tools to prepare, preview and order.",
       },
-      { property: "og:title", content: "photoX — Metal Prints & Frameless Canvas Wall Art" },
+      { property: "og:title", content: "photoX — Custom Prints from Your Photos" },
       {
         property: "og:description",
         content:
-          "Premium metal prints, frameless canvas and custom wall art. Shop by artwork, material and size, or print your own image.",
+          "Turn your photos, artwork and personal moments into premium metal prints and frameless canvas.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

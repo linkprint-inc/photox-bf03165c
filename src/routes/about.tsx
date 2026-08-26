@@ -86,7 +86,6 @@ function AboutPage() {
               </div>
             </div>
 
-
             <div>
               <p className="px-meta max-w-[52ch] text-foreground/90">
                 photoX is a brand of LinkPrint, Inc., built on years of experience turning images
@@ -98,7 +97,7 @@ function AboutPage() {
               </p>
               <div className="mt-10 flex flex-wrap gap-8">
                 <a href="/shop" className="px-label px-underline">
-                  Shop art →
+                  Start with an idea →
                 </a>
                 <a href="/custom" className="px-label px-underline">
                   Create yours →
@@ -119,7 +118,10 @@ function AboutPage() {
           {/* Metal — dominant */}
           <div className="mt-12 grid gap-8 md:grid-cols-12">
             <figure className="md:col-span-8">
-              <div className="px-gloss relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "16 / 10" }}>
+              <div
+                className="px-gloss relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "16 / 10" }}
+              >
                 <img
                   src={metalSurface}
                   alt="Light reflecting across the glossy printed surface of a metal print"
@@ -130,8 +132,8 @@ function AboutPage() {
               <figcaption className="mt-5">
                 <p className="px-label">Metal Print</p>
                 <p className="px-meta mt-2 max-w-[48ch] text-muted-foreground">
-                  Printed on ChromaLuxe® HD aluminium. A glossy surface on a thin rigid panel:
-                  light moves across it, colour stays crisp, detail stays sharp, and the edge stays
+                  Printed on ChromaLuxe® HD aluminium. A glossy surface on a thin rigid panel: light
+                  moves across it, colour stays crisp, detail stays sharp, and the edge stays
                   visually light on the wall.
                 </p>
                 <a href="/metal" className="px-label px-underline mt-6 inline-block">
@@ -142,7 +144,10 @@ function AboutPage() {
 
             <div className="grid gap-8 md:col-span-4 md:mt-16">
               <figure>
-                <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "1 / 1" }}>
+                <div
+                  className="relative w-full overflow-hidden bg-secondary"
+                  style={{ aspectRatio: "1 / 1" }}
+                >
                   <img
                     src={metalEdge}
                     alt="Corner of a metal print showing the thin rigid aluminium profile"
@@ -155,7 +160,10 @@ function AboutPage() {
                 </figcaption>
               </figure>
               <figure>
-                <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "1 / 1" }}>
+                <div
+                  className="relative w-full overflow-hidden bg-secondary"
+                  style={{ aspectRatio: "1 / 1" }}
+                >
                   <img
                     src={metalDetailCrop}
                     alt="Close crop of a metal print showing fine photographic detail"
@@ -173,7 +181,10 @@ function AboutPage() {
           {/* Canvas — secondary */}
           <div className="px-rule mt-16 grid gap-8 pt-6 md:grid-cols-12 md:items-end">
             <figure className="md:col-span-5">
-              <div className="px-weave relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "5 / 4" }}>
+              <div
+                className="px-weave relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "5 / 4" }}
+              >
                 <img
                   src={materialCanvas}
                   alt="Woven canvas texture and the wrapped edge of a frameless canvas print"
@@ -188,8 +199,8 @@ function AboutPage() {
                 A woven surface with a matte finish, wrapped around the edge so the work reads as an
                 object rather than a poster.
               </p>
-              <a href="/shop" className="px-label px-underline mt-6 inline-block">
-                Shop canvas →
+              <a href="/custom" className="px-label px-underline mt-6 inline-block">
+                Create your print →
               </a>
             </div>
           </div>
@@ -245,7 +256,10 @@ function AboutPage() {
             </div>
 
             <figure className="md:col-span-6 md:col-start-7">
-              <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "4 / 3" }}>
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "4 / 3" }}
+              >
                 <img
                   src={arrivesPrint}
                   alt="A finished photographic print standing against a warm white wall"
@@ -270,7 +284,10 @@ function AboutPage() {
 
           <div className="mt-12 grid gap-x-8 gap-y-14 md:grid-cols-12">
             <figure className="md:col-span-12">
-              <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "16 / 9" }}>
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "16 / 9" }}
+              >
                 <img
                   src={aboutCommercial}
                   alt="Creative studio reception with a very large glossy metal print on a white concrete wall"
@@ -282,7 +299,10 @@ function AboutPage() {
             </figure>
 
             <figure className="md:col-span-5">
-              <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "5 / 4" }}>
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "5 / 4" }}
+              >
                 <img
                   src={roomLiving}
                   alt="Living room with a large metal print on a soft grey plaster wall"
@@ -294,7 +314,10 @@ function AboutPage() {
             </figure>
 
             <figure className="md:col-span-5 md:col-start-8 md:mt-16">
-              <div className="relative w-full overflow-hidden bg-secondary" style={{ aspectRatio: "4 / 5" }}>
+              <div
+                className="relative w-full overflow-hidden bg-secondary"
+                style={{ aspectRatio: "4 / 5" }}
+              >
                 <img
                   src={roomWorkspace}
                   alt="Home workspace with a glossy metal print above the desk"

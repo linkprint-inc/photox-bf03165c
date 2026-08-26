@@ -108,7 +108,9 @@ function BagRow({ item }: { item: BagItem }) {
   const [editing, setEditing] = useState(false);
   const p = productById(item.productId);
   const { image: prepared } = usePreparedImage();
-  const src = item.productId === "custom-print" && prepared ? prepared.dataUrl : p?.image;
+  const src =
+    item.customization?.image.dataUrl ??
+    (item.productId === "custom-print" && prepared ? prepared.dataUrl : p?.image);
   if (!p) return null;
   const productHref = item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
 
@@ -300,8 +302,8 @@ function EmptyBag() {
     <div>
       <p className="px-serif text-[2.25rem] md:text-[2.75rem]">Your bag is empty.</p>
       <p className="px-meta mt-4 text-muted-foreground">Find something for your walls.</p>
-      <Link to="/shop" className="px-label px-underline mt-8 inline-block">
-        Shop art →
+      <Link to="/custom" className="px-label px-underline mt-8 inline-block">
+        Start a new print →
       </Link>
 
       {items.length > 0 && (

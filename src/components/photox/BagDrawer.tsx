@@ -66,11 +66,11 @@ export function BagDrawer() {
               <p className="px-serif text-[1.5rem]">Your bag is empty.</p>
               <p className="px-meta mt-2 text-muted-foreground">Find something for your walls.</p>
               <Link
-                to="/shop"
+                to="/custom"
                 onClick={closeDrawer}
                 className="px-label px-underline mt-6 inline-block"
               >
-                Shop art →
+                Start a new print →
               </Link>
             </div>
           ) : (
@@ -93,7 +93,10 @@ export function BagDrawer() {
                     >
                       <img
                         src={
-                          item.productId === "custom-print" && prepared ? prepared.dataUrl : p.image
+                          item.customization?.image.dataUrl ??
+                          (item.productId === "custom-print" && prepared
+                            ? prepared.dataUrl
+                            : p.image)
                         }
                         alt={p.name}
                         className="aspect-square w-full object-cover"

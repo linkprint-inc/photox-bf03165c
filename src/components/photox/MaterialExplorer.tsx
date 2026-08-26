@@ -9,14 +9,14 @@ const surfaces = {
     alt: "Macro of a gloss aluminium print surface catching directional light",
     lines: ["Gloss finish", "Crisp detail", "Rich colour"],
     from: 79,
-    cta: "Shop metal →",
+    cta: "Create your print →",
   },
   CANVAS: {
     image: materialCanvas,
     alt: "Macro of a matte gallery-wrapped canvas showing woven texture and wrapped edge",
     lines: ["Matte woven finish", "Soft texture", "Gallery-wrapped edge"],
     from: 69,
-    cta: "Shop canvas →",
+    cta: "Create your print →",
   },
 } as const;
 
@@ -99,7 +99,7 @@ export function MaterialExplorer() {
               <p className="px-price">
                 <span className="px-label mr-1 opacity-70">From</span>${s.from}
               </p>
-              <a href="/shop" className="px-label px-underline">
+              <a href="/custom" className="px-label px-underline">
                 {s.cta}
               </a>
             </div>

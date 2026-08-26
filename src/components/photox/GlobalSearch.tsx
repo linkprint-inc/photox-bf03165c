@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { shopProducts, materialLabel, styleOptions } from "@/lib/shop-data";
+import { shopProducts, materialLabel } from "@/lib/shop-data";
 import { useSearchUI } from "@/lib/search-ui";
 
-const popularTerms = ["Landscape", "Abstract", "Black & White", "Architecture", "Coastal"];
+const popularTerms = ["Pets", "Family", "Portraits", "Landscape"];
 const MAX_RESULTS = 6;
 
 export function GlobalSearch() {
@@ -63,7 +63,7 @@ export function GlobalSearch() {
   }, [term]);
 
   const categoryHits = useMemo(
-    () => (term ? styleOptions.filter((s) => s.toLowerCase().includes(term)) : []),
+    () => (term ? popularTerms.filter((s) => s.toLowerCase().includes(term)) : []),
     [term],
   );
 
@@ -76,9 +76,9 @@ export function GlobalSearch() {
     navigate({ to: "/shop", search: query ? { q: query } : {} });
   };
 
-  const goToProduct = (slug: string) => {
+  const startWithExample = (slug: string) => {
     closeSearch();
-    navigate({ to: "/products/$slug", params: { slug } });
+    navigate({ to: "/custom", search: { inspiration: slug } });
   };
 
   const results = matches.slice(0, MAX_RESULTS);
@@ -123,8 +123,8 @@ export function GlobalSearch() {
               onChange={(e) => setQ(e.target.value)}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
-              placeholder="Search artwork, styles or collections"
-              aria-label="Search artwork, styles or collections"
+              placeholder="Search inspiration, materials or help"
+              aria-label="Search inspiration, materials or help"
               className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/40 placeholder:transition-colors placeholder:duration-300 focus:placeholder:text-foreground/75 md:text-[1.7rem]"
             />
           </form>
@@ -140,14 +140,14 @@ export function GlobalSearch() {
               <div className="mt-12 md:mt-16">
                 <p className="px-serif text-[1.3rem]">No results for “{q.trim()}”</p>
                 <p className="px-meta mt-2 text-muted-foreground">
-                  Try another search or explore all artwork.
+                  Try another search or explore all inspiration.
                 </p>
                 <button
                   type="button"
                   onClick={() => goToShop("")}
                   className="px-label px-underline mt-5 inline-block"
                 >
-                  Shop all art →
+                  See all ideas →
                 </button>
               </div>
             ) : (
@@ -173,12 +173,12 @@ export function GlobalSearch() {
 
                 <div>
                   <p className="px-label text-muted-foreground">
-                    {term ? "Results" : "Popular artwork"}
+                    {term ? "Results" : "Starting points"}
                   </p>
                   <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-7 sm:gap-y-9 lg:grid-cols-4">
                     {(term ? results : popularArtwork).map((p) => (
                       <li key={p.id}>
-                        <ResultCard product={p} onSelect={() => goToProduct(p.id)} />
+                        <ResultCard product={p} onSelect={() => startWithExample(p.id)} />
                       </li>
                     ))}
                   </ul>
@@ -225,9 +225,7 @@ function ResultCard({
       <div className="min-w-0 sm:mt-2.5">
         <p className="px-label">{product.name}</p>
         <p className="px-meta text-muted-foreground">{materialLabel[product.material]}</p>
-        <p className="px-price mt-0.5">
-          <span className="px-label mr-1 opacity-70">From</span>${product.from}
-        </p>
+        <p className="px-meta mt-0.5 text-muted-foreground">Use this style →</p>
       </div>
     </button>
   );

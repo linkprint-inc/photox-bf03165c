@@ -56,9 +56,12 @@ export function FinalMoment() {
       return;
     }
 
-    const observer = new IntersectionObserver(([entry]) => setInView(entry?.isIntersecting ?? false), {
-      rootMargin: "160px 0px",
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? false),
+      {
+        rootMargin: "160px 0px",
+      },
+    );
     observer.observe(viewport);
     return () => observer.disconnect();
   }, []);
@@ -204,7 +207,7 @@ export function FinalMoment() {
 
       <div className="mx-auto mt-8 max-w-[1440px] px-6 md:px-10">
         <a href="/shop" className="px-label px-underline">
-          Shop all art →
+          Start with an idea →
         </a>
       </div>
     </section>

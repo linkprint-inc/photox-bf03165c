@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import sizeRoom from "@/assets/size-room.jpg";
 import artNorthsea from "@/assets/art-northsea.jpg";
 import { sizes } from "@/lib/photox-data";
-import { sizeSearchValue } from "@/lib/shop-data";
 import { Shell, SectionHead } from "./Section";
 
 const WALL_INCHES = 96;
@@ -14,8 +12,8 @@ export function SizeScene() {
   const widthPct = (size.inches * 1.5 * 100) / WALL_INCHES;
 
   return (
-    <Shell label="Shop by size" className="pb-28 md:pb-40">
-      <SectionHead title="Shop by size" note="North Sea · Metal Print" />
+    <Shell label="Choose a size" className="pb-28 md:pb-40">
+      <SectionHead title="Choose a size" note="See your photo at home." />
 
       <div className="mt-6 grid gap-8 xl:mt-10 xl:grid-cols-12">
         <div className="relative aspect-[5/4] w-full overflow-hidden bg-secondary md:aspect-[4/3] xl:col-span-8 xl:aspect-auto">
@@ -78,13 +76,9 @@ export function SizeScene() {
             <p className="px-meta mt-1 text-muted-foreground">Metal Print</p>
             <p className="px-meta text-muted-foreground">{size.label}</p>
             <p className="px-price mt-2">${size.price}</p>
-            <Link
-              to="/shop"
-              search={{ size: sizeSearchValue(size.label) }}
-              className="px-label px-underline mt-5 inline-block xl:mt-6"
-            >
-              Shop this size →
-            </Link>
+            <a href="/custom" className="px-label px-underline mt-5 inline-block xl:mt-6">
+              Create your print →
+            </a>
           </div>
         </div>
       </div>

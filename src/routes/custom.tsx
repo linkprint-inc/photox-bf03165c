@@ -1,5 +1,4 @@
 import { useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeftRight } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { SiteNav } from "@/components/photox/SiteNav";
@@ -9,12 +8,15 @@ import { CustomBuilder } from "@/components/photox/custom/CustomBuilder";
 import { CustomExtras } from "@/components/photox/custom/CustomExtras";
 import type { ToolId } from "@/lib/image-tools";
 import { customPrintExample } from "@/lib/photox-data";
+import { productBySlug } from "@/lib/product-detail";
+import { sizeSteps } from "@/lib/shop-data";
+import type { BagMaterial } from "@/lib/store";
 
 const toolIds: ToolId[] = ["restore", "enhance", "text"];
 
 const title = "Custom Prints — Your Image on Metal or Canvas | photoX";
 const description =
-  "Upload your photograph or artwork and make it a Metal Print or Frameless Canvas. Choose a size from 12 × 18\" to 30 × 40\", preview it in a room and add it to your bag. From $69.";
+  'Upload your photograph or artwork and make it a Metal Print or Frameless Canvas. Choose a size from 12 × 18" to 30 × 40", preview it in a room and add it to your bag. From $69.';
 
 export const Route = createFileRoute("/custom")({
   head: () => ({
@@ -27,14 +29,30 @@ export const Route = createFileRoute("/custom")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>): { tool?: ToolId } =>
-    toolIds.includes(search["tool"] as ToolId) ? { tool: search["tool"] as ToolId } : {},
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
+    tool?: ToolId;
+    inspiration?: string;
+    material?: BagMaterial;
+    size?: number;
+    prepare?: boolean;
+  } => {
+    const size = Number(search["size"]);
+    return {
+      ...(toolIds.includes(search["tool"] as ToolId) ? { tool: search["tool"] as ToolId } : {}),
+      ...(typeof search["inspiration"] === "string" ? { inspiration: search["inspiration"] } : {}),
+      ...(search["material"] === "metal" || search["material"] === "canvas"
+        ? { material: search["material"] }
+        : {}),
+      ...(Number.isInteger(size) && size >= 0 && size < sizeSteps.length ? { size } : {}),
+      ...(search["prepare"] === true || search["prepare"] === "true" ? { prepare: true } : {}),
+    };
+  },
   component: CustomPage,
 });
 
-
-
-function CustomIntro() {
+function CustomIntro({ inspiration }: { inspiration?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragPointer = useRef<number | null>(null);
   const [pos, setPos] = useState(50);
@@ -58,15 +76,18 @@ function CustomIntro() {
     <Shell label="Custom prints" className="pt-[108px] pb-10 md:pt-[118px] md:pb-12">
       <div className="grid gap-10 md:grid-cols-12 md:items-end md:gap-8">
         <div className="md:col-span-5">
-          <p className="px-label text-muted-foreground">Custom Prints</p>
+          <p className="px-label text-muted-foreground">
+            {inspiration ? "Your starting point is ready" : "Custom Prints"}
+          </p>
           <h1 className="px-serif mt-4 text-[2.4rem] leading-[1.06] md:text-[3.25rem]">
             Your image.
             <br />
             Made for the wall.
           </h1>
           <p className="px-meta mt-5 max-w-[40ch] text-muted-foreground">
-            Turn your photography, artwork or favourite image into a Metal Print or Frameless
-            Canvas.
+            {inspiration
+              ? "Use this look as a visual reference, then upload your own photo to make it personal."
+              : "Turn your photography, artwork or favourite image into a Metal Print or Frameless Canvas."}
           </p>
           <p className="px-price mt-6">
             <span className="px-label mr-1 opacity-70">From</span>$69
@@ -164,22 +185,19 @@ function CustomIntro() {
 }
 
 function CustomPage() {
-  const { tool } = Route.useSearch();
+  const { tool, inspiration, material, size, prepare } = Route.useSearch();
+  const startingPoint = inspiration ? productBySlug(inspiration)?.name : undefined;
   return (
     <div className="bg-background text-foreground">
       <SiteNav variant="light" />
       <main>
-        <CustomIntro />
-        <CustomBuilder initialTool={tool} />
+        <CustomIntro inspiration={inspiration} />
+        <CustomBuilder
+          initialTool={tool}
+          initialConfiguration={{ material, sizeIndex: size, startingPoint }}
+          startInEditor={prepare}
+        />
         <CustomExtras />
-        <Shell className="pb-24">
-          <p className="px-meta text-muted-foreground">
-            Prefer to start from ready-made artwork?{" "}
-            <Link to="/shop" className="px-underline text-foreground">
-              Shop the collection →
-            </Link>
-          </p>
-        </Shell>
       </main>
       <SiteFooter />
     </div>

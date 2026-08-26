@@ -28,8 +28,8 @@ export function MetalLarge() {
             {largeFormatSize}
             <span className="px-label ml-3 mr-1 opacity-70">From</span>${largeFormatPrice}
           </p>
-          <a href="/shop?q=metal" className="px-label px-underline">
-            Shop large format →
+          <a href="/custom" className="px-label px-underline">
+            Create your print →
           </a>
         </div>
       </div>

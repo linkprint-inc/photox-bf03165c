@@ -21,9 +21,9 @@ export function MetalSpaces() {
           return (
             <article key={s.room} className="group">
               <a
-                href={`/products/${s.product.id}`}
+                href={`/custom?inspiration=${encodeURIComponent(s.product.id)}`}
                 className="block"
-                aria-label={`${s.product.name} — view artwork`}
+                aria-label={`${s.product.name} — use this style`}
               >
                 <div className="px-gloss relative aspect-[4/5] w-full overflow-hidden bg-secondary group-hover:after:opacity-100">
                   <img
@@ -37,9 +37,12 @@ export function MetalSpaces() {
                   <p className="px-label">{s.room}</p>
                   <div className="px-reveal mt-2 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 max-md:translate-y-0 max-md:opacity-100">
                     <p className="px-meta text-muted-foreground">{s.product.name}</p>
-                    <p className="px-meta text-muted-foreground">Metal Print · {size.label}</p>
-                    <p className="px-price mt-1">${size.price}</p>
-                    <span className="px-label px-underline mt-3 inline-block">View artwork →</span>
+                    <p className="px-meta text-muted-foreground">
+                      Metal print · {size.label} reference
+                    </p>
+                    <span className="px-label px-underline mt-3 inline-block">
+                      Use this style →
+                    </span>
                   </div>
                 </div>
               </a>

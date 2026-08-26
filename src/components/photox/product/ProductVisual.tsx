@@ -42,15 +42,17 @@ export function RoomScene({
   material,
   inches,
   sizeLabel,
+  className = "",
 }: {
   product: ShopProduct;
   material: BagMaterial;
   inches: number;
   sizeLabel: string;
+  className?: string;
 }) {
   const widthPct = (inches * 1.5 * 100) / WALL_INCHES;
   return (
-    <div className="relative overflow-hidden bg-secondary">
+    <div className={["relative h-full w-full overflow-hidden bg-secondary", className].join(" ")}>
       <img
         src={sizeRoom}
         width={1600}
@@ -60,7 +62,7 @@ export function RoomScene({
         className="block h-full w-full object-cover"
       />
       <div
-        className="absolute left-1/2 top-[14%] -translate-x-1/2 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)] transition-[width] duration-[560ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]"
+        className="absolute left-1/2 top-[14%] -translate-x-1/2 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
         style={{ width: `${widthPct}%` }}
       >
         <img
@@ -98,23 +100,29 @@ export function MainVisual({
   inches: number;
   sizeLabel: string;
 }) {
-  if (view === "room") {
-    return (
-      <RoomScene product={product} material={material} inches={inches} sizeLabel={sizeLabel} />
-    );
-  }
+  const frame = (active: boolean) =>
+    [
+      "absolute inset-0 transition-[opacity,transform] duration-300 ease-out",
+      active ? "z-10 scale-100 opacity-100" : "pointer-events-none scale-[0.995] opacity-0",
+    ].join(" ");
 
-  if (view === "detail") {
-    return (
-      <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-        <img
-          src={detailFor(product, material)}
-          alt={`${product.name} as a ${materialName[material].toLowerCase()}, seen at an angle`}
-          className="block h-full w-full object-cover"
-        />
+  return (
+    <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
+      <div className={frame(view === "artwork")}>
+        <PrintFace product={product} material={material} className="h-full w-full" />
       </div>
-    );
-  }
-
-  return <PrintFace product={product} material={material} className="aspect-[4/3]" />;
+      <div className={frame(view === "detail")}>
+        <div className="relative h-full w-full overflow-hidden bg-secondary">
+          <img
+            src={detailFor(product, material)}
+            alt={`${product.name} as a ${materialName[material].toLowerCase()}, seen at an angle`}
+            className="block h-full w-full object-cover"
+          />
+        </div>
+      </div>
+      <div className={frame(view === "room")}>
+        <RoomScene product={product} material={material} inches={inches} sizeLabel={sizeLabel} />
+      </div>
+    </div>
+  );
 }

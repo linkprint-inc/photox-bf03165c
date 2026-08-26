@@ -9,8 +9,20 @@ import {
 } from "react";
 import customPrintImage from "@/assets/custom-print.jpg";
 import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
+import type { TextConfig, ToolId } from "./image-tools";
+import type { PreparedImage } from "./prepared-image";
 
 export type BagMaterial = "metal" | "canvas";
+
+export type PrintCustomization = {
+  originalImage: PreparedImage;
+  image: PreparedImage;
+  appliedTools: ToolId[];
+  textConfig?: TextConfig;
+  startingPointId: string;
+  price: number;
+  preview: "artwork" | "detail" | "room";
+};
 
 export type BagItem = {
   key: string;
@@ -18,6 +30,7 @@ export type BagItem = {
   material: BagMaterial;
   sizeIndex: number;
   qty: number;
+  customization?: PrintCustomization;
 };
 
 export type ShippingAddress = {
@@ -44,6 +57,7 @@ export type OrderItem = {
   material: BagMaterial;
   sizeIndex: number;
   qty: number;
+  customization?: PrintCustomization;
 };
 
 export type Order = {
@@ -212,8 +226,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const addToBag = useCallback((item: Omit<BagItem, "key">) => {
     setState((s) => {
-      const key = `${item.productId}-${item.material}-${item.sizeIndex}`;
-      const found = s.bag.find((b) => b.key === key);
+      const baseKey = `${item.productId}-${item.material}-${item.sizeIndex}`;
+      const key = item.customization
+        ? `${baseKey}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+        : baseKey;
+      const found = item.customization ? undefined : s.bag.find((b) => b.key === key);
       const bag = found
         ? s.bag.map((b) => (b.key === key ? { ...b, qty: b.qty + item.qty } : b))
         : [...s.bag, { ...item, key }];
@@ -228,6 +245,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       // merge duplicates created by config edits
       const merged: BagItem[] = [];
       for (const item of next) {
+        if (item.customization) {
+          merged.push(item);
+          continue;
+        }
         const newKey = `${item.productId}-${item.material}-${item.sizeIndex}`;
         const existing = merged.find((m) => m.key === newKey);
         if (existing) existing.qty += item.qty;
@@ -254,11 +275,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       shippingAddress: details.shippingAddress,
     };
     setState((s) => {
-      order.items = s.bag.map(({ productId, material, sizeIndex, qty }) => ({
+      order.items = s.bag.map(({ productId, material, sizeIndex, qty, customization }) => ({
         productId,
         material,
         sizeIndex,
         qty,
+        customization,
       }));
       return { ...s, orders: [order, ...s.orders], bag: [] };
     });

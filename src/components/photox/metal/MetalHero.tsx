@@ -3,7 +3,10 @@ import { metalFrom } from "@/lib/metal-data";
 
 export function MetalHero() {
   return (
-    <section id="hero" className="relative min-h-[86vh] w-full overflow-hidden bg-secondary md:min-h-[92vh]">
+    <section
+      id="hero"
+      className="relative min-h-[86vh] w-full overflow-hidden bg-secondary md:min-h-[92vh]"
+    >
       <img
         src={metalHero}
         width={1920}
@@ -31,8 +34,8 @@ export function MetalHero() {
           <p className="px-price">
             <span className="px-label mr-1 opacity-70">From</span>${metalFrom}
           </p>
-          <a href="#metal-shop" className="px-label px-underline">
-            Shop metal →
+          <a href="/custom" className="px-label px-underline">
+            Create your print →
           </a>
         </div>
       </div>

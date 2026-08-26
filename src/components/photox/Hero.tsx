@@ -25,7 +25,7 @@ export function Hero() {
         onMouseLeave={() => setLit(false)}
         onFocus={() => setLit(true)}
         onBlur={() => setLit(false)}
-        aria-label="Pacific Light No. 03, gloss metal print, 24 by 36 inches, $189 — view product"
+        aria-label="A glossy photoX print in a daylit room"
         className="absolute right-[3%] top-[16%] h-[46%] w-[47%] cursor-pointer md:right-[4%] md:top-[19%] md:h-[45%] md:w-[45%]"
       >
         <span
@@ -43,28 +43,28 @@ export function Hero() {
 
       <div className="absolute inset-x-0 bottom-0 text-white">
         <div className="mx-auto max-w-[1440px] px-6 pb-12 md:px-10 md:pb-16">
-          <p className="px-label opacity-80">Metal Prints</p>
+          <p className="px-label opacity-80">Made from your photo</p>
           <h1 className="px-serif mt-4 max-w-[16ch] text-[2.6rem] md:text-[4.2rem]">
-            Art that changes with the light.
+            Your moment, made for the wall.
           </h1>
 
           <div className="mt-10 grid gap-8 md:grid-cols-12 md:items-end">
             <div className="md:col-span-5">
-              <p className="px-label">Pacific Light No. 03</p>
-              <p className="px-meta mt-1 opacity-85">Metal Print</p>
-              <p className="px-meta opacity-85">24 × 36"</p>
-              <p className="px-price mt-2">$189</p>
+              <p className="px-label">Upload · prepare · choose size · preview</p>
+              <p className="px-meta mt-1 max-w-[38ch] opacity-85">
+                Turn a photo you love into a metal print or frameless canvas.
+              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-8 md:col-span-7 md:justify-end">
               <a
-                href="/shop"
+                href="/custom"
                 className="px-label border border-white/70 px-7 py-4 transition-colors duration-[420ms] hover:bg-white hover:text-ink"
               >
-                Shop the print
+                Create your print →
               </a>
-              <a href="/custom" className="px-label px-underline">
-                Create your own →
+              <a href="/shop" className="px-label px-underline">
+                Start with an idea →
               </a>
             </div>
           </div>

@@ -100,7 +100,8 @@ function CheckoutSummary() {
           const product = productById(item.productId);
           if (!product) return null;
           const src =
-            item.productId === "custom-print" && prepared ? prepared.dataUrl : product.image;
+            item.customization?.image.dataUrl ??
+            (item.productId === "custom-print" && prepared ? prepared.dataUrl : product.image);
           const total = unitPrice(item.material, item.sizeIndex) * item.qty;
           return (
             <li key={item.key} className="flex gap-4 border-b border-foreground/15 py-4">
@@ -207,8 +208,8 @@ function CheckoutPage() {
         <CheckoutHeader />
         <main className="mx-auto max-w-[1440px] px-6 py-20 md:px-10 md:py-28">
           <h1 className="px-serif text-[2.5rem]">Your bag is empty.</h1>
-          <Link to="/shop" className="px-label px-underline mt-7 inline-block">
-            Shop art →
+          <Link to="/custom" className="px-label px-underline mt-7 inline-block">
+            Start a new print →
           </Link>
         </main>
       </div>

@@ -4,8 +4,8 @@ import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/checkout/success")({
   validateSearch: (search: Record<string, unknown>) => ({
-    order: typeof search['order'] === "string" ? search['order'] : "",
-    email: typeof search['email'] === "string" ? search['email'] : "",
+    order: typeof search["order"] === "string" ? search["order"] : "",
+    email: typeof search["email"] === "string" ? search["email"] : "",
   }),
   head: () => ({ meta: [{ title: "Order received | photoX" }] }),
   component: CheckoutSuccess,
@@ -25,7 +25,7 @@ function CheckoutSuccess() {
         </Link>
         <h1 className="px-serif mt-14 text-[2.5rem]">Order not found.</h1>
         <Link to="/shop" className="px-label px-underline mt-7 inline-block">
-          Continue shopping →
+          Create another print →
         </Link>
       </main>
     );
@@ -64,7 +64,10 @@ function CheckoutSuccess() {
                 const product = productById(item.productId);
                 if (!product) return null;
                 const src =
-                  item.productId === "custom-print" && prepared ? prepared.dataUrl : product.image;
+                  item.customization?.image.dataUrl ??
+                  (item.productId === "custom-print" && prepared
+                    ? prepared.dataUrl
+                    : product.image);
                 return (
                   <li
                     key={`${item.productId}-${index}`}
@@ -105,7 +108,7 @@ function CheckoutSuccess() {
             View order →
           </a>
           <Link to="/shop" className="px-label px-underline">
-            Continue shopping →
+            Create another print →
           </Link>
         </div>
       </main>

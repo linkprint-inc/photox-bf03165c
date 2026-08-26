@@ -7,14 +7,14 @@ const columns = [
     qualities: ["Glossy", "Luminous", "Crisp", "Rigid"],
     best: "Photography, vivid color, high-detail artwork",
     from: metalFrom,
-    cta: { label: "Shop metal →", href: "#metal-shop" },
+    cta: { label: "Create your print →", href: "/custom" },
   },
   {
     title: "Frameless Canvas",
     qualities: ["Matte", "Textured", "Soft", "Tactile"],
     best: "Portraits, painterly artwork, softer interiors",
     from: canvasFrom,
-    cta: { label: "Explore canvas in shop →", href: "/shop?q=canvas" },
+    cta: { label: "Create your print →", href: "/custom" },
   },
 ];
 
