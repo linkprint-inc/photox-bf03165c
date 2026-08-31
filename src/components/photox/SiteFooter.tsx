@@ -1,41 +1,71 @@
-const columns = [
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
+type FooterLink = { label: string; href: string };
+type FooterColumn = { title: string; links: FooterLink[] };
+
+const columns: FooterColumn[] = [
   {
     title: "Inspiration",
     links: [
       { label: "Metal Prints", href: "/metal" },
-      { label: "All ideas", href: "/shop" },
       { label: "Pets", href: "/shop?category=pets" },
       { label: "Family", href: "/shop?category=family" },
+      { label: "Portraits", href: "/shop?category=portraits" },
       { label: "Landscape", href: "/shop?category=landscape" },
+      { label: "Community", href: "/community" },
     ],
   },
   {
-    title: "Create",
+    title: "Support",
     links: [
-      { label: "Custom Prints", href: "/custom" },
-      { label: "Restore Photo", href: "/custom?tool=restore" },
-      { label: "Enhance Resolution", href: "/custom?tool=enhance" },
-      { label: "Add Text", href: "/custom?tool=text" },
+      { label: "Size Guide", href: "/metal" },
+      { label: "FAQ", href: "/" },
+      { label: "Contact", href: "mailto:hello@photox.com" },
+      { label: "Track Order", href: "/account?tab=orders" },
+      { label: "Shipping & Delivery", href: "/shipping-policy" },
     ],
-  },
-  {
-    title: "Help",
-    links: ["Size Guide", "Shipping", "Returns", "FAQ", "Contact"].map((label) => ({
-      label,
-      href: "/shop",
-    })),
   },
   {
     title: "About",
     links: [
       { label: "About photoX", href: "/about" },
       { label: "Materials", href: "/about" },
-      { label: "Print process", href: "/custom" },
+      { label: "Print Process", href: "/custom" },
+    ],
+  },
+  {
+    title: "Policies",
+    links: [
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Refund Policy", href: "/refund-policy" },
+      { label: "Shipping Policy", href: "/shipping-policy" },
+      { label: "Terms of Service", href: "/terms-of-service" },
     ],
   },
 ];
 
+function FooterLinks({ links, tabIndex }: { links: FooterLink[]; tabIndex?: number }) {
+  return (
+    <ul className="mt-5 space-y-2">
+      {links.map((link) => (
+        <li key={link.label}>
+          <a
+            href={link.href}
+            tabIndex={tabIndex}
+            className="px-meta px-underline text-muted-foreground"
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function SiteFooter() {
+  const [openMobileColumn, setOpenMobileColumn] = useState<string | null>(null);
+
   return (
     <footer className="px-rule">
       <div className="mx-auto max-w-[1440px] px-6 py-16 md:px-10 md:py-20">
@@ -47,18 +77,45 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {columns.map((c) => (
-            <nav key={c.title} aria-label={c.title}>
-              <h3 className="px-label">{c.title}</h3>
-              <ul className="mt-5 space-y-2">
-                {c.links.map((l) => (
-                  <li key={l.label}>
-                    <a href={l.href} className="px-meta px-underline text-muted-foreground">
-                      {l.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+          <div className="col-span-2 border-y border-hairline lg:hidden">
+            {columns.map((column) => {
+              const isOpen = openMobileColumn === column.title;
+              const contentId = `footer-${column.title.toLowerCase()}`;
+
+              return (
+                <section key={column.title} className="border-b border-hairline last:border-b-0">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={contentId}
+                    onClick={() => setOpenMobileColumn(isOpen ? null : column.title)}
+                    className="flex w-full items-center justify-between py-4 text-left"
+                  >
+                    <span className="px-label">{column.title}</span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={`h-4 w-4 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  <div
+                    id={contentId}
+                    className={`grid transition-[grid-template-rows,opacity] duration-300 ease-out ${
+                      isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                    }`}
+                  >
+                    <div className="min-h-0 overflow-hidden pb-5">
+                      <FooterLinks links={column.links} tabIndex={isOpen ? 0 : -1} />
+                    </div>
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          {columns.map((column) => (
+            <nav key={column.title} aria-label={column.title} className="hidden lg:block">
+              <h3 className="px-label">{column.title}</h3>
+              <FooterLinks links={column.links} />
             </nav>
           ))}
         </div>

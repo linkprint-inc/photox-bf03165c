@@ -6,7 +6,14 @@ import { SiteFooter } from "@/components/photox/SiteFooter";
 import { Shell } from "@/components/photox/Section";
 import { ShopProductCard } from "@/components/photox/shop/ShopProductCard";
 import { shopProducts, materialLabel } from "@/lib/shop-data";
-import { useStore, productById, unitPrice, sizeLabel, materialName, type Order } from "@/lib/store";
+import {
+  useStore,
+  productById,
+  unitPrice,
+  orientedSizeLabel,
+  materialName,
+  type Order,
+} from "@/lib/store";
 
 export const Route = createFileRoute("/account")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } =>
@@ -427,11 +434,13 @@ function ItemRow({
   productId,
   material,
   sizeIndex,
+  orientation,
   qty,
 }: {
   productId: string;
   material: "metal" | "canvas";
   sizeIndex: number;
+  orientation?: "landscape" | "portrait";
   qty: number;
 }) {
   const p = productById(productId);
@@ -447,7 +456,7 @@ function ItemRow({
       <div className="min-w-0 md:flex-1">
         <p className="px-label break-words">{p.name}</p>
         <p className="px-meta mt-1 text-muted-foreground">{materialName[material]}</p>
-        <p className="px-meta text-muted-foreground">{sizeLabel(sizeIndex)}</p>
+        <p className="px-meta text-muted-foreground">{orientedSizeLabel(sizeIndex, orientation)}</p>
       </div>
       <div className="shrink-0 text-right">
         <p className="px-price">${unitPrice(material, sizeIndex) * qty}</p>

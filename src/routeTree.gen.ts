@@ -18,7 +18,11 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as CustomRouteImport } from './routes/custom'
 import { Route as MetalRouteImport } from './routes/metal'
 import { Route as PhotoToolsRouteImport } from './routes/photo-tools'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as ShippingPolicyRouteImport } from './routes/shipping-policy'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as TermsOfServiceRouteImport } from './routes/terms-of-service'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
 
@@ -67,9 +71,29 @@ const PhotoToolsRoute = PhotoToolsRouteImport.update({
   path: '/photo-tools',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingPolicyRoute = ShippingPolicyRouteImport.update({
+  id: '/shipping-policy',
+  path: '/shipping-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsOfServiceRoute = TermsOfServiceRouteImport.update({
+  id: '/terms-of-service',
+  path: '/terms-of-service',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
@@ -93,7 +117,11 @@ export interface FileRoutesByFullPath {
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-policy': typeof RefundPolicyRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
@@ -107,7 +135,11 @@ export interface FileRoutesByTo {
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-policy': typeof RefundPolicyRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
@@ -122,7 +154,11 @@ export interface FileRoutesById {
   '/custom': typeof CustomRoute
   '/metal': typeof MetalRoute
   '/photo-tools': typeof PhotoToolsRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/refund-policy': typeof RefundPolicyRoute
+  '/shipping-policy': typeof ShippingPolicyRoute
   '/shop': typeof ShopRoute
+  '/terms-of-service': typeof TermsOfServiceRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/products/$slug': typeof ProductsSlugRoute
 }
@@ -138,7 +174,11 @@ export interface FileRouteTypes {
     | '/custom'
     | '/metal'
     | '/photo-tools'
+    | '/privacy-policy'
+    | '/refund-policy'
+    | '/shipping-policy'
     | '/shop'
+    | '/terms-of-service'
     | '/checkout/success'
     | '/products/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -152,7 +192,11 @@ export interface FileRouteTypes {
     | '/custom'
     | '/metal'
     | '/photo-tools'
+    | '/privacy-policy'
+    | '/refund-policy'
+    | '/shipping-policy'
     | '/shop'
+    | '/terms-of-service'
     | '/checkout/success'
     | '/products/$slug'
   id:
@@ -166,7 +210,11 @@ export interface FileRouteTypes {
     | '/custom'
     | '/metal'
     | '/photo-tools'
+    | '/privacy-policy'
+    | '/refund-policy'
+    | '/shipping-policy'
     | '/shop'
+    | '/terms-of-service'
     | '/checkout/success'
     | '/products/$slug'
   fileRoutesById: FileRoutesById
@@ -181,7 +229,11 @@ export interface RootRouteChildren {
   CustomRoute: typeof CustomRoute
   MetalRoute: typeof MetalRoute
   PhotoToolsRoute: typeof PhotoToolsRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
+  ShippingPolicyRoute: typeof ShippingPolicyRoute
   ShopRoute: typeof ShopRoute
+  TermsOfServiceRoute: typeof TermsOfServiceRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
 }
 
@@ -250,11 +302,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PhotoToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping-policy': {
+      id: '/shipping-policy'
+      path: '/shipping-policy'
+      fullPath: '/shipping-policy'
+      preLoaderRoute: typeof ShippingPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms-of-service': {
+      id: '/terms-of-service'
+      path: '/terms-of-service'
+      fullPath: '/terms-of-service'
+      preLoaderRoute: typeof TermsOfServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/success': {
@@ -296,7 +376,11 @@ const rootRouteChildren: RootRouteChildren = {
   CustomRoute: CustomRoute,
   MetalRoute: MetalRoute,
   PhotoToolsRoute: PhotoToolsRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
+  ShippingPolicyRoute: ShippingPolicyRoute,
   ShopRoute: ShopRoute,
+  TermsOfServiceRoute: TermsOfServiceRoute,
   ProductsSlugRoute: ProductsSlugRoute,
 }
 export const routeTree = rootRouteImport

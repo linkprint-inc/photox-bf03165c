@@ -110,7 +110,7 @@ export function SiteNav({
     <header
       ref={headerRef}
       className={[
-        "fixed inset-x-0 top-0 z-50 transition-[transform,background-color,color] duration-[520ms] max-md:duration-[220ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
+        "fixed inset-x-0 top-0 z-50 border-b border-hairline transition-[transform,background-color,color] duration-[520ms] max-md:duration-[220ms] ease-[cubic-bezier(0.22,0.61,0.36,1)]",
         hidden ? "-translate-y-full" : "translate-y-0",
         menuOpen || createOpen ? "bg-paper" : overHero ? "bg-transparent" : "bg-paper/95",
         tone,
@@ -151,7 +151,7 @@ export function SiteNav({
                   : "pointer-events-none -translate-y-1 opacity-0",
               ].join(" ")}
             >
-              <ul className="border-x border-b border-foreground/20 bg-paper shadow-[0_4px_10px_rgba(30,25,20,0.018)]">
+              <ul className="border border-foreground/20 bg-paper shadow-[0_4px_10px_rgba(30,25,20,0.018)]">
                 {createLinks.map((item) => (
                   <li key={item.label} className="border-b border-foreground/10 last:border-b-0">
                     <a

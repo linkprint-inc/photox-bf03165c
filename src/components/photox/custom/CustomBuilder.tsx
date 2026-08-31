@@ -288,7 +288,7 @@ export function CustomBuilder({
           {editorOpen && draft ? (
             editing && result ? (
               <div className="mt-6">
-                <BeforeAfter before={original!.dataUrl} after={result.dataUrl} />
+                <BeforeAfter before={original!.dataUrl} after={result.dataUrl} image={original!} />
               </div>
             ) : editing ? (
               <div

@@ -1,11 +1,16 @@
 import sizeRoom from "@/assets/size-room.jpg";
 import { detailFor } from "@/lib/product-detail";
-import { materialName, type BagMaterial } from "@/lib/store";
+import { materialName, type BagMaterial, type PrintOrientation } from "@/lib/store";
 import type { ShopProduct } from "@/lib/shop-data";
 
 export type ViewMode = "artwork" | "detail" | "room";
 
 const WALL_INCHES = 96;
+
+function aspectRatioFromLabel(sizeLabel: string) {
+  const match = sizeLabel.match(/(\d+)\s*×\s*(\d+)/);
+  return match ? Number(match[1]) / Number(match[2]) : 1.5;
+}
 
 /** Clean physical front view of the print, with material surface treatment. */
 export function PrintFace({
@@ -42,15 +47,17 @@ export function RoomScene({
   material,
   inches,
   sizeLabel,
+  orientation,
   className = "",
 }: {
   product: ShopProduct;
   material: BagMaterial;
   inches: number;
   sizeLabel: string;
+  orientation: PrintOrientation;
   className?: string;
 }) {
-  const widthPct = (inches * 1.5 * 100) / WALL_INCHES;
+  const widthPct = ((orientation === "landscape" ? inches * 1.5 : inches) * 100) / WALL_INCHES;
   return (
     <div className={["relative h-full w-full overflow-hidden bg-secondary", className].join(" ")}>
       <img
@@ -70,7 +77,7 @@ export function RoomScene({
           alt={`${product.name} shown on a wall at ${sizeLabel}`}
           loading="lazy"
           className="block w-full"
-          style={{ aspectRatio: "3 / 2", objectFit: "cover" }}
+          style={{ aspectRatio: aspectRatioFromLabel(sizeLabel), objectFit: "cover" }}
         />
         {material === "metal" ? (
           <span
@@ -93,12 +100,14 @@ export function MainVisual({
   view,
   inches,
   sizeLabel,
+  orientation,
 }: {
   product: ShopProduct;
   material: BagMaterial;
   view: ViewMode;
   inches: number;
   sizeLabel: string;
+  orientation: PrintOrientation;
 }) {
   const frame = (active: boolean) =>
     [
@@ -109,19 +118,37 @@ export function MainVisual({
   return (
     <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
       <div className={frame(view === "artwork")}>
-        <PrintFace product={product} material={material} className="h-full w-full" />
+        <div className="flex h-full w-full items-center justify-center bg-secondary p-6 md:p-8">
+          <div
+            className="max-h-full max-w-full overflow-hidden shadow-sm"
+            style={{ aspectRatio: aspectRatioFromLabel(sizeLabel) }}
+          >
+            <PrintFace product={product} material={material} className="h-full w-full" />
+          </div>
+        </div>
       </div>
       <div className={frame(view === "detail")}>
-        <div className="relative h-full w-full overflow-hidden bg-secondary">
-          <img
-            src={detailFor(product, material)}
-            alt={`${product.name} as a ${materialName[material].toLowerCase()}, seen at an angle`}
-            className="block h-full w-full object-cover"
-          />
+        <div className="flex h-full w-full items-center justify-center bg-secondary p-6 md:p-8">
+          <div
+            className="max-h-full max-w-full overflow-hidden shadow-sm"
+            style={{ aspectRatio: aspectRatioFromLabel(sizeLabel) }}
+          >
+            <img
+              src={detailFor(product, material)}
+              alt={`${product.name} as a ${materialName[material].toLowerCase()}, seen at an angle`}
+              className="block h-full w-full object-cover"
+            />
+          </div>
         </div>
       </div>
       <div className={frame(view === "room")}>
-        <RoomScene product={product} material={material} inches={inches} sizeLabel={sizeLabel} />
+        <RoomScene
+          product={product}
+          material={material}
+          inches={inches}
+          sizeLabel={sizeLabel}
+          orientation={orientation}
+        />
       </div>
     </div>
   );

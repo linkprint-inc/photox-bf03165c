@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { materialName, productById, sizeLabel, unitPrice, useStore } from "@/lib/store";
+import { materialName, orientedSizeLabel, productById, unitPrice, useStore } from "@/lib/store";
 import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/checkout/success")({
@@ -77,7 +77,8 @@ function CheckoutSuccess() {
                     <div className="min-w-0 flex-1">
                       <p className="px-label">{product.name}</p>
                       <p className="px-meta mt-1 text-muted-foreground">
-                        {materialName[item.material]} · {sizeLabel(item.sizeIndex)} · Qty {item.qty}
+                        {materialName[item.material]} ·{" "}
+                        {orientedSizeLabel(item.sizeIndex, item.orientation)} · Qty {item.qty}
                       </p>
                     </div>
                     <p className="px-price">

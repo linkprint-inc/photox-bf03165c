@@ -20,6 +20,7 @@ export function CustomToolPanel({
   onCancel,
   selectedSizeLabel,
   selectedInches,
+  textPositionRange = { min: 6, max: 94 },
 }: {
   tool: ToolId;
   original: PreparedImage;
@@ -33,6 +34,7 @@ export function CustomToolPanel({
   onCancel: () => void;
   selectedSizeLabel: string;
   selectedInches: number;
+  textPositionRange?: { min: number; max: number };
 }) {
   const meta = toolMeta[tool];
   const recommended = recommendedInches(original);
@@ -41,7 +43,7 @@ export function CustomToolPanel({
   return (
     <div>
       <div className="px-rule pt-6">
-        <p className="px-label text-muted-foreground">Step 04 — Edit</p>
+        <p className="px-label text-muted-foreground">Image preparation</p>
         <h3 className="px-label mt-2">{meta.heading}</h3>
         <p className="px-meta mt-2 max-w-[38ch] text-muted-foreground">{meta.body}</p>
       </div>
@@ -87,6 +89,7 @@ export function CustomToolPanel({
             <input
               id="tool-text"
               value={cfg.text}
+              maxLength={240}
               onChange={(e) => setCfg({ ...cfg, text: e.target.value })}
               placeholder="Enter your text"
               className="px-meta mt-2 w-full border-b border-hairline bg-transparent pb-2 outline-none focus:border-foreground"
@@ -155,8 +158,8 @@ export function CustomToolPanel({
             <input
               id="tool-pos"
               type="range"
-              min={8}
-              max={94}
+              min={textPositionRange.min}
+              max={textPositionRange.max}
               value={cfg.y}
               onChange={(e) => setCfg({ ...cfg, y: Number(e.target.value) })}
               className="mt-3 w-full accent-foreground"
@@ -210,7 +213,11 @@ export function CustomToolPanel({
             onClick={onApply}
             className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
           >
-            {tool === "enhance" ? "Keep enhanced image" : "Keep edited image"}
+            {tool === "enhance"
+              ? "Keep enhanced image"
+              : tool === "restore"
+                ? "Keep restored image"
+                : "Apply text"}
           </button>
         )}
 

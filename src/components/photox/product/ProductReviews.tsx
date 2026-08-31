@@ -4,16 +4,25 @@ import type { ShopProduct } from "@/lib/shop-data";
 import { productReviewData, type ProductReview } from "@/lib/product-reviews";
 import { Shell } from "../Section";
 
-const INITIAL_REVIEWS = 6;
+const FEATURED_REVIEW_COUNT = 2;
+const EXPANDED_REVIEW_COUNT = 6;
 
-export function RatingStars({ rating, label = true }: { rating: number; label?: boolean }) {
+export function RatingStars({
+  rating,
+  label = true,
+  size = 13,
+}: {
+  rating: number;
+  label?: boolean;
+  size?: number;
+}) {
   return (
     <span
       aria-label={label ? `${rating} out of 5 stars` : undefined}
       className="inline-flex items-center gap-0.5 text-foreground"
     >
       {Array.from({ length: 5 }, (_, index) => (
-        <Star key={index} size={15} strokeWidth={1.5} fill="currentColor" aria-hidden />
+        <Star key={index} size={size} strokeWidth={1.25} fill="currentColor" aria-hidden />
       ))}
     </span>
   );
@@ -49,102 +58,108 @@ export function RatingJump({ productId }: { productId: string }) {
 }
 
 export function ProductReviews({ product }: { product: ShopProduct }) {
-  const { rating, reviewCount, distribution, reviews } = productReviewData(product.id);
-  const [shown, setShown] = useState(INITIAL_REVIEWS);
+  const { rating, reviewCount, reviews } = productReviewData(product.id);
   const [imageReview, setImageReview] = useState<ProductReview | null>(null);
+  const [shown, setShown] = useState(FEATURED_REVIEW_COUNT);
+  const hasMoreReviews = shown < reviews.length;
 
   useEffect(() => {
-    setShown(INITIAL_REVIEWS);
     setImageReview(null);
+    setShown(FEATURED_REVIEW_COUNT);
   }, [product.id]);
 
+  const showMoreReviews = () => {
+    setShown((current) =>
+      current < EXPANDED_REVIEW_COUNT
+        ? Math.min(EXPANDED_REVIEW_COUNT, reviews.length)
+        : reviews.length,
+    );
+  };
+
   return (
-    <>
-      <Shell id="reviews" label="Reviews" className="scroll-mt-24 pt-20 md:pt-28">
-        <div className="px-rule pt-6">
-          <p className="px-label text-muted-foreground">Reviews</p>
-          <div className="mt-8 grid gap-12 md:grid-cols-[0.42fr_0.58fr] md:items-end">
-            <div>
-              <p className="px-serif text-[3.5rem] leading-none md:text-[4.8rem]">
-                {rating.toFixed(1)}
-              </p>
-              <p className="px-meta mt-2 text-muted-foreground">out of 5</p>
-              <div className="mt-4">
-                <RatingStars rating={rating} />
-              </div>
-              <p className="px-meta mt-3 text-muted-foreground">
-                {reviewCount.toLocaleString()} reviews
-              </p>
-            </div>
-            <dl className="space-y-2.5">
-              {distribution.map((row) => (
-                <div
-                  key={row.stars}
-                  className="grid grid-cols-[3.5rem_minmax(0,1fr)_2.5rem] items-center gap-3"
-                >
-                  <dt className="px-meta text-muted-foreground">{row.stars} stars</dt>
-                  <dd className="h-px bg-hairline">
-                    <span
-                      className="block h-px bg-foreground"
-                      style={{ width: `${row.percent}%` }}
-                    />
-                  </dd>
-                  <span className="px-meta text-right text-muted-foreground">{row.percent}%</span>
-                </div>
-              ))}
-            </dl>
+    <Shell id="reviews" label="Reviews" className="scroll-mt-24 pt-20 md:pt-24">
+      <div className="border-t border-hairline pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 md:flex-nowrap">
+          <p className="px-label">Reviews</p>
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 md:flex-nowrap">
+            <RatingStars rating={rating} label={false} />
+            <span className="px-meta text-foreground">{rating.toFixed(1)}</span>
+            <span aria-hidden className="px-meta text-muted-foreground">
+              ·
+            </span>
+            <span className="px-meta whitespace-nowrap text-muted-foreground">
+              {reviewCount.toLocaleString()} reviews
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="mt-16 border-t border-hairline">
-          {reviews.slice(0, shown).map((review) => (
-            <ReviewRow key={review.id} review={review} onImageOpen={() => setImageReview(review)} />
-          ))}
-        </div>
-        {shown < reviews.length ? (
-          <button
-            type="button"
-            onClick={() => setShown(reviews.length)}
-            className="px-label px-underline mt-8"
-          >
-            Load more reviews
-          </button>
-        ) : null}
-      </Shell>
+      <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+        {reviews.slice(0, shown).map((review, index) => (
+          <ReviewPreview
+            key={review.id}
+            review={review}
+            number={index + 1}
+            onImageOpen={() => setImageReview(review)}
+          />
+        ))}
+      </div>
+
+      {hasMoreReviews ? (
+        <button type="button" onClick={showMoreReviews} className="px-label px-underline mt-10">
+          {shown < EXPANDED_REVIEW_COUNT ? "View all reviews →" : "Show more reviews →"}
+        </button>
+      ) : null}
       {imageReview?.image ? (
         <ReviewImageLightbox review={imageReview} onClose={() => setImageReview(null)} />
       ) : null}
-    </>
+    </Shell>
   );
 }
 
-function ReviewRow({ review, onImageOpen }: { review: ProductReview; onImageOpen: () => void }) {
+function ReviewPreview({
+  review,
+  number,
+  onImageOpen,
+}: {
+  review: ProductReview;
+  number: number;
+  onImageOpen: () => void;
+}) {
   return (
-    <article className="grid gap-6 border-b border-hairline py-8 md:grid-cols-[minmax(0,1fr)_120px] md:gap-10">
-      <div>
-        <RatingStars rating={review.rating} />
-        <h3 className="px-label mt-4">{review.title}</h3>
-        <p className="px-meta mt-3 max-w-[62ch] text-muted-foreground">“{review.body}”</p>
-        <p className="px-meta mt-5">{review.name}</p>
-        <p className="px-meta text-muted-foreground">
-          {review.material} · {review.size} · Verified purchase
-        </p>
-      </div>
+    <article className="grid gap-4 md:grid-cols-[150px_minmax(0,1fr)] md:gap-5">
       {review.image ? (
         <button
           type="button"
           onClick={onImageOpen}
           aria-label={`View customer photo from ${review.name}`}
-          className="group relative aspect-square w-28 overflow-hidden bg-secondary md:w-full"
+          className="group relative aspect-[16/10] w-full overflow-hidden bg-secondary md:aspect-[4/5]"
         >
           <img
             src={review.image}
             alt={review.imageAlt}
             loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </button>
       ) : null}
+      <div className="min-w-0">
+        <p className="px-meta text-muted-foreground">{String(number).padStart(2, "0")}</p>
+        <div className="mt-3">
+          <RatingStars rating={review.rating} label={false} />
+        </div>
+        <h3 className="px-label mt-3">{review.title}</h3>
+        <p className="px-serif mt-3 max-w-[31ch] text-[1.15rem] leading-[1.3] text-foreground md:text-[1.3rem]">
+          “{review.body}”
+        </p>
+        <div className="mt-4">
+          <p className="px-meta text-foreground">{review.name}</p>
+          <p className="px-meta mt-1 text-muted-foreground">
+            {review.material} · {review.size}
+          </p>
+          <p className="px-meta mt-1 text-muted-foreground">Verified purchase</p>
+        </div>
+      </div>
     </article>
   );
 }

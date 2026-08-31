@@ -77,6 +77,7 @@ export type TextConfig = {
   font: string;
   size: number;
   align: "left" | "center" | "right";
+  x: number;
   y: number;
   color: "light" | "dark";
 };
@@ -86,9 +87,50 @@ export const defaultTextConfig: TextConfig = {
   font: fonts[0]!.css,
   size: 40,
   align: "center",
-  y: 82,
+  x: 50,
+  y: 75,
   color: "light",
 };
+
+const textSafeArea = 0.025;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  const lines: string[] = [];
+
+  for (const paragraph of text.split("\n")) {
+    if (!paragraph) {
+      lines.push("");
+      continue;
+    }
+
+    let current = "";
+    for (const token of paragraph.split(/(\s+)/).filter(Boolean)) {
+      const candidate = `${current}${token}`;
+      if (current && ctx.measureText(candidate).width > maxWidth) {
+        lines.push(current.trimEnd());
+        current = token.trimStart();
+      } else {
+        current = candidate;
+      }
+
+      while (current && ctx.measureText(current).width > maxWidth) {
+        let splitAt = current.length - 1;
+        while (splitAt > 1 && ctx.measureText(current.slice(0, splitAt)).width > maxWidth) {
+          splitAt -= 1;
+        }
+        lines.push(current.slice(0, splitAt));
+        current = current.slice(splitAt);
+      }
+    }
+    if (current) lines.push(current.trimEnd());
+  }
+
+  return lines.length ? lines : [""];
+}
 
 export async function runText(image: PreparedImage, cfg: TextConfig): Promise<PreparedImage> {
   const img = await loadImage(image.dataUrl);
@@ -98,15 +140,43 @@ export async function runText(image: PreparedImage, cfg: TextConfig): Promise<Pr
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(img, 0, 0);
 
-  const px = (cfg.size / 100) * canvas.width * 0.12;
-  ctx.font = `${px}px ${cfg.font}`;
+  const marginX = canvas.width * textSafeArea;
+  const marginY = canvas.height * textSafeArea;
+  const maxWidth = canvas.width * (1 - textSafeArea * 2);
+  let fontSize = (cfg.size / 100) * canvas.width * 0.12;
+  let lineHeight = fontSize * 1.05;
+  let lines: string[];
+
+  ctx.font = `${fontSize}px ${cfg.font}`;
+  lines = wrapText(ctx, cfg.text, maxWidth);
+
+  // Keep a multiline caption printable even when it is much taller than its
+  // original single-line treatment. The requested size remains the maximum.
+  const availableHeight = canvas.height - marginY * 2;
+  const initialHeight = lines.length * lineHeight;
+  if (initialHeight > availableHeight) {
+    fontSize *= availableHeight / initialHeight;
+    lineHeight = fontSize * 1.05;
+    ctx.font = `${fontSize}px ${cfg.font}`;
+    lines = wrapText(ctx, cfg.text, maxWidth);
+  }
+
+  const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
+  const textHeight = lines.length * lineHeight;
+  const preferredX = ((cfg.x ?? 50) / 100) * canvas.width;
+  const preferredY = (cfg.y / 100) * canvas.height;
+  const x = clamp(preferredX, marginX + textWidth / 2, canvas.width - marginX - textWidth / 2);
+  const y = clamp(preferredY, marginY + textHeight / 2, canvas.height - marginY - textHeight / 2);
+  const textLeft = x - textWidth / 2;
+
   ctx.textBaseline = "middle";
   ctx.textAlign = cfg.align;
   ctx.fillStyle = cfg.color === "light" ? "#ffffff" : "#141414";
-  const margin = canvas.width * 0.06;
-  const x =
-    cfg.align === "left" ? margin : cfg.align === "right" ? canvas.width - margin : canvas.width / 2;
-  ctx.fillText(cfg.text, x, (cfg.y / 100) * canvas.height);
+  lines.forEach((line, index) => {
+    const lineX =
+      cfg.align === "left" ? textLeft : cfg.align === "right" ? textLeft + textWidth : x;
+    ctx.fillText(line, lineX, y - textHeight / 2 + lineHeight * (index + 0.5));
+  });
 
   return {
     dataUrl: canvas.toDataURL("image/jpeg", 0.92),

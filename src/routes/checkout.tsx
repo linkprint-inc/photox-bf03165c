@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
-import { productById, materialName, sizeLabel, unitPrice, useStore } from "@/lib/store";
+import { productById, materialName, orientedSizeLabel, unitPrice, useStore } from "@/lib/store";
 import { usePreparedImage } from "@/lib/prepared-image";
 
 export const Route = createFileRoute("/checkout")({
@@ -109,7 +109,8 @@ function CheckoutSummary() {
               <div className="min-w-0 flex-1">
                 <p className="px-label">{product.name}</p>
                 <p className="px-meta mt-1 text-muted-foreground">
-                  {materialName[item.material]} · {sizeLabel(item.sizeIndex)}
+                  {materialName[item.material]} ·{" "}
+                  {orientedSizeLabel(item.sizeIndex, item.orientation)}
                 </p>
                 <p className="px-meta text-muted-foreground">Qty {item.qty}</p>
               </div>

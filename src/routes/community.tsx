@@ -34,7 +34,11 @@ function CommunityPage() {
           </h1>
           <p className="px-meta mt-4 text-muted-foreground">Real photos, printed and lived with.</p>
         </Shell>
-        <Shell label="Customer moments" className="pb-24 md:pb-32">
+        <Shell
+          id="customer-stories"
+          label="Customer stories"
+          className="scroll-mt-24 pb-24 md:pb-32"
+        >
           <CommunityFeed />
         </Shell>
       </main>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import { useStore, productById, unitPrice, sizeLabel, materialName } from "@/lib/store";
+import { useStore, productById, unitPrice, orientedSizeLabel, materialName } from "@/lib/store";
 import { usePreparedImage } from "@/lib/prepared-image";
 
 export function BagDrawer() {
@@ -109,7 +109,8 @@ export function BagDrawer() {
                         {p.name}
                       </a>
                       <p className="px-meta mt-2 text-muted-foreground">
-                        {materialName[item.material]} · {sizeLabel(item.sizeIndex)}
+                        {materialName[item.material]} ·{" "}
+                        {orientedSizeLabel(item.sizeIndex, item.orientation)}
                       </p>
                     </div>
 

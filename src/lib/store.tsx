@@ -13,15 +13,25 @@ import type { TextConfig, ToolId } from "./image-tools";
 import type { PreparedImage } from "./prepared-image";
 
 export type BagMaterial = "metal" | "canvas";
+export type PrintOrientation = "landscape" | "portrait";
+
+export type CropPosition = {
+  zoom: number;
+  x: number;
+  y: number;
+  aspectRatio: number;
+};
 
 export type PrintCustomization = {
   originalImage: PreparedImage;
   image: PreparedImage;
   appliedTools: ToolId[];
   textConfig?: TextConfig;
+  crop: CropPosition;
   startingPointId: string;
   price: number;
   preview: "artwork" | "detail" | "room";
+  orientation: PrintOrientation;
 };
 
 export type BagItem = {
@@ -29,6 +39,7 @@ export type BagItem = {
   productId: string;
   material: BagMaterial;
   sizeIndex: number;
+  orientation?: PrintOrientation;
   qty: number;
   customization?: PrintCustomization;
 };
@@ -56,6 +67,7 @@ export type OrderItem = {
   productId: string;
   material: BagMaterial;
   sizeIndex: number;
+  orientation?: PrintOrientation;
   qty: number;
   customization?: PrintCustomization;
 };
@@ -111,6 +123,17 @@ export function unitPrice(material: BagMaterial, sizeIndex: number) {
 
 export function sizeLabel(sizeIndex: number) {
   return sizeSteps[sizeIndex]!.label;
+}
+
+/**
+ * The source size scale is portrait (12 × 18). Landscape is the same physical tier
+ * with its dimensions exchanged, so every consumer can share one orientation state.
+ */
+export function orientedSizeLabel(sizeIndex: number, orientation: PrintOrientation = "landscape") {
+  const label = sizeLabel(sizeIndex);
+  if (orientation === "portrait") return label;
+  const match = label.match(/(\d+)\s*×\s*(\d+)(.*)/);
+  return match ? `${match[2]} × ${match[1]}${match[3]}` : label;
 }
 
 function seedOrders(): Order[] {
@@ -226,7 +249,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const addToBag = useCallback((item: Omit<BagItem, "key">) => {
     setState((s) => {
-      const baseKey = `${item.productId}-${item.material}-${item.sizeIndex}`;
+      const baseKey = `${item.productId}-${item.material}-${item.sizeIndex}-${item.orientation ?? "landscape"}`;
       const key = item.customization
         ? `${baseKey}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
         : baseKey;
@@ -249,7 +272,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           merged.push(item);
           continue;
         }
-        const newKey = `${item.productId}-${item.material}-${item.sizeIndex}`;
+        const newKey = `${item.productId}-${item.material}-${item.sizeIndex}-${item.orientation ?? "landscape"}`;
         const existing = merged.find((m) => m.key === newKey);
         if (existing) existing.qty += item.qty;
         else merged.push({ ...item, key: newKey });
@@ -275,13 +298,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       shippingAddress: details.shippingAddress,
     };
     setState((s) => {
-      order.items = s.bag.map(({ productId, material, sizeIndex, qty, customization }) => ({
-        productId,
-        material,
-        sizeIndex,
-        qty,
-        customization,
-      }));
+      order.items = s.bag.map(
+        ({ productId, material, sizeIndex, orientation, qty, customization }) => ({
+          productId,
+          material,
+          sizeIndex,
+          orientation,
+          qty,
+          customization,
+        }),
+      );
       return { ...s, orders: [order, ...s.orders], bag: [] };
     });
     return order;

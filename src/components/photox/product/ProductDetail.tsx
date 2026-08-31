@@ -15,7 +15,14 @@ import {
   relatedProducts,
 } from "@/lib/product-detail";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
-import { materialName, unitPrice, useStore, type BagMaterial } from "@/lib/store";
+import {
+  materialName,
+  orientedSizeLabel,
+  unitPrice,
+  useStore,
+  type BagMaterial,
+  type PrintOrientation,
+} from "@/lib/store";
 
 const views: { key: ViewMode; label: string }[] = [
   { key: "artwork", label: "Artwork" },
@@ -37,20 +44,23 @@ function SizePrint({
   product,
   material,
   size,
+  orientation,
 }: {
   product: ShopProduct;
   material: BagMaterial;
   size: (typeof sizeSteps)[number];
+  orientation: PrintOrientation;
 }) {
   const isMetal = material === "metal";
   const { width, height } = parsePhysicalSize(size);
+  const aspectRatio = orientation === "landscape" ? width / height : height / width;
   return (
     <div
       className={[
         "relative w-full overflow-hidden bg-secondary shadow-sm",
         isMetal ? "px-gloss" : "px-weave",
       ].join(" ")}
-      style={{ aspectRatio: `${width}/${height}` }}
+      style={{ aspectRatio }}
     >
       <img
         src={product.image}
@@ -67,6 +77,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const materials = useMemo(() => materialsFor(product), [product]);
   const [material, setMaterial] = useState<BagMaterial>(materials[0]!);
   const [sizeIndex, setSizeIndex] = useState(2);
+  const [orientation, setOrientation] = useState<PrintOrientation>(
+    product.orientation === "Portrait" ? "portrait" : "landscape",
+  );
   const [view, setView] = useState<ViewMode>("artwork");
   const [openInfo, setOpenInfo] = useState<string | null>(null);
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -77,8 +90,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   useEffect(() => {
     setMaterial(materials[0]!);
     setSizeIndex(2);
+    setOrientation(product.orientation === "Portrait" ? "portrait" : "landscape");
     setView("artwork");
-  }, [product.id, materials]);
+  }, [product.id, product.orientation, materials]);
 
   useEffect(() => {
     const mainCta = mainCtaRef.current;
@@ -122,6 +136,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   }, [product.id]);
 
   const size = sizeSteps[sizeIndex]!;
+  const sizeLabel = orientedSizeLabel(sizeIndex, orientation);
   const price = unitPrice(material, sizeIndex);
   const saved = hydrated && isSaved(product.id);
   const related = useMemo(() => relatedProducts(product), [product]);
@@ -146,7 +161,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               material={material}
               view={view}
               inches={size.inches}
-              sizeLabel={size.label}
+              sizeLabel={sizeLabel}
+              orientation={orientation}
             />
 
             <ul className="mt-4 flex gap-6">
@@ -200,7 +216,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                 </button>
               </div>
               <p className="px-meta mt-2 text-muted-foreground">
-                {product.orientation} · {materials.map((m) => materialName[m]).join(" / ")}
+                {orientation === "landscape" ? "Landscape" : "Portrait"} ·{" "}
+                {materials.map((m) => materialName[m]).join(" / ")}
               </p>
               <RatingJump productId={product.id} />
 
@@ -248,7 +265,46 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
 
               {/* Size */}
               <div className="mt-7">
-                <h2 className="px-label text-muted-foreground">Choose your size</h2>
+                <div className="flex items-center justify-between gap-4">
+                  <h2 className="px-label text-muted-foreground">Choose your size</h2>
+                  <div
+                    className="-mr-2 flex items-center"
+                    role="group"
+                    aria-label="Print orientation"
+                  >
+                    {(
+                      [
+                        {
+                          key: "landscape",
+                          label: "Landscape orientation",
+                          shape: "h-[15px] w-[22px]",
+                        },
+                        {
+                          key: "portrait",
+                          label: "Portrait orientation",
+                          shape: "h-[22px] w-[15px]",
+                        },
+                      ] as const
+                    ).map(({ key, label, shape }) => {
+                      const active = orientation === key;
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          onClick={() => setOrientation(key)}
+                          aria-label={label}
+                          aria-pressed={active}
+                          className="flex h-10 w-10 items-center justify-center outline-none transition-colors focus-visible:ring-1 focus-visible:ring-foreground/60"
+                        >
+                          <span
+                            aria-hidden
+                            className={`${shape} border transition-colors ${active ? "border-foreground" : "border-foreground/35 hover:border-foreground/65"}`}
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <ul className="mt-3 border-t border-hairline">
                   {sizeSteps.map((s, i) => {
                     const active = sizeIndex === i;
@@ -266,7 +322,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                             active ? "opacity-100" : "opacity-50 hover:opacity-100",
                           ].join(" ")}
                         >
-                          <span className="px-label">{s.label}</span>
+                          <span className="px-label">{orientedSizeLabel(i, orientation)}</span>
                           <span className="px-price">${unitPrice(material, i)}</span>
                         </button>
                       </li>
@@ -277,7 +333,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
 
               <div className="mt-4 flex items-baseline justify-between gap-6">
                 <p className="px-label text-muted-foreground">
-                  {materialName[material]} · {size.label}
+                  {materialName[material]} · {sizeLabel}
                 </p>
                 <p className="px-price">${price}</p>
               </div>
@@ -344,6 +400,15 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         </div>
       </Shell>
 
+      <ProductInformationSection
+        product={product}
+        materials={materials}
+        openInfo={openInfo}
+        onOpenInfoChange={setOpenInfo}
+      />
+
+      <ProductReviews product={product} />
+
       {/* ---------- See the difference in size ---------- */}
       <Shell className="pt-20 md:pt-28">
         <SectionHead
@@ -365,7 +430,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           >
             {sizeSteps.map((s) => (
               <div key={s.label} className="flex flex-col items-center">
-                <SizePrint product={product} material={material} size={s} />
+                <SizePrint
+                  product={product}
+                  material={material}
+                  size={s}
+                  orientation={orientation}
+                />
               </div>
             ))}
           </div>
@@ -393,7 +463,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                         : "",
                     ].join(" ")}
                   >
-                    {s.label}
+                    {orientedSizeLabel(i, orientation)}
                   </span>
                   <p
                     className={[
@@ -419,7 +489,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                   className="flex flex-shrink-0 flex-col items-center"
                   style={{ width: `${width * 7}px` }}
                 >
-                  <SizePrint product={product} material={material} size={s} />
+                  <SizePrint
+                    product={product}
+                    material={material}
+                    size={s}
+                    orientation={orientation}
+                  />
                   <div className="mt-4 text-center">
                     <span
                       className={[
@@ -430,7 +505,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                           : "",
                       ].join(" ")}
                     >
-                      {s.label}
+                      {orientedSizeLabel(i, orientation)}
                     </span>
                     <p
                       className={[
@@ -471,68 +546,6 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         </div>
       </Shell>
 
-      {/* ---------- About the work + information ---------- */}
-      <Shell className="pt-20 md:pt-28">
-        <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
-            <h2 className="px-label text-muted-foreground">About the work</h2>
-            <dl className="mt-6 border-t border-hairline">
-              <div className="flex justify-between gap-6 border-b border-hairline py-3">
-                <dt className="px-meta text-muted-foreground">Title</dt>
-                <dd className="px-label">{product.name}</dd>
-              </div>
-              <div className="flex justify-between gap-6 border-b border-hairline py-3">
-                <dt className="px-meta text-muted-foreground">Category</dt>
-                <dd className="px-label">{categoryLabel(product)}</dd>
-              </div>
-              <div className="flex justify-between gap-6 border-b border-hairline py-3">
-                <dt className="px-meta text-muted-foreground">Orientation</dt>
-                <dd className="px-label">{product.orientation}</dd>
-              </div>
-              <div className="flex justify-between gap-6 border-b border-hairline py-3">
-                <dt className="px-meta text-muted-foreground">Materials</dt>
-                <dd className="px-label">{materials.map((m) => materialName[m]).join(" / ")}</dd>
-              </div>
-            </dl>
-          </div>
-
-          <div className="md:col-span-6 md:col-start-7">
-            <h2 className="px-label text-muted-foreground">Product information</h2>
-            <ul className="mt-6 border-t border-hairline">
-              {productInfo.map((row) => {
-                const open = openInfo === row.title;
-                return (
-                  <li key={row.title} className="border-b border-hairline">
-                    <button
-                      type="button"
-                      onClick={() => setOpenInfo(open ? null : row.title)}
-                      aria-expanded={open}
-                      className="flex w-full items-center justify-between gap-6 py-4 text-left"
-                    >
-                      <span className="px-label">{row.title}</span>
-                      <span
-                        aria-hidden
-                        className={[
-                          "text-lg leading-none transition-transform duration-300",
-                          open ? "rotate-45" : "",
-                        ].join(" ")}
-                      >
-                        +
-                      </span>
-                    </button>
-                    {open ? (
-                      <p className="px-meta max-w-prose pb-5 text-muted-foreground">{row.body}</p>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </div>
-      </Shell>
-
-      <ProductReviews product={product} />
-
       {/* ---------- You may also like ---------- */}
       <Shell className="pt-20 pb-28 md:pt-28 md:pb-36">
         <SectionHead title="You may also like" />
@@ -554,7 +567,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       >
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
           <span className="px-meta text-muted-foreground">
-            {size.label} · ${price}
+            {sizeLabel} · ${price}
           </span>
           <button
             type="button"
@@ -571,11 +584,86 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           product={product}
           material={material}
           sizeIndex={sizeIndex}
-          sizeLabel={size.label}
+          sizeLabel={sizeLabel}
           price={price}
+          onSizeChange={setSizeIndex}
+          orientation={orientation}
           onClose={() => setUploadOpen(false)}
         />
       ) : null}
     </>
+  );
+}
+
+function ProductInformationSection({
+  product,
+  materials,
+  openInfo,
+  onOpenInfoChange,
+}: {
+  product: ShopProduct;
+  materials: BagMaterial[];
+  openInfo: string | null;
+  onOpenInfoChange: (title: string | null) => void;
+}) {
+  return (
+    <Shell className="pt-16 md:pt-20">
+      <div className="grid gap-12 md:grid-cols-12">
+        <div className="md:col-span-5">
+          <h2 className="px-label text-muted-foreground">About the work</h2>
+          <dl className="mt-6 border-t border-hairline">
+            <div className="flex justify-between gap-6 border-b border-hairline py-3">
+              <dt className="px-meta text-muted-foreground">Title</dt>
+              <dd className="px-label">{product.name}</dd>
+            </div>
+            <div className="flex justify-between gap-6 border-b border-hairline py-3">
+              <dt className="px-meta text-muted-foreground">Category</dt>
+              <dd className="px-label">{categoryLabel(product)}</dd>
+            </div>
+            <div className="flex justify-between gap-6 border-b border-hairline py-3">
+              <dt className="px-meta text-muted-foreground">Orientation</dt>
+              <dd className="px-label">{product.orientation}</dd>
+            </div>
+            <div className="flex justify-between gap-6 border-b border-hairline py-3">
+              <dt className="px-meta text-muted-foreground">Materials</dt>
+              <dd className="px-label">{materials.map((m) => materialName[m]).join(" / ")}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="md:col-span-6 md:col-start-7">
+          <h2 className="px-label text-muted-foreground">Product information</h2>
+          <ul className="mt-6 border-t border-hairline">
+            {productInfo.map((row) => {
+              const open = openInfo === row.title;
+              return (
+                <li key={row.title} className="border-b border-hairline">
+                  <button
+                    type="button"
+                    onClick={() => onOpenInfoChange(open ? null : row.title)}
+                    aria-expanded={open}
+                    className="flex w-full items-center justify-between gap-6 py-4 text-left"
+                  >
+                    <span className="px-label">{row.title}</span>
+                    <span
+                      aria-hidden
+                      className={[
+                        "text-lg leading-none transition-transform duration-300",
+                        open ? "rotate-45" : "",
+                      ].join(" ")}
+                    >
+                      +
+                    </span>
+                  </button>
+                  {open ? (
+                    <p className="px-meta max-w-prose pb-5 text-muted-foreground">{row.body}</p>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+    </Shell>
   );
 }

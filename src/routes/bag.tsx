@@ -8,7 +8,7 @@ import {
   useStore,
   productById,
   unitPrice,
-  sizeLabel,
+  orientedSizeLabel,
   materialName,
   finishLabel,
   type BagItem,
@@ -141,7 +141,7 @@ function BagRow({ item }: { item: BagItem }) {
             <ProductInformation
               name={p.name}
               material={materialName[item.material]}
-              size={sizeLabel(item.sizeIndex)}
+              size={orientedSizeLabel(item.sizeIndex, item.orientation)}
               finish={finishLabel[item.material]}
               productHref={productHref}
               editing={editing}
@@ -184,7 +184,7 @@ function BagRow({ item }: { item: BagItem }) {
         <ProductInformation
           name={p.name}
           material={materialName[item.material]}
-          size={sizeLabel(item.sizeIndex)}
+          size={orientedSizeLabel(item.sizeIndex, item.orientation)}
           finish={finishLabel[item.material]}
           productHref={productHref}
           editing={editing}

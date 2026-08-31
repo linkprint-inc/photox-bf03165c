@@ -41,6 +41,8 @@ const sharedReviews: ProductReview[] = [
     name: "Jordan R.",
     material: "Metal Print",
     size: '20 × 30"',
+    image: metalDetail,
+    imageAlt: "Close detail of a customer's glossy metal print surface",
   },
   {
     id: "mei",
