@@ -158,7 +158,7 @@ export function CustomToolPanel({
             <>
               <div>
                 <p className="px-label text-muted-foreground">Style</p>
-                <div className="mt-3 grid grid-cols-3 gap-x-5 gap-y-4 sm:grid-cols-4">
+                <div className="mt-3 flex flex-wrap justify-between gap-x-3 gap-y-4 sm:flex-nowrap sm:items-center">
                   {styleBatch.map((style, index) => {
                     const styleNumber = index + 1;
                     const selected =
