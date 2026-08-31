@@ -51,6 +51,7 @@ export function RoomScene({
   className?: string;
 }) {
   const widthPct = ((orientation === "landscape" ? inches * 1.5 : inches) * 100) / WALL_INCHES;
+  const portrait = orientation === "portrait";
   return (
     <div className={["relative h-full w-full overflow-hidden bg-secondary", className].join(" ")}>
       <img
@@ -62,8 +63,14 @@ export function RoomScene({
         className="block h-full w-full object-cover"
       />
       <div
-        className="absolute left-1/2 top-[14%] -translate-x-1/2 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)] transition-[width] duration-300 ease-out"
-        style={{ width: `${widthPct}%` }}
+        className={`absolute left-1/2 -translate-x-1/2 shadow-[0_10px_24px_-18px_rgba(0,0,0,0.7)] transition-[top,transform,width] duration-300 ease-out ${portrait ? "-translate-y-1/2" : ""}`}
+        style={{
+          width: `${widthPct}%`,
+          // Portrait prints grow around this wall anchor. At the largest size
+          // this raises the print roughly 10% of the room above the cabinet,
+          // while landscape retains its approved top-edge placement.
+          top: portrait ? "32%" : "14%",
+        }}
       >
         <img
           src={product.image}

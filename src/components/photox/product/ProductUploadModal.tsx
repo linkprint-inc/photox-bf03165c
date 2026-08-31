@@ -47,6 +47,8 @@ const defaultCrop: CropPosition = { zoom: 1, x: 0, y: 0, aspectRatio: 1.5 };
 const customizationDraftKey = "photox-pdp-customization-draft-v1";
 const sharedPreviewStageClass =
   "h-[min(42dvh,420px)] md:h-[min(54dvh,560px)] lg:h-[min(60dvh,620px)]";
+const preparePreviewStageClass =
+  "h-[clamp(200px,34dvh,340px)] [@media(max-height:700px)]:h-[clamp(180px,30dvh,260px)] lg:h-[min(60dvh,620px)]";
 const sharedPreviewPaddingClass = "p-5 md:p-6";
 
 type CustomizationDraft = {
@@ -466,7 +468,7 @@ export function ProductUploadModal({
         className="absolute inset-0 cursor-default"
       />
       <section className="relative z-10 flex h-[96dvh] w-full flex-col overflow-hidden border border-foreground/15 bg-paper shadow-[0_16px_38px_rgba(30,25,20,0.08)] md:h-[84vh] md:w-[86vw] md:max-w-[1280px]">
-        <header className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-hairline bg-paper px-6 py-5 md:px-8">
+        <header className="relative z-10 shrink-0 flex items-center justify-between gap-4 border-b border-hairline bg-paper px-6 py-5 md:px-8">
           <p id="customize-print-title" className="px-label shrink-0">
             Customize your print
           </p>
@@ -511,12 +513,12 @@ export function ProductUploadModal({
 
         <div
           className={`min-h-0 flex-1 px-6 py-7 md:px-8 md:py-8 ${
-            step === "prepare" && image ? "overflow-y-auto lg:overflow-hidden" : "overflow-y-auto"
+            step === "prepare" && image ? "overflow-hidden" : "overflow-y-auto"
           }`}
         >
           <div
             key={step}
-            className={`${animation} ${step === "prepare" && image ? "lg:h-full lg:min-h-0" : ""}`}
+            className={`${animation} ${step === "prepare" && image ? "h-full min-h-0" : ""}`}
           >
             {step === "photo" ? (
               <PhotoStep
@@ -817,11 +819,11 @@ function PrepareStep({
   const shouldShowReset = applied.length > 0 || cropApplied;
 
   return (
-    <div className="grid gap-8 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)] lg:gap-8">
-      <div className="sticky top-0 z-[1] flex min-w-0 flex-col lg:static lg:h-full">
+    <div className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] lg:grid-cols-[minmax(0,7fr)_minmax(280px,3fr)] lg:grid-rows-1 lg:gap-8">
+      <div className="relative flex min-w-0 flex-col lg:static lg:h-full">
         <div
           ref={previewRef}
-          className={`relative flex ${sharedPreviewStageClass} ${sharedPreviewPaddingClass} shrink-0 items-center justify-center overflow-hidden bg-secondary/65`}
+          className={`relative flex w-full ${preparePreviewStageClass} ${sharedPreviewPaddingClass} shrink-0 items-center justify-center overflow-hidden bg-secondary/65`}
         >
           {!cropEditing && resetConfirming ? (
             <div className="absolute right-5 top-5 z-20 w-[12rem] border border-hairline bg-paper p-4 shadow-[0_8px_18px_rgba(20,20,20,0.08)]">
@@ -913,7 +915,7 @@ function PrepareStep({
           )}
         </div>
       </div>
-      <aside className="flex min-w-0 flex-col lg:h-full lg:min-h-0">
+      <aside className="flex min-h-0 min-w-0 flex-col overflow-y-auto overscroll-contain border-t border-hairline pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:h-full lg:overflow-visible lg:border-t-0 lg:pt-0 lg:pb-0">
         {editing && toolOriginal ? (
           <div
             key={editing}
@@ -931,6 +933,7 @@ function PrepareStep({
               onApply={onApply}
               onCancel={onCancelTool}
               onBack={onCancelTool}
+              normalFlowOnMobile
               selectedSizeLabel={sizeLabel}
               selectedInches={selectedInches}
             />
@@ -994,7 +997,7 @@ function PrepareStep({
                 ))}
               </ul>
             </div>
-            <div className="sticky bottom-0 z-10 -mx-1 mt-6 shrink-0 border-t border-hairline bg-paper/95 px-1 pb-3 pt-5 backdrop-blur-sm lg:static lg:mx-0 lg:mt-0 lg:bg-paper lg:px-0 lg:pb-0">
+            <div className="mt-8 shrink-0 border-t border-hairline pt-5 lg:mt-0">
               <button
                 type="button"
                 onClick={onContinue}
@@ -1068,7 +1071,7 @@ function CropToolPanel({
           Reset crop
         </button>
       </div>
-      <div className="sticky bottom-0 z-10 -mx-1 mt-8 shrink-0 border-t border-hairline bg-paper/95 px-1 pb-3 pt-5 backdrop-blur-sm lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0">
+      <div className="mt-8 shrink-0 border-t border-hairline pt-5 lg:sticky lg:bottom-0 lg:z-10 lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0 lg:backdrop-blur-sm">
         <button
           type="button"
           onClick={onApply}

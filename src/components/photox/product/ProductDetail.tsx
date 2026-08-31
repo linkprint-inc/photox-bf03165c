@@ -576,28 +576,52 @@ function ProductInformationSection({
           <ul className="mt-6 border-t border-hairline">
             {productInfo.map((row) => {
               const open = openInfo === row.title;
+              const accordionId = `product-information-${row.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
               return (
                 <li key={row.title} className="border-b border-hairline">
                   <button
                     type="button"
                     onClick={() => onOpenInfoChange(open ? null : row.title)}
                     aria-expanded={open}
+                    aria-controls={accordionId}
                     className="flex w-full items-center justify-between gap-6 py-4 text-left"
                   >
                     <span className="px-label">{row.title}</span>
                     <span
                       aria-hidden
                       className={[
-                        "text-lg leading-none transition-transform duration-300",
+                        "text-lg leading-none transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                        open ? "duration-[360ms]" : "duration-[300ms]",
                         open ? "rotate-45" : "",
                       ].join(" ")}
                     >
                       +
                     </span>
                   </button>
-                  {open ? (
-                    <p className="px-meta max-w-prose pb-5 text-muted-foreground">{row.body}</p>
-                  ) : null}
+                  <div
+                    id={accordionId}
+                    role="region"
+                    aria-label={row.title}
+                    className={[
+                      "grid transition-[grid-template-rows] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                      open
+                        ? "grid-rows-[1fr] duration-[360ms]"
+                        : "grid-rows-[0fr] duration-[300ms]",
+                    ].join(" ")}
+                  >
+                    <div className="min-h-0 overflow-hidden" aria-hidden={!open} inert={!open}>
+                      <p
+                        className={[
+                          "px-meta max-w-prose pb-5 text-muted-foreground transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                          open
+                            ? "translate-y-0 opacity-100 duration-[360ms]"
+                            : "-translate-y-1.5 opacity-0 duration-[300ms]",
+                        ].join(" ")}
+                      >
+                        {row.body}
+                      </p>
+                    </div>
+                  </div>
                 </li>
               );
             })}

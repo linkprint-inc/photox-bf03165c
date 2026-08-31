@@ -25,6 +25,7 @@ export function CustomToolPanel({
   onBack,
   selectedSizeLabel,
   selectedInches,
+  normalFlowOnMobile = false,
   requiresTextResult = false,
 }: {
   tool: ToolId;
@@ -43,6 +44,8 @@ export function CustomToolPanel({
   onBack?: () => void;
   selectedSizeLabel: string;
   selectedInches: number;
+  /** Lets the PDP mobile modal keep every tool control in document flow. */
+  normalFlowOnMobile?: boolean;
   requiresTextResult?: boolean;
 }) {
   const meta = toolMeta[tool];
@@ -52,6 +55,9 @@ export function CustomToolPanel({
   const [generatingStyles, setGeneratingStyles] = useState(false);
   const [styleBatch, setStyleBatch] = useState(() => createTextStyleBatch(cfg.styleVersion || 1));
   const textGenerated = cfg.styleVersion > 0;
+  const actionBarClass = normalFlowOnMobile
+    ? "mt-10 border-t border-hairline pt-5 lg:sticky lg:bottom-0 lg:z-10 lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0 lg:backdrop-blur-sm"
+    : "sticky bottom-0 z-10 -mx-1 mt-10 border-t border-hairline bg-paper/95 px-1 pb-3 pt-5 backdrop-blur-sm lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0";
 
   const selectTextStyle = (style: GeneratedTextStyle, version: number) => {
     const next = {
@@ -228,7 +234,7 @@ export function CustomToolPanel({
         </div>
       ) : null}
 
-      <div className="sticky bottom-0 z-10 -mx-1 mt-10 border-t border-hairline bg-paper/95 px-1 pb-3 pt-5 backdrop-blur-sm lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0">
+      <div className={actionBarClass}>
         {tool === "text" ? (
           textGenerated ? (
             <button
