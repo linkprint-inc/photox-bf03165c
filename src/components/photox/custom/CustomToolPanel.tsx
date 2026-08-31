@@ -1,8 +1,11 @@
+import { useState } from "react";
 import {
-  fonts,
+  generatedTextStyle,
   recommendedInches,
+  textStyleIds,
   toolMeta,
   type TextConfig,
+  type TextStyleId,
   type ToolId,
 } from "@/lib/image-tools";
 import type { PreparedImage } from "@/lib/prepared-image";
@@ -16,11 +19,13 @@ export function CustomToolPanel({
   busy,
   error,
   onRun,
+  onGenerateText,
   onApply,
   onCancel,
+  onBack,
   selectedSizeLabel,
   selectedInches,
-  textPositionRange = { min: 6, max: 94 },
+  requiresTextResult = false,
 }: {
   tool: ToolId;
   original: PreparedImage;
@@ -30,18 +35,53 @@ export function CustomToolPanel({
   busy: boolean;
   error: string | null;
   onRun: () => void;
+  /** Optional legacy raster export for the standalone builder. */
+  onGenerateText?: (config: TextConfig) => void;
   onApply: () => void;
   onCancel: () => void;
+  /** Prepare-step tools use Back as their single discard-and-return action. */
+  onBack?: () => void;
   selectedSizeLabel: string;
   selectedInches: number;
-  textPositionRange?: { min: number; max: number };
+  requiresTextResult?: boolean;
 }) {
   const meta = toolMeta[tool];
   const recommended = recommendedInches(original);
   const needsMore = selectedInches > recommended;
+  const [generatedVersion, setGeneratedVersion] = useState(() => cfg.styleVersion || 0);
+  const textGenerated = cfg.styleVersion > 0;
+
+  const selectTextStyle = (styleId: TextStyleId, version: number) => {
+    const next = {
+      ...cfg,
+      ...generatedTextStyle(styleId, version),
+      text: cfg.text,
+      styleVersion: version,
+    };
+    setCfg(next);
+    onGenerateText?.(next);
+  };
+
+  const generateTextStyles = () => {
+    if (!cfg.text.trim()) return;
+    const nextVersion = Math.max(generatedVersion, cfg.styleVersion, 0) + 1;
+    setGeneratedVersion(nextVersion);
+    // The first generated set selects a safe treatment immediately. Later
+    // regenerations only present alternatives, preserving the active design.
+    if (!textGenerated) selectTextStyle("editorial", nextVersion);
+  };
 
   return (
     <div>
+      {onBack ? (
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-label px-underline mb-6 inline-block text-muted-foreground"
+        >
+          ← Back
+        </button>
+      ) : null}
       <div className="px-rule pt-6">
         <p className="px-label text-muted-foreground">Image preparation</p>
         <h3 className="px-label mt-2">{meta.heading}</h3>
@@ -90,122 +130,118 @@ export function CustomToolPanel({
               id="tool-text"
               value={cfg.text}
               maxLength={240}
-              onChange={(e) => setCfg({ ...cfg, text: e.target.value })}
+              onChange={(event) => setCfg({ ...cfg, text: event.target.value })}
               placeholder="Enter your text"
               className="px-meta mt-2 w-full border-b border-hairline bg-transparent pb-2 outline-none focus:border-foreground"
             />
           </div>
 
-          <div>
-            <p className="px-label text-muted-foreground">Font</p>
-            <div className="mt-2 flex gap-6">
-              {fonts.map((f) => (
-                <button
-                  key={f.label}
-                  type="button"
-                  onClick={() => setCfg({ ...cfg, font: f.css })}
-                  aria-pressed={cfg.font === f.css}
-                  className={[
-                    "px-label px-underline",
-                    cfg.font === f.css ? "opacity-100" : "opacity-45 hover:opacity-100",
-                  ].join(" ")}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          {textGenerated ? (
+            <>
+              <div>
+                <p className="px-label text-muted-foreground">Style</p>
+                <div className="mt-3 flex gap-5">
+                  {textStyleIds.map((styleId, index) => {
+                    const selected =
+                      cfg.styleId === styleId && cfg.styleVersion === generatedVersion;
+                    return (
+                      <button
+                        key={styleId}
+                        type="button"
+                        onClick={() => selectTextStyle(styleId, generatedVersion)}
+                        aria-label={`Select text style ${index + 1}`}
+                        aria-pressed={selected}
+                        className={`px-label px-underline ${selected ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
+                      >
+                        {String(index + 1).padStart(2, "0")}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-          <div>
-            <label htmlFor="tool-size" className="px-label text-muted-foreground">
-              Size
-            </label>
-            <input
-              id="tool-size"
-              type="range"
-              min={15}
-              max={100}
-              value={cfg.size}
-              onChange={(e) => setCfg({ ...cfg, size: Number(e.target.value) })}
-              className="mt-3 w-full accent-foreground"
-            />
-          </div>
+              <div>
+                <label htmlFor="tool-size" className="px-label text-muted-foreground">
+                  Size
+                </label>
+                <input
+                  id="tool-size"
+                  type="range"
+                  min={8}
+                  max={68}
+                  value={cfg.size}
+                  onChange={(event) => setCfg({ ...cfg, size: Number(event.target.value) })}
+                  className="mt-3 w-full accent-foreground"
+                />
+                <p className="px-meta mt-2 text-muted-foreground">
+                  Drag the text directly on the image to position it.
+                </p>
+              </div>
 
-          <div>
-            <p className="px-label text-muted-foreground">Alignment</p>
-            <div className="mt-2 flex gap-6">
-              {(["left", "center", "right"] as const).map((a) => (
-                <button
-                  key={a}
-                  type="button"
-                  onClick={() => setCfg({ ...cfg, align: a })}
-                  aria-pressed={cfg.align === a}
-                  className={[
-                    "px-label px-underline capitalize",
-                    cfg.align === a ? "opacity-100" : "opacity-45 hover:opacity-100",
-                  ].join(" ")}
-                >
-                  {a}
-                </button>
-              ))}
-            </div>
-          </div>
+              <div>
+                <p className="px-label text-muted-foreground">Light / dark</p>
+                <div className="mt-3 flex gap-6">
+                  {(["light", "dark"] as const).map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setCfg({ ...cfg, color })}
+                      aria-pressed={cfg.color === color}
+                      className={`px-label px-underline ${cfg.color === color ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          <div>
-            <label htmlFor="tool-pos" className="px-label text-muted-foreground">
-              Position
-            </label>
-            <input
-              id="tool-pos"
-              type="range"
-              min={textPositionRange.min}
-              max={textPositionRange.max}
-              value={cfg.y}
-              onChange={(e) => setCfg({ ...cfg, y: Number(e.target.value) })}
-              className="mt-3 w-full accent-foreground"
-            />
-            <p className="px-meta mt-2 text-muted-foreground">
-              Or drag the text directly on the preview.
-            </p>
-          </div>
-
-          <div>
-            <p className="px-label text-muted-foreground">Text colour</p>
-            <div className="mt-2 flex gap-6">
-              {(["light", "dark"] as const).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setCfg({ ...cfg, color: c })}
-                  aria-pressed={cfg.color === c}
-                  className={[
-                    "px-label px-underline capitalize",
-                    cfg.color === c ? "opacity-100" : "opacity-45 hover:opacity-100",
-                  ].join(" ")}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
+              <button
+                type="button"
+                onClick={generateTextStyles}
+                className="px-label px-underline inline-block text-muted-foreground"
+              >
+                Regenerate →
+              </button>
+            </>
+          ) : null}
         </div>
       ) : null}
 
-      <div className="mt-10">
-        {!result ? (
+      <div className="sticky bottom-0 z-10 -mx-1 mt-10 border-t border-hairline bg-paper/95 px-1 pb-3 pt-5 backdrop-blur-sm lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0">
+        {tool === "text" ? (
+          textGenerated ? (
+            <button
+              type="button"
+              onClick={onApply}
+              disabled={!cfg.text.trim() || (requiresTextResult && (!result || busy))}
+              className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {busy ? "Preparing text…" : "Apply text →"}
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={!cfg.text.trim()}
+              onClick={generateTextStyles}
+              className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Generate text styles →
+            </button>
+          )
+        ) : !result ? (
           <button
             type="button"
-            disabled={busy || (tool === "text" && !cfg.text)}
+            disabled={busy}
             onClick={onRun}
             className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy
-              ? "Working…"
+              ? tool === "restore"
+                ? "Restoring image…"
+                : "Enhancing image…"
               : tool === "restore"
-                ? "Apply restoration"
-                : tool === "enhance"
-                  ? "Enhance image"
-                  : "Apply text"}
+                ? "Preview restoration →"
+                : "Preview enhancement →"}
           </button>
         ) : (
           <button
@@ -213,23 +249,21 @@ export function CustomToolPanel({
             onClick={onApply}
             className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
           >
-            {tool === "enhance"
-              ? "Keep enhanced image"
-              : tool === "restore"
-                ? "Keep restored image"
-                : "Apply text"}
+            {tool === "enhance" ? "Keep enhanced image →" : "Keep restored image →"}
           </button>
         )}
 
         {error ? <p className="px-meta mt-3 text-destructive">{error}</p> : null}
 
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-label px-underline mt-5 inline-block text-muted-foreground"
-        >
-          Cancel
-        </button>
+        {!onBack ? (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-label px-underline mt-5 inline-block text-muted-foreground"
+          >
+            Cancel
+          </button>
+        ) : null}
       </div>
     </div>
   );

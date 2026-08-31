@@ -9,7 +9,6 @@ import { MetalSurface } from "@/components/photox/metal/MetalSurface";
 import { MetalSpaces } from "@/components/photox/metal/MetalSpaces";
 import { MetalMotion } from "@/components/photox/metal/MetalMotion";
 import { MetalLarge } from "@/components/photox/metal/MetalLarge";
-import { MetalCompare } from "@/components/photox/metal/MetalCompare";
 import { MetalArrives } from "@/components/photox/metal/MetalArrives";
 import { MetalHelp } from "@/components/photox/metal/MetalHelp";
 
@@ -45,7 +44,6 @@ function MetalPage() {
         <MetalMotion />
         <MetalSpaces />
         <MetalLarge />
-        <MetalCompare />
         <MetalArrives />
 
         <MetalHelp />

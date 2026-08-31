@@ -38,19 +38,15 @@ const topics: Topic[] = [
     titleBottom: "your print",
     descriptor: "Material, size and finish.",
     image: helpChoosing,
-    alt: "Glossy metal print beside a textured frameless canvas print",
+    alt: "Glossy Metal Print surface detail",
     destination: { label: "Shop prints", href: "/shop" },
     answers: [
       {
-        q: "Metal or canvas?",
+        q: "What is a Metal Print?",
         lines: [
           {
-            term: "Metal",
+            term: "Metal Print",
             body: "Glossy, luminous and crisp. Ideal when you want colour, detail and reflected light.",
-          },
-          {
-            term: "Canvas",
-            body: "Matte, tactile and softer. Ideal for a more traditional, textured finish.",
           },
         ],
         visual: { kind: "materials" },
@@ -71,7 +67,7 @@ const topics: Topic[] = [
         q: "Which finish is right for my image?",
         lines: [
           {
-            body: "Metal suits crisp detail and reflected light. Canvas gives images a softer, matte finish.",
+            body: "Metal is glossy, luminous and crisp, making it ideal when you want colour, detail and reflected light.",
           },
         ],
         visual: { kind: "materials" },
@@ -92,10 +88,10 @@ const topics: Topic[] = [
         q: "Can I print my own photo or artwork?",
         lines: [
           {
-            body: "Yes. Custom prints use your own file on the same metal and frameless canvas as the collection.",
+            body: "Yes. Custom prints use your own file on the same Metal Print as the collection.",
           },
           {
-            body: "Upload the image, choose material and size, and the price updates with the size you pick.",
+            body: "Upload the image, choose its orientation and size, and the price updates with the size you pick.",
           },
         ],
         visual: {
@@ -178,7 +174,7 @@ const topics: Topic[] = [
         q: "Can I print my own artwork?",
         lines: [
           {
-            body: "Yes. Custom prints use your own image or artwork on metal or frameless canvas.",
+            body: "Yes. Custom prints use your own image or artwork on Metal Print.",
           },
         ],
         visual: { kind: "image", src: helpPrivacy, alt: "Fine art print surface detail" },
@@ -205,7 +201,7 @@ const topics: Topic[] = [
 
 function MaterialsVisual() {
   return (
-    <div className="grid grid-cols-2 gap-px bg-foreground/15">
+    <div className="bg-foreground/15">
       <figure className="bg-background">
         <div className="px-gloss relative aspect-square overflow-hidden">
           <img
@@ -219,21 +215,6 @@ function MaterialsVisual() {
         </div>
         <figcaption className="px-meta px-rule pt-2 text-muted-foreground">
           Metal — gloss
-        </figcaption>
-      </figure>
-      <figure className="bg-background">
-        <div className="px-weave relative aspect-square overflow-hidden">
-          <img
-            src={helpChoosing}
-            alt="Textured canvas print surface"
-            loading="lazy"
-            width={1200}
-            height={1200}
-            className="h-full w-full origin-right scale-[2] object-cover"
-          />
-        </div>
-        <figcaption className="px-meta px-rule pt-2 text-muted-foreground">
-          Canvas — matte
         </figcaption>
       </figure>
     </div>

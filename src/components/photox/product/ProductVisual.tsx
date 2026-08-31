@@ -22,21 +22,14 @@ export function PrintFace({
   material: BagMaterial;
   className?: string;
 }) {
-  const isMetal = material === "metal";
   return (
-    <div
-      className={[
-        "relative overflow-hidden bg-secondary",
-        isMetal ? "px-gloss" : "px-weave",
-        className,
-      ].join(" ")}
-    >
+    <div className={["relative overflow-hidden bg-secondary", "px-gloss", className].join(" ")}>
       <img
         src={product.image}
         alt={`${product.name} as a ${materialName[material].toLowerCase()}`}
         className="block h-full w-full object-cover"
       />
-      <span aria-hidden className={isMetal ? "px-edge" : "px-canvas-edge"} />
+      <span aria-hidden className="px-edge" />
     </div>
   );
 }
@@ -79,16 +72,14 @@ export function RoomScene({
           className="block w-full"
           style={{ aspectRatio: aspectRatioFromLabel(sizeLabel), objectFit: "cover" }}
         />
-        {material === "metal" ? (
-          <span
-            aria-hidden
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(108deg, transparent 34%, rgba(255,255,255,0.18) 46%, transparent 62%)",
-            }}
-          />
-        ) : null}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(108deg, transparent 34%, rgba(255,255,255,0.18) 46%, transparent 62%)",
+          }}
+        />
       </div>
     </div>
   );

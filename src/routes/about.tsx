@@ -10,14 +10,13 @@ import aboutCommercial from "@/assets/about-commercial.jpg";
 import metalSurface from "@/assets/metal-surface.jpg";
 import metalEdge from "@/assets/metal-edge.jpg";
 import metalDetailCrop from "@/assets/metal-detail-crop.jpg";
-import materialCanvas from "@/assets/material-canvas.jpg";
 import roomLiving from "@/assets/room-living-architectural.jpg";
 import roomWorkspace from "@/assets/room-workspace.jpg";
 import { customPrintExample } from "@/lib/photox-data";
 
 const title = "About photoX — Art, Made Physical";
 const description =
-  "photoX is a brand of LinkPrint, Inc., turning photography, artwork and personal images into objects made for the wall: metal prints, frameless canvas and custom prints.";
+  "photoX is a brand of LinkPrint, Inc., turning photography, artwork and personal images into metal prints made for the wall.";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -177,33 +176,6 @@ function AboutPage() {
               </figure>
             </div>
           </div>
-
-          {/* Canvas — secondary */}
-          <div className="px-rule mt-16 grid gap-8 pt-6 md:grid-cols-12 md:items-end">
-            <figure className="md:col-span-5">
-              <div
-                className="px-weave relative w-full overflow-hidden bg-secondary"
-                style={{ aspectRatio: "5 / 4" }}
-              >
-                <img
-                  src={materialCanvas}
-                  alt="Woven canvas texture and the wrapped edge of a frameless canvas print"
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover"
-                />
-              </div>
-            </figure>
-            <div className="md:col-span-5 md:col-start-7">
-              <p className="px-label">Frameless Canvas</p>
-              <p className="px-meta mt-3 max-w-[44ch] text-muted-foreground">
-                A woven surface with a matte finish, wrapped around the edge so the work reads as an
-                object rather than a poster.
-              </p>
-              <a href="/custom" className="px-label px-underline mt-6 inline-block">
-                Create your print →
-              </a>
-            </div>
-          </div>
         </Shell>
 
         {/* 04 Made in the USA */}
@@ -216,8 +188,8 @@ function AboutPage() {
                 THE USA.
               </h2>
               <p className="px-meta mt-6 max-w-[40ch] text-muted-foreground">
-                Every photoX print — metal, frameless canvas and custom — is produced in the United
-                States and inspected before it ships.
+                Every photoX Metal Print is produced in the United States and inspected before it
+                ships.
               </p>
             </div>
             <figure className="md:col-span-7 md:col-start-6">

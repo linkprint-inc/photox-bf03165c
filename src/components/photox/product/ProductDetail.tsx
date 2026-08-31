@@ -5,15 +5,7 @@ import { ShopProductCard } from "../shop/ShopProductCard";
 import { ProductReviews, RatingJump } from "./ProductReviews";
 import { ProductUploadModal } from "./ProductUploadModal";
 import { MainVisual, PrintFace, type ViewMode } from "./ProductVisual";
-import {
-  categoryLabel,
-  closeUps,
-  fromPrice,
-  materialBlurb,
-  materialsFor,
-  productInfo,
-  relatedProducts,
-} from "@/lib/product-detail";
+import { categoryLabel, closeUps, productInfo, relatedProducts } from "@/lib/product-detail";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
   materialName,
@@ -51,15 +43,11 @@ function SizePrint({
   size: (typeof sizeSteps)[number];
   orientation: PrintOrientation;
 }) {
-  const isMetal = material === "metal";
   const { width, height } = parsePhysicalSize(size);
   const aspectRatio = orientation === "landscape" ? width / height : height / width;
   return (
     <div
-      className={[
-        "relative w-full overflow-hidden bg-secondary shadow-sm",
-        isMetal ? "px-gloss" : "px-weave",
-      ].join(" ")}
+      className={["relative w-full overflow-hidden bg-secondary shadow-sm", "px-gloss"].join(" ")}
       style={{ aspectRatio }}
     >
       <img
@@ -68,14 +56,13 @@ function SizePrint({
         loading="lazy"
         className="block h-full w-full object-cover"
       />
-      <span aria-hidden className={isMetal ? "px-edge" : "px-canvas-edge"} />
+      <span aria-hidden className="px-edge" />
     </div>
   );
 }
 
 export function ProductDetail({ product }: { product: ShopProduct }) {
-  const materials = useMemo(() => materialsFor(product), [product]);
-  const [material, setMaterial] = useState<BagMaterial>(materials[0]!);
+  const material: BagMaterial = "metal";
   const [sizeIndex, setSizeIndex] = useState(2);
   const [orientation, setOrientation] = useState<PrintOrientation>(
     product.orientation === "Portrait" ? "portrait" : "landscape",
@@ -88,11 +75,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const { toggleSaved, isSaved, hydrated } = useStore();
 
   useEffect(() => {
-    setMaterial(materials[0]!);
     setSizeIndex(2);
     setOrientation(product.orientation === "Portrait" ? "portrait" : "landscape");
     setView("artwork");
-  }, [product.id, product.orientation, materials]);
+  }, [product.id, product.orientation]);
 
   useEffect(() => {
     const mainCta = mainCtaRef.current;
@@ -216,55 +202,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                 </button>
               </div>
               <p className="px-meta mt-2 text-muted-foreground">
-                {orientation === "landscape" ? "Landscape" : "Portrait"} ·{" "}
-                {materials.map((m) => materialName[m]).join(" / ")}
+                {orientation === "landscape" ? "Landscape" : "Portrait"} · Metal Print
               </p>
               <RatingJump productId={product.id} />
 
-              {/* Surface */}
-              <div className="px-rule mt-7 pt-5">
-                <h2 className="px-label text-muted-foreground">Choose your surface</h2>
-                <ul className="mt-3">
-                  {materials.map((m) => {
-                    const active = material === m;
-                    return (
-                      <li key={m} className="border-b border-hairline">
-                        <button
-                          type="button"
-                          onClick={() => setMaterial(m)}
-                          aria-pressed={active}
-                          className="flex w-full items-baseline justify-between gap-6 py-[10px] text-left transition-opacity duration-[420ms]"
-                        >
-                          <span className={active ? "opacity-100" : "opacity-50 hover:opacity-100"}>
-                            <span
-                              className={[
-                                "px-label px-underline block",
-                                active ? "after:scale-x-100" : "",
-                              ].join(" ")}
-                            >
-                              {materialName[m]}
-                            </span>
-                            <span className="px-meta mt-1 block text-muted-foreground">
-                              {materialBlurb[m]}
-                            </span>
-                          </span>
-                          <span
-                            className={[
-                              "px-price whitespace-nowrap",
-                              active ? "opacity-100" : "opacity-50",
-                            ].join(" ")}
-                          >
-                            <span className="px-label mr-1 opacity-70">From</span>${fromPrice(m)}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
               {/* Size */}
-              <div className="mt-7">
+              <div className="px-rule mt-7 pt-5">
                 <div className="flex items-center justify-between gap-4">
                   <h2 className="px-label text-muted-foreground">Choose your size</h2>
                   <div
@@ -402,7 +345,6 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
 
       <ProductInformationSection
         product={product}
-        materials={materials}
         openInfo={openInfo}
         onOpenInfoChange={setOpenInfo}
       />
@@ -597,12 +539,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
 
 function ProductInformationSection({
   product,
-  materials,
   openInfo,
   onOpenInfoChange,
 }: {
   product: ShopProduct;
-  materials: BagMaterial[];
   openInfo: string | null;
   onOpenInfoChange: (title: string | null) => void;
 }) {
@@ -626,7 +566,7 @@ function ProductInformationSection({
             </div>
             <div className="flex justify-between gap-6 border-b border-hairline py-3">
               <dt className="px-meta text-muted-foreground">Materials</dt>
-              <dd className="px-label">{materials.map((m) => materialName[m]).join(" / ")}</dd>
+              <dd className="px-label">Metal Print</dd>
             </div>
           </dl>
         </div>

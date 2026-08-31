@@ -12,6 +12,9 @@ export type ProductReview = {
   size: string;
   image?: string;
   imageAlt?: string;
+  images?: string[];
+  imageAlts?: string[];
+  verified?: boolean;
 };
 
 export type ProductReviewData = {
@@ -50,7 +53,7 @@ const sharedReviews: ProductReview[] = [
     title: "Better in person",
     body: "The image has a quiet glow in the afternoon light. It changed the feel of the whole room.",
     name: "Mei L.",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '16 × 24"',
     image: roomDining,
     imageAlt: "A finished print in a dining room",
@@ -81,7 +84,7 @@ const sharedReviews: ProductReview[] = [
     title: "A meaningful gift",
     body: "It made an ordinary phone photo feel intentional. The recipient loved it.",
     name: "Morgan S.",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '20 × 30"',
   },
   {
@@ -99,7 +102,7 @@ const sharedReviews: ProductReview[] = [
     title: "Made for the wall",
     body: "A clean, well-made print that feels much more considered than a standard framed photo.",
     name: "Noah P.",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '16 × 24"',
   },
 ];

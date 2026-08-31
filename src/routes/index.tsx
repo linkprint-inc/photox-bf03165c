@@ -22,13 +22,12 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Turn your photos, artwork and personal moments into premium metal prints and frameless canvas, with simple tools to prepare, preview and order.",
+          "Turn your photos, artwork and personal moments into premium metal prints, with simple tools to prepare, preview and order.",
       },
       { property: "og:title", content: "photoX — Custom Prints from Your Photos" },
       {
         property: "og:description",
-        content:
-          "Turn your photos, artwork and personal moments into premium metal prints and frameless canvas.",
+        content: "Turn your photos, artwork and personal moments into premium metal prints.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

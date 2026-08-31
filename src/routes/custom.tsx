@@ -14,9 +14,9 @@ import type { BagMaterial } from "@/lib/store";
 
 const toolIds: ToolId[] = ["restore", "enhance", "text"];
 
-const title = "Custom Prints — Your Image on Metal or Canvas | photoX";
+const title = "Custom Prints — Your Image on Metal | photoX";
 const description =
-  'Upload your photograph or artwork and make it a Metal Print or Frameless Canvas. Choose a size from 12 × 18" to 30 × 40", preview it in a room and add it to your bag. From $69.';
+  'Upload your photograph or artwork to make a Metal Print. Choose a size from 12 × 18" to 30 × 40", preview it in a room and add it to your bag. From $79.';
 
 export const Route = createFileRoute("/custom")({
   head: () => ({
@@ -42,9 +42,7 @@ export const Route = createFileRoute("/custom")({
     return {
       ...(toolIds.includes(search["tool"] as ToolId) ? { tool: search["tool"] as ToolId } : {}),
       ...(typeof search["inspiration"] === "string" ? { inspiration: search["inspiration"] } : {}),
-      ...(search["material"] === "metal" || search["material"] === "canvas"
-        ? { material: search["material"] }
-        : {}),
+      ...(search["material"] === "metal" ? { material: "metal" as const } : {}),
       ...(Number.isInteger(size) && size >= 0 && size < sizeSteps.length ? { size } : {}),
       ...(search["prepare"] === true || search["prepare"] === "true" ? { prepare: true } : {}),
     };
@@ -87,10 +85,10 @@ function CustomIntro({ inspiration }: { inspiration?: string }) {
           <p className="px-meta mt-5 max-w-[40ch] text-muted-foreground">
             {inspiration
               ? "Use this look as a visual reference, then upload your own photo to make it personal."
-              : "Turn your photography, artwork or favourite image into a Metal Print or Frameless Canvas."}
+              : "Turn your photography, artwork or favourite image into a Metal Print."}
           </p>
           <p className="px-price mt-6">
-            <span className="px-label mr-1 opacity-70">From</span>$69
+            <span className="px-label mr-1 opacity-70">From</span>$79
           </p>
           <a href="#builder" className="px-label px-underline mt-8 inline-block">
             Start with your image ↓

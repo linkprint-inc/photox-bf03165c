@@ -20,10 +20,9 @@ export const toolMeta: Record<ToolId, { label: string; heading: string; body: st
   },
 };
 
-export const fonts = [
-  { label: "Serif", css: "'Instrument Serif', Georgia, serif" },
-  { label: "Sans", css: "Archivo, system-ui, sans-serif" },
-];
+const editorialFont = "'Instrument Serif', Georgia, serif";
+const sansFont = "Archivo, system-ui, sans-serif";
+const displayFont = "'Space Grotesk', Archivo, system-ui, sans-serif";
 
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -34,26 +33,52 @@ function loadImage(src: string) {
   });
 }
 
-/** Contrast / saturation / brightness recovery pass for faded originals. */
+function debugProcessing(
+  tool: "restore" | "enhance",
+  phase: "started" | "completed",
+  image: Pick<PreparedImage, "dataUrl" | "width" | "height">,
+) {
+  if (import.meta.env.DEV) {
+    console.info(`[photoX ${tool}] ${phase}`, {
+      source: image.dataUrl.slice(0, 48),
+      width: image.width,
+      height: image.height,
+    });
+  }
+}
+
+/**
+ * Local processing boundary used until a server-side restoration provider is
+ * connected. It creates a distinct bitmap with restrained tonal recovery; it
+ * is intentionally not presented as an AI restoration service.
+ */
 export async function runRestore(image: PreparedImage): Promise<PreparedImage> {
+  debugProcessing("restore", "started", image);
   const img = await loadImage(image.dataUrl);
   const canvas = document.createElement("canvas");
   canvas.width = img.naturalWidth;
   canvas.height = img.naturalHeight;
   const ctx = canvas.getContext("2d")!;
-  ctx.filter = "contrast(122%) saturate(126%) brightness(103%)";
+  ctx.filter = "contrast(130%) saturate(114%) brightness(105%)";
   ctx.drawImage(img, 0, 0);
-  return {
+  const result = {
     dataUrl: canvas.toDataURL("image/jpeg", 0.92),
     width: canvas.width,
     height: canvas.height,
     name: image.name,
     source: "restore",
-  };
+  } as const;
+  debugProcessing("restore", "completed", result);
+  return result;
 }
 
-/** 2× resample with smoothing plus a light sharpening pass. */
+/**
+ * Local high-quality 2× bitmap resampling boundary. The output dimensions are
+ * real (not metadata), while a future super-resolution provider can replace
+ * this function without changing the customization workflow.
+ */
 export async function runEnhance(image: PreparedImage): Promise<PreparedImage> {
+  debugProcessing("enhance", "started", image);
   const img = await loadImage(image.dataUrl);
   const canvas = document.createElement("canvas");
   canvas.width = img.naturalWidth * 2;
@@ -61,19 +86,25 @@ export async function runEnhance(image: PreparedImage): Promise<PreparedImage> {
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  ctx.filter = "contrast(106%) saturate(104%)";
+  ctx.filter = "contrast(104%) saturate(102%)";
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  return {
+  const result = {
     dataUrl: canvas.toDataURL("image/jpeg", 0.92),
     width: canvas.width,
     height: canvas.height,
     name: image.name,
     source: "enhance",
-  };
+  } as const;
+  debugProcessing("enhance", "completed", result);
+  return result;
 }
 
 export type TextConfig = {
   text: string;
+  /** The selected generated treatment. Typography remains intentionally internal. */
+  styleId: TextStyleId;
+  /** A regenerated style set can be selected without replacing the accepted design. */
+  styleVersion: number;
   font: string;
   size: number;
   align: "left" | "center" | "right";
@@ -82,9 +113,42 @@ export type TextConfig = {
   color: "light" | "dark";
 };
 
+export type TextStyleId = "editorial" | "minimal" | "bold" | "caption";
+
+export const textStyleIds: TextStyleId[] = ["editorial", "minimal", "bold", "caption"];
+
+type TextStyle = Pick<TextConfig, "styleId" | "font" | "size" | "align" | "x" | "y">;
+
+/**
+ * Deterministic local stand-in for generated typography. The wording is never
+ * altered; each option only changes its visual treatment and safe placement.
+ */
+export function generatedTextStyle(styleId: TextStyleId, version = 1): TextStyle {
+  const nudge = ((Math.max(version, 1) - 1) % 3) * 2;
+  switch (styleId) {
+    case "minimal":
+      return { styleId, font: sansFont, size: 30, align: "center", x: 50, y: 88 - nudge };
+    case "bold":
+      return { styleId, font: displayFont, size: 56, align: "center", x: 50, y: 50 + nudge };
+    case "caption":
+      return { styleId, font: sansFont, size: 26, align: "left", x: 18 + nudge, y: 84 - nudge };
+    default:
+      return {
+        styleId: "editorial",
+        font: editorialFont,
+        size: 43,
+        align: "center",
+        x: 50,
+        y: 78 - nudge,
+      };
+  }
+}
+
 export const defaultTextConfig: TextConfig = {
   text: "",
-  font: fonts[0]!.css,
+  styleId: "editorial",
+  styleVersion: 0,
+  font: editorialFont,
   size: 40,
   align: "center",
   x: 50,

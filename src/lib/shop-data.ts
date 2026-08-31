@@ -18,11 +18,10 @@ import roomBedroom from "@/assets/room-bedroom.jpg";
 import roomWorkspace from "@/assets/room-workspace.jpg";
 import roomDining from "@/assets/room-dining.jpg";
 import idxMetal from "@/assets/idx-metal.jpg";
-import idxCanvas from "@/assets/idx-canvas.jpg";
 import { sizes } from "./photox-data";
 import { hoverImages } from "./hover-images";
 
-export type ShopMaterial = "metal" | "canvas" | "both";
+export type ShopMaterial = "metal";
 export type Orientation = "Portrait" | "Landscape" | "Square";
 
 export type ShopStyle =
@@ -52,14 +51,10 @@ export const totalWorks = 128;
 
 export const materialLabel: Record<ShopMaterial, string> = {
   metal: "Metal Print",
-  canvas: "Frameless Canvas",
-  both: "Metal / Canvas",
 };
 
 export const angleView: Record<ShopMaterial, string> = {
   metal: idxMetal,
-  canvas: idxCanvas,
-  both: idxMetal,
 };
 
 export const sizeRangeShort = '12×18" — 30×40"';
@@ -84,7 +79,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "north-sea",
     name: "North Sea",
-    material: "both",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Photography", "Landscape", "Black & White"],
     from: 79,
@@ -104,7 +99,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "blue-hour",
     name: "Blue Hour",
-    material: "both",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Photography", "Urban"],
     from: 89,
@@ -114,7 +109,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "red-field-02",
     name: "Red Field No. 02",
-    material: "canvas",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 99,
@@ -134,7 +129,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "salt-mirror",
     name: "Salt Mirror",
-    material: "canvas",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Landscape", "Nature"],
     from: 109,
@@ -154,7 +149,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "signal-blue",
     name: "Signal Blue",
-    material: "both",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 79,
@@ -174,7 +169,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "study-in-olive",
     name: "Study in Olive",
-    material: "canvas",
+    material: "metal",
     orientation: "Portrait",
     styles: ["Figurative", "Photography"],
     from: 119,
@@ -194,7 +189,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "tide-line",
     name: "Tide Line",
-    material: "canvas",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Landscape", "Nature"],
     from: 109,
@@ -204,7 +199,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "chroma-study",
     name: "Chroma Study",
-    material: "both",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 89,
@@ -224,7 +219,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "harbour-lights",
     name: "Harbour Lights",
-    material: "both",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Urban", "Photography"],
     from: 99,
@@ -244,7 +239,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "ember-field",
     name: "Ember Field",
-    material: "canvas",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 209,
@@ -254,7 +249,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "low-tide",
     name: "Low Tide",
-    material: "canvas",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Landscape", "Nature", "Black & White"],
     from: 69,
@@ -264,7 +259,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "cobalt-drift",
     name: "Cobalt Drift",
-    material: "both",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 259,
@@ -284,7 +279,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "salt-horizon",
     name: "Salt Horizon",
-    material: "canvas",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Landscape", "Nature"],
     from: 159,
@@ -294,7 +289,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "figure-study-04",
     name: "Figure Study No. 04",
-    material: "canvas",
+    material: "metal",
     orientation: "Portrait",
     styles: ["Figurative"],
     from: 189,
@@ -314,7 +309,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "deep-blue-hour",
     name: "Deep Blue Hour",
-    material: "both",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Photography", "Urban"],
     from: 249,
@@ -334,7 +329,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "chroma-ii",
     name: "Chroma II",
-    material: "canvas",
+    material: "metal",
     orientation: "Square",
     styles: ["Abstract"],
     from: 99,
@@ -344,7 +339,7 @@ const source: Omit<ShopProduct, "room" | "availableSizes">[] = [
   {
     id: "shore-break",
     name: "Shore Break",
-    material: "both",
+    material: "metal",
     orientation: "Landscape",
     styles: ["Landscape", "Nature"],
     from: 129,

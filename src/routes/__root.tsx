@@ -82,11 +82,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "photoX — Metal & Frameless Canvas Wall Art" },
+      { title: "photoX — Metal Print Wall Art" },
       {
         name: "description",
-        content:
-          "Premium metal prints, frameless canvas and custom wall art made from your own image.",
+        content: "Premium metal prints and custom wall art made from your own image.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -137,12 +136,12 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <StoreProvider>
         <PreparedImageProvider>
-        <SearchProvider>
-          {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-          <Outlet />
-          <BagDrawer />
-          <GlobalSearch />
-        </SearchProvider>
+          <SearchProvider>
+            {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+            <Outlet />
+            <BagDrawer />
+            <GlobalSearch />
+          </SearchProvider>
         </PreparedImageProvider>
       </StoreProvider>
     </QueryClientProvider>

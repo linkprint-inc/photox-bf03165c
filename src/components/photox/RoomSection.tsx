@@ -18,9 +18,9 @@ const rooms = [
   {
     label: "Bedroom",
     image: roomBedroom,
-    alt: "Dark bedroom with a matte canvas of a black and white abstract above the bed",
+    alt: "Dark bedroom with a Metal Print of a black and white abstract above the bed",
     work: "Ink Study No. 04",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '24 × 36"',
     price: 189,
     ratio: "4 / 5",

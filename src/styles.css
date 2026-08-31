@@ -310,7 +310,7 @@
   }
 }
 
-/* Material treatments — metal reads glossy/rigid, canvas matte/woven */
+/* Material treatment — metal reads glossy and rigid. */
 
 @utility px-gloss {
   position: relative;
@@ -332,22 +332,6 @@
   }
 }
 
-@utility px-weave {
-  position: relative;
-  overflow: hidden;
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      repeating-linear-gradient(0deg, rgb(0 0 0 / 0.1) 0 1px, transparent 1px 3px),
-      repeating-linear-gradient(90deg, rgb(255 255 255 / 0.1) 0 1px, transparent 1px 3px);
-    opacity: 0;
-    transition: opacity 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
-  }
-}
-
 @utility px-edge {
   position: absolute;
   top: 0;
@@ -355,16 +339,6 @@
   right: 0;
   width: 0px;
   background: linear-gradient(90deg, rgb(0 0 0 / 0.05), transparent);
-  transition: width 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
-}
-
-@utility px-canvas-edge {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 0px;
-  background: linear-gradient(90deg, rgb(0 0 0 / 0.04), transparent);
   transition: width 520ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 

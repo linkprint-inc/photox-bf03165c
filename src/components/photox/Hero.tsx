@@ -52,7 +52,7 @@ export function Hero() {
             <div className="md:col-span-5">
               <p className="px-label">Upload · prepare · choose size · preview</p>
               <p className="px-meta mt-1 max-w-[38ch] opacity-85">
-                Turn a photo you love into a metal print or frameless canvas.
+                Turn a photo you love into a Metal Print.
               </p>
             </div>
 

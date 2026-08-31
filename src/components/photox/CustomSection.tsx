@@ -92,17 +92,11 @@ export function CustomSection() {
             Turn your photography, artwork or favourite image into a physical print.
           </p>
 
-          <div className="mt-10 grid gap-8 sm:grid-cols-2">
+          <div className="mt-10">
             <div className="px-rule pt-4">
               <p className="px-label">Metal Prints</p>
               <p className="px-price mt-2">
                 <span className="px-label mr-1 opacity-70">From</span>$79
-              </p>
-            </div>
-            <div className="px-rule pt-4">
-              <p className="px-label">Frameless Canvas</p>
-              <p className="px-price mt-2">
-                <span className="px-label mr-1 opacity-70">From</span>$69
               </p>
             </div>
           </div>

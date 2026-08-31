@@ -23,13 +23,12 @@ export const Route = createFileRoute("/bag")({
       {
         name: "description",
         content:
-          "Review the metal prints and frameless canvas works in your photoX bag: material, size, finish and quantity before checkout.",
+          "Review the metal prints in your photoX bag: size, finish and quantity before checkout.",
       },
       { property: "og:title", content: "Bag — Review Your Prints | photoX" },
       {
         property: "og:description",
-        content:
-          "Review the metal prints and frameless canvas works in your photoX bag before checkout.",
+        content: "Review the metal prints in your photoX bag before checkout.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -114,8 +113,7 @@ function BagRow({ item }: { item: BagItem }) {
   if (!p) return null;
   const productHref = item.productId === "custom-print" ? "/custom" : `/products/${p.id}`;
 
-  const materials: BagMaterial[] =
-    p.material === "both" ? ["metal", "canvas"] : [p.material as BagMaterial];
+  const materials: BagMaterial[] = ["metal"];
 
   return (
     <li className="border-b border-hairline py-10">

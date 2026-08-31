@@ -23,11 +23,6 @@ import {
 
 const WALL_INCHES = 108;
 
-const materials: { id: BagMaterial; name: string; note: string; from: number }[] = [
-  { id: "metal", name: "Metal Print", note: "Glossy · crisp · luminous", from: 79 },
-  { id: "canvas", name: "Frameless Canvas", note: "Matte · textured · soft", from: 69 },
-];
-
 const appliedLabel: Record<ToolId, string> = {
   restore: "Restored",
   enhance: "Enhanced",
@@ -101,8 +96,7 @@ function StepLabel({
 }
 
 function price(material: BagMaterial, sizeIndex: number) {
-  const base = sizes[sizeIndex]!.price;
-  return material === "canvas" ? base - 10 : base;
+  return sizes[sizeIndex]!.price;
 }
 
 export type InitialPrintConfiguration = {
@@ -125,7 +119,7 @@ export function CustomBuilder({
   const inputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const startEditorRef = useRef(startInEditor);
-  const [material, setMaterial] = useState<BagMaterial>(initialConfiguration?.material ?? "metal");
+  const material: BagMaterial = "metal";
   const [sizeIndex, setSizeIndex] = useState(initialConfiguration?.sizeIndex ?? 3);
   const [view, setView] = useState<"print" | "room">("print");
   const [dragOver, setDragOver] = useState(false);
@@ -204,12 +198,12 @@ export function CustomBuilder({
     }
   };
 
-  const run = async () => {
+  const run = async (config = cfg) => {
     if (!original || !editing) return;
     setBusy(true);
     setToolError(null);
     try {
-      setResult(await runTool(editing, original, cfg));
+      setResult(await runTool(editing, original, config));
     } catch (e) {
       setToolError(e instanceof Error ? e.message : "Something went wrong.");
     } finally {
@@ -286,7 +280,7 @@ export function CustomBuilder({
           </div>
 
           {editorOpen && draft ? (
-            editing && result ? (
+            editing && result && editing !== "text" ? (
               <div className="mt-6">
                 <BeforeAfter before={original!.dataUrl} after={result.dataUrl} image={original!} />
               </div>
@@ -369,13 +363,13 @@ export function CustomBuilder({
               <div
                 className={[
                   "relative max-h-full",
-                  material === "metal" ? "px-gloss" : "px-weave",
+                  "px-gloss",
                   "shadow-[0_18px_40px_-28px_rgba(0,0,0,0.75)]",
                 ].join(" ")}
               >
                 <img
                   src={image.dataUrl}
-                  alt={`Your image shown as a ${material === "metal" ? "metal print" : "frameless canvas"} at ${size.label}`}
+                  alt={`Your image shown as a metal print at ${size.label}`}
                   className="block max-h-[46vh] w-auto max-w-full object-contain"
                 />
                 <span
@@ -383,19 +377,14 @@ export function CustomBuilder({
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      material === "metal"
-                        ? "linear-gradient(104deg, transparent 30%, rgba(255,255,255,0.22) 46%, transparent 64%)"
-                        : "none",
+                      "linear-gradient(104deg, transparent 30%, rgba(255,255,255,0.22) 46%, transparent 64%)",
                   }}
                 />
                 <span
                   aria-hidden
                   className="absolute inset-y-0 right-0 w-[3px]"
                   style={{
-                    background:
-                      material === "metal"
-                        ? "linear-gradient(90deg, rgba(0,0,0,0.35), rgba(255,255,255,0.85))"
-                        : "linear-gradient(90deg, rgba(0,0,0,0.30), rgba(0,0,0,0.10))",
+                    background: "linear-gradient(90deg, rgba(0,0,0,0.35), rgba(255,255,255,0.85))",
                   }}
                 />
               </div>
@@ -423,9 +412,7 @@ export function CustomBuilder({
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      material === "metal"
-                        ? "linear-gradient(104deg, transparent 32%, rgba(255,255,255,0.20) 46%, transparent 62%)"
-                        : "none",
+                      "linear-gradient(104deg, transparent 32%, rgba(255,255,255,0.20) 46%, transparent 62%)",
                   }}
                 />
               </div>
@@ -482,10 +469,15 @@ export function CustomBuilder({
                   busy={busy}
                   error={toolError}
                   onRun={() => void run()}
+                  onGenerateText={(config) => {
+                    setCfg(config);
+                    void run(config);
+                  }}
                   onApply={applyResult}
                   onCancel={cancelEdit}
                   selectedSizeLabel={size.label}
                   selectedInches={size.inches}
+                  requiresTextResult
                 />
               ) : (
                 <div className="px-rule pt-6">
@@ -534,38 +526,7 @@ export function CustomBuilder({
               <>
                 <div className={image ? "" : "opacity-70"}>
                   <div className="px-rule pt-6">
-                    <StepLabel n="03" name="Surface" state={image ? "active" : "future"} />
-                    <h3 className="px-label mt-2">Choose your surface</h3>
-                    <ul className="mt-4 border-t border-hairline">
-                      {materials.map((m) => (
-                        <li key={m.id} className="border-b border-hairline">
-                          <button
-                            type="button"
-                            disabled={!image}
-                            onClick={() => setMaterial(m.id)}
-                            aria-pressed={material === m.id}
-                            className={[
-                              "flex w-full items-baseline justify-between gap-6 py-4 text-left transition-opacity duration-300",
-                              material === m.id ? "opacity-100" : "opacity-50 hover:opacity-100",
-                            ].join(" ")}
-                          >
-                            <span>
-                              <span className="px-label block">{m.name}</span>
-                              <span className="px-meta mt-1 block text-muted-foreground">
-                                {m.note}
-                              </span>
-                            </span>
-                            <span className="px-price whitespace-nowrap">
-                              <span className="px-label mr-1 opacity-70">From</span>${m.from}
-                            </span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="mt-10">
-                    <StepLabel n="04" name="Size" state={image ? "active" : "future"} />
+                    <StepLabel n="03" name="Size" state={image ? "active" : "future"} />
                     <h3 className="px-label mt-2">Choose your size</h3>
                     <ul className="mt-4 border-t border-hairline">
                       {sizes.map((s, i) => (
@@ -607,13 +568,11 @@ export function CustomBuilder({
                 {/* Summary */}
                 <div className="px-rule mt-12 pt-6">
                   <StepLabel
-                    n="05"
+                    n="04"
                     name="Preview · Your print"
                     state={image ? "active" : "future"}
                   />
-                  <p className="px-label mt-3">
-                    {material === "metal" ? "Metal Print" : "Frameless Canvas"}
-                  </p>
+                  <p className="px-label mt-3">Metal Print</p>
                   <p className="px-meta mt-1 text-muted-foreground">{size.label}</p>
                   <p className="px-meta text-muted-foreground">
                     {image ? image.name : "No image uploaded yet"}
@@ -627,7 +586,7 @@ export function CustomBuilder({
 
                   {image ? (
                     <>
-                      <StepLabel n="06" name="Add to bag" state="active" />
+                      <StepLabel n="05" name="Add to bag" state="active" />
                       <button
                         type="button"
                         onClick={() => {

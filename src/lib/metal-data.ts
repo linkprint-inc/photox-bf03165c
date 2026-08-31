@@ -1,13 +1,9 @@
 import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
 
 /** Every artwork available on Metal Print. */
-export const metalProducts: ShopProduct[] = shopProducts.filter((p) => p.material !== "canvas");
+export const metalProducts: ShopProduct[] = shopProducts;
 
 export const metalFrom = Math.min(...metalProducts.map((p) => p.from));
-
-export const canvasFrom = Math.min(
-  ...shopProducts.filter((p) => p.material !== "metal").map((p) => p.from),
-);
 
 export const metalSizes = sizeSteps;
 

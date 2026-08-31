@@ -14,7 +14,7 @@ import metalDetail from "@/assets/metal-detail.jpg";
 import metalDetailCrop from "@/assets/metal-detail-crop.jpg";
 import metalArrives from "@/assets/metal-arrives-print.jpg";
 import metalPack from "@/assets/metal-arrives-pack.jpg";
-import materialCanvas from "@/assets/material-canvas.jpg";
+import metalSurface from "@/assets/metal-surface.jpg";
 import artCanopy from "@/assets/art-canopy.jpg";
 import artFigure from "@/assets/art-figure.jpg";
 import artNorthsea from "@/assets/art-northsea.jpg";
@@ -134,7 +134,7 @@ const posts: CommunityPost[] = [
     rating: 5,
     quote: "I was worried about the fine detail in the original, but it came through beautifully.",
     author: "Avery K.",
-    detail: 'Frameless Canvas · 16 × 24"',
+    detail: 'Metal Print · 16 × 24"',
     verified: true,
   },
   {
@@ -159,7 +159,7 @@ const posts: CommunityPost[] = [
     rating: 5,
     quote: "The color is soft but still incredibly clear. It looks more like us on the wall.",
     author: "Nora C.",
-    detail: 'Frameless Canvas · 16 × 24"',
+    detail: 'Metal Print · 16 × 24"',
     verified: true,
   },
   {
@@ -180,19 +180,19 @@ const posts: CommunityPost[] = [
     rating: 5,
     quote: "It made an ordinary phone photo feel intentional. The recipient loved it.",
     author: "Morgan S.",
-    detail: 'Frameless Canvas · 20 × 30"',
+    detail: 'Metal Print · 20 × 30"',
     verified: true,
   },
   {
     id: "bedroom",
     type: "photo",
     image: roomBedroom,
-    alt: "A frameless canvas print over a bed",
+    alt: "A Metal Print over a bed",
     ratio: "4 / 5",
     rating: 5,
     quote: "It changed the whole corner without making it feel overdone.",
     author: "Camille D.",
-    detail: 'Frameless Canvas · 24 × 36"',
+    detail: 'Metal Print · 24 × 36"',
     verified: true,
   },
   {
@@ -239,7 +239,7 @@ const posts: CommunityPost[] = [
     rating: 5,
     quote: "A photo we loved finally has the space it deserved.",
     author: "Avery & Sam",
-    detail: 'Frameless Canvas · 24 × 36"',
+    detail: 'Metal Print · 24 × 36"',
     verified: true,
   },
   {
@@ -291,13 +291,13 @@ const posts: CommunityPost[] = [
   {
     id: "soft-texture",
     type: "photo",
-    image: materialCanvas,
-    alt: "Close detail of a woven canvas surface",
+    image: metalSurface,
+    alt: "Close detail of a glossy Metal Print surface",
     ratio: "1 / 1",
     rating: 5,
-    quote: "The canvas texture made this older photo feel gentler and more tactile.",
+    quote: "The glossy surface made this older photo feel clear and unexpectedly luminous.",
     author: "Sofia G.",
-    detail: 'Frameless Canvas · 20 × 30"',
+    detail: 'Metal Print · 20 × 30"',
     verified: true,
   },
 ];

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import idxMetal from "@/assets/idx-metal.jpg";
-import idxCanvas from "@/assets/idx-canvas.jpg";
 import idxCustom from "@/assets/idx-custom.jpg";
 import { Shell } from "./Section";
 
@@ -17,16 +16,6 @@ const entries = [
   },
   {
     n: "02",
-    title: "Choose canvas",
-    note: "Matte · textured · soft",
-    from: 69,
-    cta: "Create your print →",
-    image: idxCanvas,
-    alt: "Macro of a gallery-wrapped canvas corner with visible woven texture",
-    href: "#surface",
-  },
-  {
-    n: "03",
     title: "Start with your photo",
     note: "Your image, made physical",
     from: 79,

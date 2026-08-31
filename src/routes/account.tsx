@@ -438,7 +438,7 @@ function ItemRow({
   qty,
 }: {
   productId: string;
-  material: "metal" | "canvas";
+  material: "metal";
   sizeIndex: number;
   orientation?: "landscape" | "portrait";
   qty: number;

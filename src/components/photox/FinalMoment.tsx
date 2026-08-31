@@ -8,7 +8,7 @@ const strip = [
   { image: roomLiving, alt: "A metal print above a sofa in a daylit living room" },
   { image: roomWorkspace, alt: "A red abstract metal print above a workspace desk" },
   { image: roomDining, alt: "A city night metal print in a dining area" },
-  { image: roomBedroom, alt: "A matte canvas above a bed in a dark bedroom" },
+  { image: roomBedroom, alt: "A Metal Print above a bed in a dark bedroom" },
 ];
 
 export function FinalMoment() {

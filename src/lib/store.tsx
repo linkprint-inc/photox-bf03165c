@@ -12,7 +12,7 @@ import { shopProducts, sizeSteps, type ShopProduct } from "./shop-data";
 import type { TextConfig, ToolId } from "./image-tools";
 import type { PreparedImage } from "./prepared-image";
 
-export type BagMaterial = "metal" | "canvas";
+export type BagMaterial = "metal";
 export type PrintOrientation = "landscape" | "portrait";
 
 export type CropPosition = {
@@ -89,23 +89,21 @@ const STORAGE = "photox-store-v1";
 
 export const finishLabel: Record<BagMaterial, string> = {
   metal: "Gloss",
-  canvas: "Matte",
 };
 
 export const materialName: Record<BagMaterial, string> = {
   metal: "Metal Print",
-  canvas: "Frameless Canvas",
 };
 
 /** Placeholder record for prints built from a customer's own image. */
 export const customPrintProduct: ShopProduct = {
   id: "custom-print",
   name: "Your Custom Print",
-  material: "both",
+  material: "metal",
   orientation: "Landscape",
   styles: ["Photography"],
   availableSizes: sizeSteps.map((size) => size.label),
-  from: 69,
+  from: 79,
   image: customPrintImage,
   room: customPrintImage,
   badges: [],
@@ -117,8 +115,7 @@ export function productById(id: string): ShopProduct | undefined {
 }
 
 export function unitPrice(material: BagMaterial, sizeIndex: number) {
-  const base = sizeSteps[sizeIndex]!.price;
-  return material === "canvas" ? base - 10 : base;
+  return sizeSteps[sizeIndex]!.price;
 }
 
 export function sizeLabel(sizeIndex: number) {
@@ -144,7 +141,7 @@ function seedOrders(): Order[] {
       status: "In production",
       items: [
         { productId: "north-sea", material: "metal", sizeIndex: 3, qty: 1 },
-        { productId: "blue-hour", material: "canvas", sizeIndex: 1, qty: 1 },
+        { productId: "blue-hour", material: "metal", sizeIndex: 1, qty: 1 },
       ],
       shippingAddress: [
         "Anna Ferrell",
@@ -206,7 +203,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE);
-      if (raw) setState({ ...initial, ...(JSON.parse(raw) as State) });
+      if (raw) {
+        const stored = JSON.parse(raw) as State;
+        setState({
+          ...initial,
+          ...stored,
+          bag: (stored.bag ?? []).map((item) => ({ ...item, material: "metal" as const })),
+          orders: (stored.orders ?? []).map((order) => ({
+            ...order,
+            items: order.items.map((item) => ({ ...item, material: "metal" as const })),
+          })),
+        });
+      }
     } catch {
       /* ignore */
     }

@@ -15,9 +15,8 @@ import roomBedroom from "@/assets/room-bedroom.jpg";
 import roomWorkspace from "@/assets/room-workspace.jpg";
 import roomDining from "@/assets/room-dining.jpg";
 import idxMetal from "@/assets/idx-metal.jpg";
-import idxCanvas from "@/assets/idx-canvas.jpg";
 
-export type Material = "Metal Print" | "Frameless Canvas";
+export type Material = "Metal Print";
 
 export const sizes = [
   { label: '12 × 18"', inches: 12, price: 79 },
@@ -32,13 +31,11 @@ export const sizeList = sizes.map((s) => s.label);
 
 export const materialFrom: Record<Material, number> = {
   "Metal Print": 79,
-  "Frameless Canvas": 69,
 };
 
 /** Angled, three-quarter physical view used on product hover. */
 export const angleFor: Record<Material, string> = {
   "Metal Print": idxMetal,
-  "Frameless Canvas": idxCanvas,
 };
 
 export type Product = {
@@ -64,7 +61,7 @@ export const products: Product[] = [
   {
     id: "salt-mirror",
     name: "Salt Mirror",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     from: 109,
     image: artSaltflat,
     hover: roomLiving,
@@ -82,7 +79,7 @@ export const products: Product[] = [
   {
     id: "red-field-no-2",
     name: "Red Field No. 02",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     from: 99,
     image: artRedfield,
     hover: roomWorkspace,
@@ -100,7 +97,7 @@ export const products: Product[] = [
   {
     id: "study-in-olive",
     name: "Study in Olive",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     from: 119,
     image: artFigure,
     hover: roomBedroom,
@@ -176,7 +173,7 @@ export const largeWorks: LargeWork[] = [
   {
     id: "tide-line",
     name: "Tide Line",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '30 × 40"',
     price: 249,
     image: artTideline,
@@ -185,7 +182,7 @@ export const largeWorks: LargeWork[] = [
   {
     id: "chroma-study",
     name: "Chroma Study",
-    material: "Frameless Canvas",
+    material: "Metal Print",
     size: '24 × 36"',
     price: 189,
     image: artChroma,

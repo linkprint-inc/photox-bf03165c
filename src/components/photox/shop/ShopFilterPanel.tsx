@@ -141,17 +141,6 @@ export function ShopFilterPanel({
           </Group>
         ) : null}
 
-        <Group title="Material">
-          {["Metal Print", "Frameless Canvas"].map((m) => (
-            <Check
-              key={m}
-              label={m}
-              checked={filters.materials.includes(m)}
-              onChange={() => onToggle("materials", m)}
-            />
-          ))}
-        </Group>
-
         <Group title="Size">
           {sizeSteps.map((s) => (
             <Check

@@ -7,7 +7,12 @@ function previewSize(
   image: PreparedImage,
   availableWidth: number,
   availableHeight: number,
+  aspectRatio?: number,
 ): FrameSize {
+  if (aspectRatio) {
+    const width = Math.min(availableWidth, availableHeight * aspectRatio);
+    return { width, height: width / aspectRatio };
+  }
   const isPortrait = image.height > image.width;
   const isLandscape = image.width > image.height;
   const primaryScale = isPortrait
@@ -26,12 +31,18 @@ export function PreviewImageFrame({
   image,
   alt,
   children,
+  content,
+  aspectRatio,
   className = "",
   imageClassName = "",
 }: {
   image: PreparedImage;
   alt: string;
   children?: ReactNode;
+  /** Replaces the default source-image element while retaining the exact measured frame. */
+  content?: ReactNode;
+  /** Lets crop/print previews use their committed printable ratio. */
+  aspectRatio?: number;
   className?: string;
   imageClassName?: string;
 }) {
@@ -44,7 +55,7 @@ export function PreviewImageFrame({
     const update = () => {
       const { width, height } = stage.getBoundingClientRect();
       if (!width || !height) return;
-      const next = previewSize(image, width, height);
+      const next = previewSize(image, width, height, aspectRatio);
       setSize((current) =>
         current &&
         Math.abs(current.width - next.width) < 0.5 &&
@@ -57,20 +68,22 @@ export function PreviewImageFrame({
     const observer = new ResizeObserver(update);
     observer.observe(stage);
     return () => observer.disconnect();
-  }, [image]);
+  }, [aspectRatio, image]);
 
   return (
     <div ref={stageRef} className={`flex h-full w-full items-center justify-center ${className}`}>
       <div
-        className="relative shrink-0"
+        className="relative shrink-0 [container-type:inline-size]"
         style={size ? { width: `${size.width}px`, height: `${size.height}px` } : undefined}
       >
-        <img
-          src={image.dataUrl}
-          alt={alt}
-          draggable={false}
-          className={`block h-full w-full select-none object-contain ${imageClassName}`}
-        />
+        {content ?? (
+          <img
+            src={image.dataUrl}
+            alt={alt}
+            draggable={false}
+            className={`block h-full w-full select-none object-contain ${imageClassName}`}
+          />
+        )}
         {children}
       </div>
     </div>

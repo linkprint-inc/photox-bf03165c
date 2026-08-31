@@ -23,7 +23,6 @@ export function ShopProductCard({
   action?: "save" | "remove";
 }) {
   const link = href ?? `/products/${product.id}`;
-  const isMetal = product.material !== "canvas";
   const primary = view === "room" ? product.room : product.image;
   const secondary = view === "room" ? product.image : product.room;
   const note =
@@ -37,7 +36,7 @@ export function ShopProductCard({
         <div
           className={[
             "relative aspect-square w-full overflow-hidden bg-secondary",
-            isMetal ? "px-gloss" : "px-weave",
+            "px-gloss",
           ].join(" ")}
         >
           <img

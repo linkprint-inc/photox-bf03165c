@@ -16,8 +16,8 @@ export const Route = createFileRoute("/products/$slug")({
         meta: [{ title: "Artwork unavailable | photoX" }, { name: "robots", content: "noindex" }],
       };
     }
-    const title = `${loaderData.name} — Metal & Canvas Wall Art | photoX`;
-    const description = `Order ${loaderData.name} as a metal print or frameless canvas. Five sizes from $${loaderData.from}, made to order and ready to hang.`;
+    const title = `${loaderData.name} — Metal Print Wall Art | photoX`;
+    const description = `Order ${loaderData.name} as a Metal Print. Five sizes from $${loaderData.from}, made to order and ready to hang.`;
     return {
       meta: [
         { title },
