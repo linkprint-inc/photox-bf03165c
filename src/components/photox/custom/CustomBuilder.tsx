@@ -308,6 +308,11 @@ export function CustomBuilder({
                       transform: "translateY(-50%)",
                       textAlign: cfg.align,
                       fontFamily: cfg.font,
+                      fontWeight: cfg.fontWeight,
+                      fontStyle: cfg.fontStyle,
+                      letterSpacing: cfg.letterSpacing,
+                      lineHeight: cfg.lineHeight,
+                      textTransform: cfg.textTransform,
                       fontSize: `${cfg.size / 2.6}px`,
                       color: cfg.color === "light" ? "#fff" : "#141414",
                     }}

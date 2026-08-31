@@ -1,11 +1,11 @@
 import { useState } from "react";
 import {
-  generatedTextStyle,
+  createTextStyleBatch,
+  generateTextStyles,
   recommendedInches,
-  textStyleIds,
   toolMeta,
+  type GeneratedTextStyle,
   type TextConfig,
-  type TextStyleId,
   type ToolId,
 } from "@/lib/image-tools";
 import type { PreparedImage } from "@/lib/prepared-image";
@@ -49,12 +49,14 @@ export function CustomToolPanel({
   const recommended = recommendedInches(original);
   const needsMore = selectedInches > recommended;
   const [generatedVersion, setGeneratedVersion] = useState(() => cfg.styleVersion || 0);
+  const [generatingStyles, setGeneratingStyles] = useState(false);
+  const [styleBatch, setStyleBatch] = useState(() => createTextStyleBatch(cfg.styleVersion || 1));
   const textGenerated = cfg.styleVersion > 0;
 
-  const selectTextStyle = (styleId: TextStyleId, version: number) => {
+  const selectTextStyle = (style: GeneratedTextStyle, version: number) => {
     const next = {
       ...cfg,
-      ...generatedTextStyle(styleId, version),
+      ...style,
       text: cfg.text,
       styleVersion: version,
     };
@@ -62,13 +64,29 @@ export function CustomToolPanel({
     onGenerateText?.(next);
   };
 
-  const generateTextStyles = () => {
+  const requestTextStyles = async () => {
     if (!cfg.text.trim()) return;
     const nextVersion = Math.max(generatedVersion, cfg.styleVersion, 0) + 1;
-    setGeneratedVersion(nextVersion);
-    // The first generated set selects a safe treatment immediately. Later
-    // regenerations only present alternatives, preserving the active design.
-    if (!textGenerated) selectTextStyle("editorial", nextVersion);
+    setGeneratingStyles(true);
+    try {
+      const nextBatch = await generateTextStyles({
+        text: cfg.text,
+        count: 8,
+        batch: nextVersion,
+        imageContext: {
+          width: original.width,
+          height: original.height,
+          orientation: original.width >= original.height ? "landscape" : "portrait",
+        },
+      });
+      setStyleBatch(nextBatch);
+      setGeneratedVersion(nextVersion);
+      // The first batch chooses a safe initial treatment. Subsequent batches
+      // only offer alternatives, leaving the selected design and its layout intact.
+      if (!textGenerated) selectTextStyle(nextBatch[0]!, nextVersion);
+    } finally {
+      setGeneratingStyles(false);
+    }
   };
 
   return (
@@ -140,25 +158,36 @@ export function CustomToolPanel({
             <>
               <div>
                 <p className="px-label text-muted-foreground">Style</p>
-                <div className="mt-3 flex gap-5">
-                  {textStyleIds.map((styleId, index) => {
+                <div className="mt-3 grid grid-cols-3 gap-x-5 gap-y-4 sm:grid-cols-4">
+                  {styleBatch.map((style, index) => {
+                    const styleNumber = index + 1;
                     const selected =
-                      cfg.styleId === styleId && cfg.styleVersion === generatedVersion;
+                      cfg.styleId === style.styleId && cfg.styleVersion === generatedVersion;
                     return (
                       <button
-                        key={styleId}
+                        key={style.styleId}
                         type="button"
-                        onClick={() => selectTextStyle(styleId, generatedVersion)}
-                        aria-label={`Select text style ${index + 1}`}
+                        onClick={() => selectTextStyle(style, generatedVersion)}
+                        disabled={generatingStyles}
+                        aria-label={`Select text style ${styleNumber}`}
                         aria-pressed={selected}
-                        className={`px-label px-underline ${selected ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
+                        className={`px-label px-underline w-fit disabled:cursor-not-allowed ${selected ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
                       >
-                        {String(index + 1).padStart(2, "0")}
+                        {String(styleNumber).padStart(2, "0")}
                       </button>
                     );
                   })}
                 </div>
               </div>
+
+              <button
+                type="button"
+                onClick={() => void requestTextStyles()}
+                disabled={generatingStyles}
+                className="px-label px-underline inline-block text-muted-foreground disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                {generatingStyles ? "Generating…" : "Generate more →"}
+              </button>
 
               <div>
                 <label htmlFor="tool-size" className="px-label text-muted-foreground">
@@ -179,7 +208,7 @@ export function CustomToolPanel({
               </div>
 
               <div>
-                <p className="px-label text-muted-foreground">Light / dark</p>
+                <p className="px-label text-muted-foreground">Color</p>
                 <div className="mt-3 flex gap-6">
                   {(["light", "dark"] as const).map((color) => (
                     <button
@@ -194,14 +223,6 @@ export function CustomToolPanel({
                   ))}
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={generateTextStyles}
-                className="px-label px-underline inline-block text-muted-foreground"
-              >
-                Regenerate →
-              </button>
             </>
           ) : null}
         </div>
@@ -221,11 +242,11 @@ export function CustomToolPanel({
           ) : (
             <button
               type="button"
-              disabled={!cfg.text.trim()}
-              onClick={generateTextStyles}
+              disabled={!cfg.text.trim() || generatingStyles}
+              onClick={() => void requestTextStyles()}
               className="px-label w-full border border-foreground py-4 text-center transition-colors duration-300 hover:bg-foreground hover:text-background disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Generate text styles →
+              {generatingStyles ? "Generating…" : "Generate text styles →"}
             </button>
           )
         ) : !result ? (

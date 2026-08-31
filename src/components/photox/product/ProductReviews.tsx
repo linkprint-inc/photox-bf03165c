@@ -242,7 +242,7 @@ function ReviewImageLightbox({
         className="absolute inset-0 cursor-default"
       />
       <div
-        className={`relative z-10 max-h-[calc(100dvh-2rem)] w-full overflow-hidden bg-paper md:max-h-[calc(100dvh-4rem)] ${hasImage ? "max-w-6xl" : "max-w-xl"}`}
+        className="relative z-10 flex h-[calc(100dvh-2rem)] w-full max-w-[1360px] flex-col overflow-hidden bg-paper md:h-[76vh] md:max-h-[800px] md:w-[80vw]"
         onPointerDown={(event) => {
           swipeStartX.current = event.clientX;
         }}
@@ -265,7 +265,7 @@ function ReviewImageLightbox({
           <X aria-hidden size={20} strokeWidth={1.4} />
         </button>
         <div
-          className={`max-h-[calc(100dvh-2rem)] overflow-y-auto md:max-h-[calc(100dvh-4rem)] ${hasImage ? "lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:overflow-hidden" : ""}`}
+          className={`min-h-0 flex-1 overflow-y-auto ${hasImage ? "lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)] lg:overflow-hidden" : "lg:flex lg:items-center"}`}
         >
           {hasImage ? (
             <section className="relative flex min-h-[42dvh] items-center justify-center bg-secondary px-5 py-14 md:min-h-[52dvh] md:px-10 lg:min-h-0 lg:p-10">
@@ -273,7 +273,7 @@ function ReviewImageLightbox({
                 key={`${review.id}-${activeImageIndex}`}
                 src={images[activeImageIndex]}
                 alt={reviewImageAlt(review, activeImageIndex)}
-                className="px-fade block max-h-[54dvh] max-w-full object-contain lg:max-h-[calc(100dvh-12rem)]"
+                className="px-fade block max-h-[54dvh] max-w-full object-contain lg:max-h-full"
               />
               {images.length > 1 ? (
                 <div className="absolute bottom-5 left-5 flex items-center gap-4 md:bottom-7 md:left-7">
@@ -301,7 +301,7 @@ function ReviewImageLightbox({
             </section>
           ) : null}
           <aside
-            className={`flex min-h-0 flex-col p-7 md:p-10 ${hasImage ? "lg:max-h-[calc(100dvh-4rem)] lg:overflow-y-auto" : ""}`}
+            className={`min-h-0 p-7 md:p-10 ${hasImage ? "lg:overflow-y-auto" : "mx-auto w-full max-w-[46rem]"}`}
           >
             <div key={review.id} className="px-panel-transition">
               <p className="px-meta text-muted-foreground">
@@ -325,26 +325,29 @@ function ReviewImageLightbox({
                 ) : null}
               </div>
             </div>
-            <div className="mt-10 flex items-center justify-between gap-6 border-t border-hairline pt-5">
-              <button
-                type="button"
-                disabled={!canGoPrevious}
-                onClick={() => moveReview(-1)}
-                className="px-label disabled:opacity-35"
-              >
-                ← Previous
-              </button>
-              <button
-                type="button"
-                disabled={!canGoNext}
-                onClick={() => moveReview(1)}
-                className="px-label disabled:opacity-35"
-              >
-                Next →
-              </button>
-            </div>
           </aside>
         </div>
+        <nav
+          className="flex h-[68px] shrink-0 items-center justify-between gap-6 border-t border-hairline bg-paper px-7 md:px-10"
+          aria-label="Review navigation"
+        >
+          <button
+            type="button"
+            disabled={!canGoPrevious}
+            onClick={() => moveReview(-1)}
+            className="px-label disabled:opacity-35"
+          >
+            ← Previous
+          </button>
+          <button
+            type="button"
+            disabled={!canGoNext}
+            onClick={() => moveReview(1)}
+            className="px-label disabled:opacity-35"
+          >
+            Next →
+          </button>
+        </nav>
       </div>
     </div>
   );

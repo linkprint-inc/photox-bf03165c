@@ -1195,6 +1195,11 @@ function TextPreviewOverlay({
         transform: "translate(-50%, -50%)",
         textAlign: config.align,
         fontFamily: config.font,
+        fontWeight: config.fontWeight,
+        fontStyle: config.fontStyle,
+        letterSpacing: config.letterSpacing,
+        lineHeight: config.lineHeight,
+        textTransform: config.textTransform,
         fontSize: `clamp(8px, ${config.size * 0.09}cqw, 48px)`,
         color: config.color === "light" ? "#fff" : "#141414",
         textShadow:
@@ -1402,6 +1407,11 @@ function AppliedTextOverlay({ config }: { config: TextConfig }) {
         transform: "translate(-50%, -50%)",
         textAlign: config.align,
         fontFamily: config.font,
+        fontWeight: config.fontWeight,
+        fontStyle: config.fontStyle,
+        letterSpacing: config.letterSpacing,
+        lineHeight: config.lineHeight,
+        textTransform: config.textTransform,
         fontSize: `clamp(8px, ${config.size * 0.09}cqw, 48px)`,
         color: config.color === "light" ? "#fff" : "#141414",
         textShadow:

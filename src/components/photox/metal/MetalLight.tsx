@@ -18,7 +18,7 @@ export function MetalLight() {
   return (
     <Shell label="The light test" className="pb-20 md:pb-28">
       <div className="grid gap-8 md:grid-cols-12 md:items-end">
-        <div className="md:col-span-4">
+        <div className="md:order-2 md:col-span-4">
           <h2 className="px-serif text-[2rem] md:text-[2.6rem]">See what light does.</h2>
           <p className="px-meta mt-5 max-w-[40ch] text-muted-foreground">
             A glossy surface responds to the room around it, changing subtly as daylight moves
@@ -34,7 +34,7 @@ export function MetalLight() {
           ref={ref}
           onMouseMove={(e) => onMove(e.clientX)}
           onTouchMove={(e) => onMove(e.touches[0]!.clientX)}
-          className="relative aspect-[16/11] w-full touch-pan-y overflow-hidden bg-secondary md:col-span-8"
+          className="relative aspect-[16/11] w-full touch-pan-y overflow-hidden bg-secondary md:order-1 md:col-span-8"
         >
           <img
             src={metalLight}

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import idxMetal from "@/assets/idx-metal.jpg";
 import idxCustom from "@/assets/idx-custom.jpg";
+import metalSizeRoom from "@/assets/metal-size-room.jpg";
 import { Shell } from "./Section";
 
 const entries = [
   {
     n: "01",
-    title: "Choose metal",
+    title: "Explore metal",
     note: "Glossy · luminous · crisp",
     from: 79,
     cta: "Explore metal →",
@@ -16,6 +17,16 @@ const entries = [
   },
   {
     n: "02",
+    title: "Find your size",
+    note: "See it at the right scale",
+    from: 79,
+    cta: "View size guide →",
+    image: metalSizeRoom,
+    alt: "A single-layer metal print shown on a wall for scale",
+    href: "/metal#metal-size",
+  },
+  {
+    n: "03",
     title: "Start with your photo",
     note: "Your image, made physical",
     from: 79,

@@ -106,6 +106,11 @@ export type TextConfig = {
   /** A regenerated style set can be selected without replacing the accepted design. */
   styleVersion: number;
   font: string;
+  fontWeight: number;
+  fontStyle: "normal" | "italic";
+  letterSpacing: string;
+  lineHeight: number;
+  textTransform: "none" | "uppercase";
   size: number;
   align: "left" | "center" | "right";
   x: number;
@@ -113,35 +118,180 @@ export type TextConfig = {
   color: "light" | "dark";
 };
 
-export type TextStyleId = "editorial" | "minimal" | "bold" | "caption";
+export type TextStyleId =
+  "editorial" | "modern" | "bold" | "soft" | "display" | "caption" | "refined" | "expressive";
 
-export const textStyleIds: TextStyleId[] = ["editorial", "minimal", "bold", "caption"];
+export const textStyleIds: TextStyleId[] = [
+  "editorial",
+  "modern",
+  "bold",
+  "soft",
+  "display",
+  "caption",
+  "refined",
+  "expressive",
+];
 
-type TextStyle = Pick<TextConfig, "styleId" | "font" | "size" | "align" | "x" | "y">;
+export type GeneratedTextStyle = Pick<
+  TextConfig,
+  | "styleId"
+  | "font"
+  | "fontWeight"
+  | "fontStyle"
+  | "letterSpacing"
+  | "lineHeight"
+  | "textTransform"
+  | "align"
+>;
+
+export type TextStyleGenerationInput = {
+  text: string;
+  imageContext?: { width: number; height: number; orientation?: "landscape" | "portrait" };
+  count?: number;
+  batch?: number;
+};
+
+/** The approved internal typography pool. It is intentionally not exposed as a font picker. */
+const textStylePool: Record<TextStyleId, GeneratedTextStyle> = {
+  editorial: {
+    styleId: "editorial",
+    font: editorialFont,
+    fontWeight: 500,
+    fontStyle: "normal",
+    letterSpacing: "-0.025em",
+    lineHeight: 1.02,
+    textTransform: "none",
+    align: "center",
+  },
+  modern: {
+    styleId: "modern",
+    font: sansFont,
+    fontWeight: 500,
+    fontStyle: "normal",
+    letterSpacing: "0.015em",
+    lineHeight: 1.08,
+    textTransform: "none",
+    align: "center",
+  },
+  bold: {
+    styleId: "bold",
+    font: displayFont,
+    fontWeight: 700,
+    fontStyle: "normal",
+    letterSpacing: "-0.045em",
+    lineHeight: 0.94,
+    textTransform: "uppercase",
+    align: "center",
+  },
+  soft: {
+    styleId: "soft",
+    font: editorialFont,
+    fontWeight: 400,
+    fontStyle: "italic",
+    letterSpacing: "0em",
+    lineHeight: 1.1,
+    textTransform: "none",
+    align: "center",
+  },
+  display: {
+    styleId: "display",
+    font: displayFont,
+    fontWeight: 600,
+    fontStyle: "normal",
+    letterSpacing: "-0.06em",
+    lineHeight: 0.9,
+    textTransform: "uppercase",
+    align: "center",
+  },
+  caption: {
+    styleId: "caption",
+    font: sansFont,
+    fontWeight: 500,
+    fontStyle: "normal",
+    letterSpacing: "0.09em",
+    lineHeight: 1.18,
+    textTransform: "uppercase",
+    align: "left",
+  },
+  refined: {
+    styleId: "refined",
+    font: editorialFont,
+    fontWeight: 500,
+    fontStyle: "normal",
+    letterSpacing: "0.045em",
+    lineHeight: 1.06,
+    textTransform: "none",
+    align: "center",
+  },
+  expressive: {
+    styleId: "expressive",
+    font: editorialFont,
+    fontWeight: 500,
+    fontStyle: "italic",
+    letterSpacing: "-0.04em",
+    lineHeight: 0.98,
+    textTransform: "none",
+    align: "center",
+  },
+};
 
 /**
  * Deterministic local stand-in for generated typography. The wording is never
- * altered; each option only changes its visual treatment and safe placement.
+ * altered; each option only changes typography. Position, size and colour are
+ * independent customer-controlled layout state.
  */
-export function generatedTextStyle(styleId: TextStyleId, version = 1): TextStyle {
-  const nudge = ((Math.max(version, 1) - 1) % 3) * 2;
-  switch (styleId) {
-    case "minimal":
-      return { styleId, font: sansFont, size: 30, align: "center", x: 50, y: 88 - nudge };
-    case "bold":
-      return { styleId, font: displayFont, size: 56, align: "center", x: 50, y: 50 + nudge };
-    case "caption":
-      return { styleId, font: sansFont, size: 26, align: "left", x: 18 + nudge, y: 84 - nudge };
-    default:
-      return {
-        styleId: "editorial",
-        font: editorialFont,
-        size: 43,
-        align: "center",
-        x: 50,
-        y: 78 - nudge,
-      };
+export function generatedTextStyle(styleId: TextStyleId): GeneratedTextStyle {
+  return textStylePool[styleId];
+}
+
+function withBatchVariation(
+  style: GeneratedTextStyle,
+  styleIndex: number,
+  batch: number,
+): GeneratedTextStyle {
+  // Each local-development batch deliberately has a different typographic
+  // composition. A future provider can replace this adapter without changing
+  // the selection UI or the persisted customer layout state.
+  const variation = (Math.max(1, batch) - 1) % 3;
+  if (variation === 0) return style;
+
+  if (variation === 1) {
+    return {
+      ...style,
+      fontWeight: Math.min(700, style.fontWeight + (styleIndex % 2 ? 100 : 0)),
+      letterSpacing: styleIndex % 2 ? "0.035em" : "-0.015em",
+      lineHeight: Math.max(0.92, style.lineHeight - 0.04),
+      fontStyle: style.styleId === "soft" ? "normal" : style.fontStyle,
+    };
   }
+
+  return {
+    ...style,
+    fontWeight: Math.max(400, style.fontWeight - (styleIndex % 2 ? 0 : 100)),
+    letterSpacing: styleIndex % 2 ? "0.075em" : "0.01em",
+    lineHeight: Math.min(1.2, style.lineHeight + 0.06),
+    fontStyle: style.styleId === "refined" ? "italic" : style.fontStyle,
+  };
+}
+
+/** Deterministic local batch used until a text-style provider is connected. */
+export function createTextStyleBatch(batch = 1, count = 8): GeneratedTextStyle[] {
+  const offset = (Math.max(1, batch) - 1) % textStyleIds.length;
+  return Array.from({ length: Math.min(count, textStyleIds.length) }, (_, index) => {
+    const styleId = textStyleIds[(index + offset) % textStyleIds.length]!;
+    return withBatchVariation(generatedTextStyle(styleId), index, batch);
+  });
+}
+
+/**
+ * Provider boundary for future AI-assisted typography. The deterministic local
+ * fallback keeps all eight style choices functional without exposing fonts.
+ */
+export async function generateTextStyles({
+  count = 8,
+  batch = 1,
+}: TextStyleGenerationInput): Promise<GeneratedTextStyle[]> {
+  return createTextStyleBatch(batch, count);
 }
 
 export const defaultTextConfig: TextConfig = {
@@ -149,6 +299,11 @@ export const defaultTextConfig: TextConfig = {
   styleId: "editorial",
   styleVersion: 0,
   font: editorialFont,
+  fontWeight: 500,
+  fontStyle: "normal",
+  letterSpacing: "-0.025em",
+  lineHeight: 1.02,
+  textTransform: "none",
   size: 40,
   align: "center",
   x: 50,
@@ -207,12 +362,13 @@ export async function runText(image: PreparedImage, cfg: TextConfig): Promise<Pr
   const marginX = canvas.width * textSafeArea;
   const marginY = canvas.height * textSafeArea;
   const maxWidth = canvas.width * (1 - textSafeArea * 2);
+  const renderedText = cfg.textTransform === "uppercase" ? cfg.text.toUpperCase() : cfg.text;
   let fontSize = (cfg.size / 100) * canvas.width * 0.12;
-  let lineHeight = fontSize * 1.05;
+  let lineHeight = fontSize * cfg.lineHeight;
   let lines: string[];
 
-  ctx.font = `${fontSize}px ${cfg.font}`;
-  lines = wrapText(ctx, cfg.text, maxWidth);
+  ctx.font = `${cfg.fontStyle} ${cfg.fontWeight} ${fontSize}px ${cfg.font}`;
+  lines = wrapText(ctx, renderedText, maxWidth);
 
   // Keep a multiline caption printable even when it is much taller than its
   // original single-line treatment. The requested size remains the maximum.
@@ -220,9 +376,9 @@ export async function runText(image: PreparedImage, cfg: TextConfig): Promise<Pr
   const initialHeight = lines.length * lineHeight;
   if (initialHeight > availableHeight) {
     fontSize *= availableHeight / initialHeight;
-    lineHeight = fontSize * 1.05;
-    ctx.font = `${fontSize}px ${cfg.font}`;
-    lines = wrapText(ctx, cfg.text, maxWidth);
+    lineHeight = fontSize * cfg.lineHeight;
+    ctx.font = `${cfg.fontStyle} ${cfg.fontWeight} ${fontSize}px ${cfg.font}`;
+    lines = wrapText(ctx, renderedText, maxWidth);
   }
 
   const textWidth = Math.max(...lines.map((line) => ctx.measureText(line).width));
