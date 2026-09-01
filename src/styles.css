@@ -216,6 +216,23 @@
   }
 }
 
+/* The mobile print-preparation editor has intentionally thin dividers and
+   CTA borders. Keep touch focus from inheriting a browser ring while retaining
+   a quiet, keyboard-only focus treatment for every interactive control. */
+@media (max-width: 1023px) {
+  .px-prepare-modal
+    :is(button, a, input, textarea, select, [role="button"]):focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .px-prepare-modal :is(button, a, input, textarea, select, [role="button"]):focus-visible {
+    outline: 1px solid oklch(0.19 0.005 60 / 38%);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+}
+
 /* ---- PhotoX typographic system ---- */
 
 @utility px-serif {

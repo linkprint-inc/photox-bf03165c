@@ -467,7 +467,9 @@ export function ProductUploadModal({
         onClick={onClose}
         className="absolute inset-0 cursor-default"
       />
-      <section className="relative z-10 flex h-[96dvh] w-full flex-col overflow-hidden border border-foreground/15 bg-paper shadow-[0_16px_38px_rgba(30,25,20,0.08)] md:h-[84vh] md:w-[86vw] md:max-w-[1280px]">
+      <section
+        className={`relative z-10 flex h-[96dvh] w-full flex-col overflow-hidden border border-foreground/15 bg-paper shadow-[0_16px_38px_rgba(30,25,20,0.08)] md:h-[84vh] md:w-[86vw] md:max-w-[1280px] ${step === "prepare" ? "px-prepare-modal" : ""}`}
+      >
         <header className="relative z-10 shrink-0 flex items-center justify-between gap-4 border-b border-hairline bg-paper px-6 py-5 md:px-8">
           <p id="customize-print-title" className="px-label shrink-0">
             Customize your print
