@@ -287,52 +287,28 @@ export async function suggestTextColors({
       weight: cluster.count * (0.55 + cluster.saturation / cluster.count),
     }))
     .sort((first, second) => second.weight - first.weight);
-  const dominantHue = groupedHues[0]?.hue ?? local.hue;
-  const warmHue =
-    groupedHues.find((candidate) => candidate.hue <= 75 || candidate.hue >= 330)?.hue ??
-    (dominantHue + 28) % 360;
-  const coolHue =
-    groupedHues.find(
-      (candidate) =>
-        (candidate.hue >= 165 && candidate.hue <= 280) ||
-        circularHueDistance(candidate.hue, dominantHue) >= 90,
-    )?.hue ?? (dominantHue + 185) % 360;
-  const accentHue =
-    [...groupedHues].sort((first, second) => second.saturation - first.saturation)[0]?.hue ??
-    (dominantHue + 52) % 360;
-  const lightHue = groupedHues[1]?.hue ?? (warmHue + 12) % 360;
-  const roleHues = [dominantHue, warmHue, coolHue, accentHue, lightHue].map((hue, index, all) => {
-    const previous = all.slice(0, index);
-    return previous.some((candidate) => circularHueDistance(candidate, hue) < 16)
-      ? (hue + [0, 24, -32, 48, -18][index]!) % 360
-      : hue;
-  });
+  const hues: number[] = [];
+  for (const candidate of groupedHues) {
+    if (hues.every((hue) => circularHueDistance(hue, candidate.hue) >= 20)) {
+      hues.push(candidate.hue);
+    }
+    if (hues.length === count) break;
+  }
+  const hueOffsets = [0, 25, -28, 52, -54, 180];
+  for (let index = 0; hues.length < count; index += 1) {
+    hues.push((local.hue + hueOffsets[index % hueOffsets.length]!) % 360);
+  }
 
-  // Keep a deliberate editorial range: deep, earthy, muted cool/neutral,
-  // image accent, then one lighter accent. These targets never duplicate the
-  // dedicated white/black controls above the palette.
-  const roles = [
-    { lightness: 20, minimumSaturation: 32, contrast: 1.6 },
-    { lightness: 31, minimumSaturation: 42, contrast: 1.8 },
-    { lightness: 42, minimumSaturation: 28, contrast: 2.1 },
-    { lightness: 53, minimumSaturation: 54, contrast: 2.4 },
-    { lightness: 69, minimumSaturation: 26, contrast: 3.2 },
-  ];
-  const palette = roleHues.slice(0, count).map((hue, index) => {
-    const role = roles[index % roles.length]!;
-    const saturation = Math.max(
-      role.minimumSaturation,
-      Math.min(72, local.saturation * 100 + role.minimumSaturation * 0.7),
-    );
-    let lightness = role.lightness;
+  const targetLightness = backgroundIsDark ? [73, 66, 58, 52, 77] : [20, 29, 38, 47, 58];
+  const baseSaturation = Math.max(26, Math.min(62, local.saturation * 100 + 14));
+  const saturationVariation = [8, -4, 5, -8, 0];
+  const palette = hues.slice(0, count).map((hue, index) => {
+    const saturation = Math.max(22, Math.min(68, baseSaturation + saturationVariation[index]!));
+    let lightness = targetLightness[index % targetLightness.length]!;
     let color = hslToHex(hue, saturation, lightness);
-    for (
-      let attempt = 0;
-      attempt < 9 && contrastRatio(color, average) < role.contrast;
-      attempt += 1
-    ) {
-      lightness += backgroundIsDark ? 2 : -2;
-      lightness = Math.max(18, Math.min(76, lightness));
+    for (let attempt = 0; attempt < 14 && contrastRatio(color, average) < 3.5; attempt += 1) {
+      lightness += backgroundIsDark ? 3 : -3;
+      lightness = Math.max(18, Math.min(82, lightness));
       color = hslToHex(hue, saturation, lightness);
     }
     return color;
