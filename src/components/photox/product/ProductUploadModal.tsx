@@ -4,7 +4,14 @@ import sizeRoom from "@/assets/size-room.jpg";
 import { BeforeAfter } from "@/components/photox/custom/BeforeAfter";
 import { CustomToolPanel } from "@/components/photox/custom/CustomToolPanel";
 import { PreviewImageFrame } from "@/components/photox/custom/PreviewImageFrame";
-import { defaultTextConfig, runTool, type TextConfig, type ToolId } from "@/lib/image-tools";
+import {
+  defaultTextConfig,
+  runTool,
+  textColorShadow,
+  textColorValue,
+  type TextConfig,
+  type ToolId,
+} from "@/lib/image-tools";
 import {
   acceptedTypes,
   readImageFile,
@@ -1206,11 +1213,8 @@ function TextPreviewOverlay({
         lineHeight: config.lineHeight,
         textTransform: config.textTransform,
         fontSize: `clamp(10px, ${config.size * 0.12}cqw, 160px)`,
-        color: config.color === "light" ? "#fff" : "#141414",
-        textShadow:
-          config.color === "light"
-            ? "0 1px 7px rgba(0,0,0,0.52)"
-            : "0 1px 7px rgba(255,255,255,0.4)",
+        color: textColorValue(config.color),
+        textShadow: textColorShadow(config.color),
       }}
     >
       {config.text}
@@ -1418,11 +1422,8 @@ function AppliedTextOverlay({ config }: { config: TextConfig }) {
         lineHeight: config.lineHeight,
         textTransform: config.textTransform,
         fontSize: `clamp(10px, ${config.size * 0.12}cqw, 160px)`,
-        color: config.color === "light" ? "#fff" : "#141414",
-        textShadow:
-          config.color === "light"
-            ? "0 1px 7px rgba(0,0,0,0.52)"
-            : "0 1px 7px rgba(255,255,255,0.4)",
+        color: textColorValue(config.color),
+        textShadow: textColorShadow(config.color),
       }}
     >
       {config.text}

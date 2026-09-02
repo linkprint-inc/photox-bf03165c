@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createTextStyleBatch,
   generateTextStyles,
   recommendedInches,
+  suggestTextColors,
   toolMeta,
   type GeneratedTextStyle,
+  type TextColor,
   type TextConfig,
   type ToolId,
 } from "@/lib/image-tools";
 import type { PreparedImage } from "@/lib/prepared-image";
+
+const fallbackTextColors = ["#6B493B", "#81584D", "#52616D", "#9A7960", "#C39C75"];
+
+function isCustomTextColor(color: TextColor): color is `#${string}` {
+  return color.startsWith("#");
+}
+
+function customHexValue(color: TextColor) {
+  return isCustomTextColor(color) ? color.toUpperCase() : fallbackTextColors[0]!;
+}
+
+function isHexColor(value: string): value is `#${string}` {
+  return /^#[0-9A-F]{6}$/i.test(value);
+}
 
 export function CustomToolPanel({
   tool,
@@ -54,6 +70,9 @@ export function CustomToolPanel({
   const [generatedVersion, setGeneratedVersion] = useState(() => cfg.styleVersion || 0);
   const [generatingStyles, setGeneratingStyles] = useState(false);
   const [styleBatch, setStyleBatch] = useState(() => createTextStyleBatch(cfg.styleVersion || 1));
+  const [customColorOpen, setCustomColorOpen] = useState(() => isCustomTextColor(cfg.color));
+  const [suggestedColors, setSuggestedColors] = useState<string[]>(fallbackTextColors);
+  const [hexValue, setHexValue] = useState(() => customHexValue(cfg.color));
   const textGenerated = cfg.styleVersion > 0;
   const actionBarClass = normalFlowOnMobile
     ? "mt-10 border-t border-hairline pt-5 lg:sticky lg:bottom-0 lg:z-10 lg:mx-0 lg:bg-paper lg:px-0 lg:pb-0 lg:backdrop-blur-sm"
@@ -69,6 +88,34 @@ export function CustomToolPanel({
     setCfg(next);
     onGenerateText?.(next);
   };
+
+  const currentCustomHex = customHexValue(cfg.color);
+
+  useEffect(() => {
+    if (!customColorOpen || tool !== "text") return;
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void suggestTextColors({
+        image: original,
+        textPosition: { x: cfg.x ?? 50, y: cfg.y },
+        count: 5,
+      })
+        .then((colors) => {
+          if (!cancelled && colors.length) setSuggestedColors(colors);
+        })
+        .catch(() => {
+          if (!cancelled) setSuggestedColors(fallbackTextColors);
+        });
+    }, 180);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [cfg.x, cfg.y, customColorOpen, original, tool]);
+
+  useEffect(() => {
+    if (customColorOpen) setHexValue(currentCustomHex);
+  }, [currentCustomHex, customColorOpen]);
 
   const requestTextStyles = async () => {
     if (!cfg.text.trim()) return;
@@ -212,25 +259,95 @@ export function CustomToolPanel({
                   Drag the text directly on the image to position it.
                 </p>
               </div>
-
-              <div>
-                <p className="px-label text-muted-foreground">Color</p>
-                <div className="mt-3 flex gap-6">
-                  {(["light", "dark"] as const).map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      onClick={() => setCfg({ ...cfg, color })}
-                      aria-pressed={cfg.color === color}
-                      className={`px-label px-underline ${cfg.color === color ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
-                    >
-                      {color}
-                    </button>
-                  ))}
-                </div>
-              </div>
             </>
           ) : null}
+
+          <div>
+            <p className="px-label text-muted-foreground">Color</p>
+            <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-3">
+              {(["light", "dark"] as const).map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => {
+                    setCfg({ ...cfg, color });
+                    setCustomColorOpen(false);
+                  }}
+                  aria-pressed={cfg.color === color}
+                  className={`px-label px-underline ${cfg.color === color ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
+                >
+                  {color}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCustomColorOpen((open) => !open)}
+                aria-expanded={customColorOpen}
+                aria-controls="custom-text-color-controls"
+                className={`px-label px-underline ${customColorOpen ? "opacity-100 after:scale-x-100" : "opacity-45 hover:opacity-100"}`}
+              >
+                {customColorOpen ? "Custom" : "Custom +"}
+              </button>
+            </div>
+
+            <div
+              id="custom-text-color-controls"
+              className={`grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${customColorOpen ? "mt-5 grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+              aria-hidden={!customColorOpen}
+            >
+              <div className="overflow-hidden">
+                <p className="px-label text-muted-foreground">Suggested from image</p>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  {suggestedColors.map((color) => {
+                    const selected = cfg.color === color;
+                    return (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setCfg({ ...cfg, color: color as TextColor })}
+                        aria-label={`Use suggested color ${color}`}
+                        aria-pressed={selected}
+                        className={`grid h-5 w-5 place-items-center rounded-full transition-shadow focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground ${selected ? "ring-1 ring-foreground ring-offset-2 ring-offset-paper" : "hover:ring-1 hover:ring-foreground/45 hover:ring-offset-2 hover:ring-offset-paper"}`}
+                        style={{ backgroundColor: color }}
+                      >
+                        <span className="sr-only">{color}</span>
+                      </button>
+                    );
+                  })}
+                  <label
+                    className="grid h-5 w-5 cursor-pointer place-items-center rounded-full border border-hairline text-[1rem] leading-none text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+                    title="Choose a custom color"
+                  >
+                    <span aria-hidden>+</span>
+                    <span className="sr-only">Choose a custom color</span>
+                    <input
+                      type="color"
+                      value={currentCustomHex}
+                      onChange={(event) =>
+                        setCfg({ ...cfg, color: event.target.value.toUpperCase() as TextColor })
+                      }
+                      className="sr-only"
+                    />
+                  </label>
+                </div>
+                <label className="mt-4 block w-fit">
+                  <span className="sr-only">Custom hex color</span>
+                  <input
+                    value={hexValue}
+                    onChange={(event) => {
+                      const next = event.target.value.toUpperCase();
+                      setHexValue(next);
+                      if (isHexColor(next)) setCfg({ ...cfg, color: next });
+                    }}
+                    onBlur={() => setHexValue(currentCustomHex)}
+                    maxLength={7}
+                    spellCheck={false}
+                    className="px-meta min-w-[110px] w-[116px] border-b border-hairline bg-transparent pb-1 pr-2 uppercase outline-none transition-colors focus:border-foreground"
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
 

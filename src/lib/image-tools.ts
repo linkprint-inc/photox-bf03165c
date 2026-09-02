@@ -115,8 +115,230 @@ export type TextConfig = {
   align: "left" | "center" | "right";
   x: number;
   y: number;
-  color: "light" | "dark";
+  /** Curated light/dark defaults, or a customer-selected hex value. */
+  color: TextColor;
 };
+
+export type TextColor = "light" | "dark" | `#${string}`;
+
+export function textColorValue(color: TextColor) {
+  if (color === "light") return "#ffffff";
+  if (color === "dark") return "#141414";
+  return color;
+}
+
+export function textColorShadow(color: TextColor) {
+  const hex = textColorValue(color).replace("#", "");
+  const value = Number.parseInt(hex.length === 3 ? hex.replace(/(.)/g, "$1$1") : hex, 16);
+  const luminance = Number.isFinite(value)
+    ? (0.2126 * ((value >> 16) & 255) + 0.7152 * ((value >> 8) & 255) + 0.0722 * (value & 255)) /
+      255
+    : 1;
+  return luminance > 0.55 ? "0 1px 7px rgba(0,0,0,0.52)" : "0 1px 7px rgba(255,255,255,0.4)";
+}
+
+export type TextColorSuggestionInput = {
+  image: Pick<PreparedImage, "dataUrl" | "width" | "height">;
+  textPosition: { x: number; y: number };
+  /** Reserved for a provider to use a more precise sampled crop later. */
+  sampleRegion?: { width: number; height: number };
+  count?: number;
+};
+
+function rgbToHsl(red: number, green: number, blue: number) {
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const lightness = (max + min) / 2;
+  const delta = max - min;
+  if (!delta) return { hue: 32, saturation: 0, lightness };
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
+  let hue = 0;
+  if (max === r) hue = ((g - b) / delta) % 6;
+  else if (max === g) hue = (b - r) / delta + 2;
+  else hue = (r - g) / delta + 4;
+  return { hue: (hue * 60 + 360) % 360, saturation, lightness };
+}
+
+function hslToHex(hue: number, saturation: number, lightness: number) {
+  const s = saturation / 100;
+  const l = lightness / 100;
+  const chroma = (1 - Math.abs(2 * l - 1)) * s;
+  const segment = (((hue % 360) + 360) % 360) / 60;
+  const second = chroma * (1 - Math.abs((segment % 2) - 1));
+  const match = l - chroma / 2;
+  const [r, g, b] =
+    segment < 1
+      ? [chroma, second, 0]
+      : segment < 2
+        ? [second, chroma, 0]
+        : segment < 3
+          ? [0, chroma, second]
+          : segment < 4
+            ? [0, second, chroma]
+            : segment < 5
+              ? [second, 0, chroma]
+              : [chroma, 0, second];
+  return `#${[r, g, b]
+    .map((channel) =>
+      Math.round((channel + match) * 255)
+        .toString(16)
+        .padStart(2, "0"),
+    )
+    .join("")}`.toUpperCase();
+}
+
+function hexToRgb(hex: string) {
+  const value = Number.parseInt(hex.slice(1), 16);
+  return { red: (value >> 16) & 255, green: (value >> 8) & 255, blue: value & 255 };
+}
+
+function relativeLuminance({ red, green, blue }: { red: number; green: number; blue: number }) {
+  const linear = [red, green, blue].map((channel) => {
+    const normalized = channel / 255;
+    return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * linear[0]! + 0.7152 * linear[1]! + 0.0722 * linear[2]!;
+}
+
+function contrastRatio(first: string, second: { red: number; green: number; blue: number }) {
+  const light = relativeLuminance(hexToRgb(first));
+  const dark = relativeLuminance(second);
+  return (Math.max(light, dark) + 0.05) / (Math.min(light, dark) + 0.05);
+}
+
+function circularHueDistance(first: number, second: number) {
+  const difference = Math.abs(first - second) % 360;
+  return Math.min(difference, 360 - difference);
+}
+
+/**
+ * Provider-neutral, image-aware fallback for Add Text color suggestions.
+ * It samples the local area beneath the text, groups its palette into distinct
+ * color families, then curates five readable text colors. A future
+ * visual-analysis provider can replace this function without changing the
+ * controls or persisted TextConfig shape.
+ */
+export async function suggestTextColors({
+  image,
+  textPosition,
+  sampleRegion,
+  count = 5,
+}: TextColorSuggestionInput): Promise<string[]> {
+  const imageElement = await loadImage(image.dataUrl);
+  const canvas = document.createElement("canvas");
+  const side = 96;
+  canvas.width = side;
+  canvas.height = side;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  if (!context) return ["#6B493B", "#81584D", "#52616D", "#9A7960", "#C39C75"].slice(0, count);
+
+  const regionWidth = Math.max(12, Math.round(sampleRegion?.width ?? image.width * 0.22));
+  const regionHeight = Math.max(12, Math.round(sampleRegion?.height ?? image.height * 0.16));
+  const sourceX = Math.max(
+    0,
+    Math.min(
+      imageElement.naturalWidth - regionWidth,
+      (textPosition.x / 100) * imageElement.naturalWidth - regionWidth / 2,
+    ),
+  );
+  const sourceY = Math.max(
+    0,
+    Math.min(
+      imageElement.naturalHeight - regionHeight,
+      (textPosition.y / 100) * imageElement.naturalHeight - regionHeight / 2,
+    ),
+  );
+  context.drawImage(imageElement, sourceX, sourceY, regionWidth, regionHeight, 0, 0, side, side);
+  const pixels = context.getImageData(0, 0, side, side).data;
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  let total = 0;
+  const clusters = new Map<
+    string,
+    { count: number; hue: number; saturation: number; lightness: number }
+  >();
+  for (let index = 0; index < pixels.length; index += 16) {
+    red += pixels[index] ?? 0;
+    green += pixels[index + 1] ?? 0;
+    blue += pixels[index + 2] ?? 0;
+    total += 1;
+    const color = rgbToHsl(pixels[index] ?? 0, pixels[index + 1] ?? 0, pixels[index + 2] ?? 0);
+    const hueBucket = Math.round(color.hue / 30) % 12;
+    const lightnessBucket = Math.min(3, Math.floor(color.lightness * 4));
+    const key = `${hueBucket}-${lightnessBucket}`;
+    const existing = clusters.get(key) ?? { count: 0, hue: 0, saturation: 0, lightness: 0 };
+    existing.count += 1;
+    existing.hue += color.hue;
+    existing.saturation += color.saturation;
+    existing.lightness += color.lightness;
+    clusters.set(key, existing);
+  }
+  const average = { red: red / total, green: green / total, blue: blue / total };
+  const local = rgbToHsl(average.red, average.green, average.blue);
+  const backgroundIsDark = relativeLuminance(average) < 0.38;
+  const groupedHues = [...clusters.values()]
+    .map((cluster) => ({
+      hue: cluster.hue / cluster.count,
+      saturation: cluster.saturation / cluster.count,
+      weight: cluster.count * (0.55 + cluster.saturation / cluster.count),
+    }))
+    .sort((first, second) => second.weight - first.weight);
+  const dominantHue = groupedHues[0]?.hue ?? local.hue;
+  const warmHue =
+    groupedHues.find((candidate) => candidate.hue <= 75 || candidate.hue >= 330)?.hue ??
+    (dominantHue + 28) % 360;
+  const coolHue =
+    groupedHues.find(
+      (candidate) =>
+        (candidate.hue >= 165 && candidate.hue <= 280) ||
+        circularHueDistance(candidate.hue, dominantHue) >= 90,
+    )?.hue ?? (dominantHue + 185) % 360;
+  const accentHue =
+    [...groupedHues].sort((first, second) => second.saturation - first.saturation)[0]?.hue ??
+    (dominantHue + 52) % 360;
+  const lightHue = groupedHues[1]?.hue ?? (warmHue + 12) % 360;
+  const roleHues = [dominantHue, warmHue, coolHue, accentHue, lightHue].map((hue, index, all) => {
+    const previous = all.slice(0, index);
+    return previous.some((candidate) => circularHueDistance(candidate, hue) < 16)
+      ? (hue + [0, 24, -32, 48, -18][index]!) % 360
+      : hue;
+  });
+
+  // Keep a deliberate editorial range: deep, earthy, muted cool/neutral,
+  // image accent, then one lighter accent. These targets never duplicate the
+  // dedicated white/black controls above the palette.
+  const roles = [
+    { lightness: 20, minimumSaturation: 32, contrast: 1.6 },
+    { lightness: 31, minimumSaturation: 42, contrast: 1.8 },
+    { lightness: 42, minimumSaturation: 28, contrast: 2.1 },
+    { lightness: 53, minimumSaturation: 54, contrast: 2.4 },
+    { lightness: 69, minimumSaturation: 26, contrast: 3.2 },
+  ];
+  const palette = roleHues.slice(0, count).map((hue, index) => {
+    const role = roles[index % roles.length]!;
+    const saturation = Math.max(
+      role.minimumSaturation,
+      Math.min(72, local.saturation * 100 + role.minimumSaturation * 0.7),
+    );
+    let lightness = role.lightness;
+    let color = hslToHex(hue, saturation, lightness);
+    for (
+      let attempt = 0;
+      attempt < 9 && contrastRatio(color, average) < role.contrast;
+      attempt += 1
+    ) {
+      lightness += backgroundIsDark ? 2 : -2;
+      lightness = Math.max(18, Math.min(76, lightness));
+      color = hslToHex(hue, saturation, lightness);
+    }
+    return color;
+  });
+  return [...new Set(palette)].slice(0, count);
+}
 
 export type TextStyleId =
   "editorial" | "modern" | "bold" | "soft" | "display" | "caption" | "refined" | "expressive";
@@ -391,7 +613,7 @@ export async function runText(image: PreparedImage, cfg: TextConfig): Promise<Pr
 
   ctx.textBaseline = "middle";
   ctx.textAlign = cfg.align;
-  ctx.fillStyle = cfg.color === "light" ? "#ffffff" : "#141414";
+  ctx.fillStyle = textColorValue(cfg.color);
   lines.forEach((line, index) => {
     const lineX =
       cfg.align === "left" ? textLeft : cfg.align === "right" ? textLeft + textWidth : x;

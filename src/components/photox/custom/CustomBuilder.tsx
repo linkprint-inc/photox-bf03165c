@@ -9,6 +9,7 @@ import {
   defaultTextConfig,
   recommendedInches,
   runTool,
+  textColorValue,
   toolMeta,
   type TextConfig,
   type ToolId,
@@ -314,7 +315,7 @@ export function CustomBuilder({
                       lineHeight: cfg.lineHeight,
                       textTransform: cfg.textTransform,
                       fontSize: `${cfg.size / 1.8}px`,
-                      color: cfg.color === "light" ? "#fff" : "#141414",
+                      color: textColorValue(cfg.color),
                     }}
                   >
                     {cfg.text}
