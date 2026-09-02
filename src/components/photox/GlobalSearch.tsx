@@ -1,23 +1,156 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { shopProducts, materialLabel } from "@/lib/shop-data";
 import { useSearchUI } from "@/lib/search-ui";
 
-const popularTerms = ["Pets", "Family", "Portraits", "Landscape"];
-const MAX_RESULTS = 6;
+type QuickFindItem = { label: string; detail: string; href: string; terms: string[] };
+
+const quickFindItems: QuickFindItem[] = [
+  {
+    label: "Create your print",
+    detail: "Start with your own photo",
+    href: "/custom",
+    terms: ["create", "custom", "upload", "print", "your photo"],
+  },
+  {
+    label: "Landscape",
+    detail: "A landscape artwork to customize",
+    href: "/products/north-sea",
+    terms: ["landscape", "scenery", "nature"],
+  },
+  {
+    label: "Portraits",
+    detail: "Portrait artwork and inspiration",
+    href: "/products/study-in-olive",
+    terms: ["portrait", "portraits", "people"],
+  },
+  {
+    label: "Pets",
+    detail: "Pet print inspiration",
+    href: "/products/canopy",
+    terms: ["pet", "pets", "dog", "cat"],
+  },
+  {
+    label: "Family",
+    detail: "Family print inspiration",
+    href: "/shop?category=family",
+    terms: ["family", "gift", "people"],
+  },
+  {
+    label: "Metal prints",
+    detail: "Material, finish and how metal prints are made",
+    href: "/metal",
+    terms: ["metal", "metal print", "finish", "surface", "gloss", "materials"],
+  },
+  {
+    label: "Size guide",
+    detail: "Compare print sizes in a room",
+    href: "/metal#metal-size",
+    terms: [
+      "size",
+      "size guide",
+      "dimensions",
+      "12 x 18",
+      "16 x 24",
+      "20 x 30",
+      "24 x 36",
+      "30 x 40",
+    ],
+  },
+  {
+    label: "Shipping & delivery",
+    detail: "Production, delivery and tracking",
+    href: "/shipping-policy",
+    terms: ["shipping", "delivery", "ship", "track order"],
+  },
+  {
+    label: "Returns",
+    detail: "Refund and return policy",
+    href: "/refund-policy",
+    terms: ["return", "returns", "refund", "exchange"],
+  },
+  {
+    label: "FAQ",
+    detail: "Answers about prints, files and ordering",
+    href: "/#help",
+    terms: ["faq", "help", "question", "questions"],
+  },
+  {
+    label: "Community",
+    detail: "Customer stories and real homes",
+    href: "/community",
+    terms: ["community", "stories", "customer", "reviews"],
+  },
+  {
+    label: "Reviews",
+    detail: "Customer reviews for a photoX print",
+    href: "/products/north-sea#reviews",
+    terms: ["reviews", "review", "rating", "ratings"],
+  },
+  {
+    label: "About photoX",
+    detail: "Our print experience and approach",
+    href: "/about",
+    terms: ["about", "photox", "photo x", "company"],
+  },
+  {
+    label: "Materials",
+    detail: "The metal print material and finish",
+    href: "/about#material-matters",
+    terms: ["material", "materials", "metal", "finish", "surface"],
+  },
+  {
+    label: "Print process",
+    detail: "Prepare and make your print",
+    href: "/custom",
+    terms: ["process", "print process", "production", "how it works"],
+  },
+  {
+    label: "Restore old photo",
+    detail: "Prepare a faded or damaged image",
+    href: "/custom?prepare=true&tool=restore",
+    terms: ["restore", "restoration", "old photo", "repair"],
+  },
+  {
+    label: "Enhance resolution",
+    detail: "Prepare an image for a larger print",
+    href: "/custom?prepare=true&tool=enhance",
+    terms: ["enhance", "resolution", "quality", "upscale"],
+  },
+  {
+    label: "Add text",
+    detail: "Add a name, date or caption to a print",
+    href: "/custom?prepare=true&tool=text",
+    terms: ["text", "caption", "date", "typography", "add text"],
+  },
+];
+
+const quickLinks = [
+  "Create your print",
+  "Landscape",
+  "Portraits",
+  "Pets",
+  "Family",
+  "Metal prints",
+  "Size guide",
+  "Shipping & delivery",
+  "Returns",
+  "Community",
+];
+
+function searchableText(item: QuickFindItem) {
+  return [item.label, item.detail, ...item.terms].join(" ").toLowerCase().replaceAll("×", "x");
+}
 
 export function GlobalSearch() {
   const { open, closeSearch } = useSearchUI();
   const [q, setQ] = useState("");
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
     const scrollY = window.scrollY;
     const body = document.body;
-    const prev = {
+    const previous = {
       position: body.style.position,
       top: body.style.top,
       width: body.style.width,
@@ -27,22 +160,17 @@ export function GlobalSearch() {
     body.style.top = `-${scrollY}px`;
     body.style.width = "100%";
     body.style.overflow = "hidden";
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeSearch();
-    };
-    window.addEventListener("keydown", onKey);
-
-    const t = window.setTimeout(() => inputRef.current?.focus(), 30);
-
+    const onKeyDown = (event: KeyboardEvent) => event.key === "Escape" && closeSearch();
+    window.addEventListener("keydown", onKeyDown);
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 30);
     return () => {
-      body.style.position = prev.position;
-      body.style.top = prev.top;
-      body.style.width = prev.width;
-      body.style.overflow = prev.overflow;
+      body.style.position = previous.position;
+      body.style.top = previous.top;
+      body.style.width = previous.width;
+      body.style.overflow = previous.overflow;
       window.scrollTo(0, scrollY);
-      window.removeEventListener("keydown", onKey);
-      window.clearTimeout(t);
+      window.removeEventListener("keydown", onKeyDown);
+      window.clearTimeout(timer);
     };
   }, [open, closeSearch]);
 
@@ -50,183 +178,113 @@ export function GlobalSearch() {
     if (!open) setQ("");
   }, [open]);
 
-  const term = q.trim().toLowerCase();
-
+  const term = q.trim().toLowerCase().replaceAll("×", "x");
   const matches = useMemo(() => {
     if (!term) return [];
-    return shopProducts.filter(
-      (p) =>
-        p.name.toLowerCase().includes(term) ||
-        materialLabel[p.material].toLowerCase().includes(term) ||
-        p.styles.some((s) => s.toLowerCase().includes(term)),
-    );
+    const tokens = term.split(/\s+/).filter(Boolean);
+    return quickFindItems.filter((item) => {
+      const text = searchableText(item);
+      return text.includes(term) || tokens.every((token) => text.includes(token));
+    });
   }, [term]);
-
-  const categoryHits = useMemo(
-    () => (term ? popularTerms.filter((s) => s.toLowerCase().includes(term)) : []),
-    [term],
-  );
-
-  const popularArtwork = useMemo(() => shopProducts.slice(0, 4), []);
+  const links = quickLinks.map((label) => quickFindItems.find((item) => item.label === label)!);
 
   if (!open) return null;
 
-  const goToShop = (query: string) => {
-    closeSearch();
-    navigate({ to: "/shop", search: query ? { q: query } : {} });
-  };
-
-  const startWithExample = (slug: string) => {
-    closeSearch();
-    navigate({ to: "/custom", search: { inspiration: slug } });
-  };
-
-  const results = matches.slice(0, MAX_RESULTS);
-  const empty = term && results.length === 0 && categoryHits.length === 0;
-
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-foreground/10">
-      <button
-        type="button"
-        aria-label="Close search"
-        onClick={closeSearch}
-        className="fixed inset-0 h-full w-full cursor-default"
-      />
-
-      <div className="relative min-h-screen w-full bg-paper">
-        <div className="mx-auto max-w-[1440px] px-6 pb-12 pt-5 md:px-10 md:pb-16 md:pt-6">
-          <div className="flex items-center justify-between">
-            <span className="px-label">Search</span>
-            <button
-              type="button"
-              onClick={closeSearch}
-              aria-label="Close search"
-              className="-mr-3 flex h-11 w-11 items-center justify-center text-[1.1rem] leading-none transition-opacity hover:opacity-60"
-            >
-              ×
-            </button>
-          </div>
-
-          <form
-            className={[
-              "mt-4 border-b transition-colors duration-300 md:mt-5",
-              focused ? "border-foreground/90" : "border-foreground/30",
-            ].join(" ")}
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (term) goToShop(q.trim());
-            }}
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-paper">
+      <div className="mx-auto min-h-screen max-w-[980px] px-6 pb-12 pt-5 md:px-10 md:pb-16 md:pt-6">
+        <div className="flex items-center justify-between">
+          <span className="px-label">Search</span>
+          <button
+            type="button"
+            onClick={closeSearch}
+            aria-label="Close search"
+            className="-mr-3 flex h-11 w-11 items-center justify-center text-[1.1rem] leading-none transition-opacity hover:opacity-60"
           >
-            <input
-              ref={inputRef}
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              onFocus={() => setFocused(true)}
-              onBlur={() => setFocused(false)}
-              placeholder="Search inspiration, materials or help"
-              aria-label="Search inspiration, materials or help"
-              className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/40 placeholder:transition-colors placeholder:duration-300 focus:placeholder:text-foreground/75 md:text-[1.7rem]"
-            />
-          </form>
-
+            ×
+          </button>
+        </div>
+        <p className="px-meta mt-8 text-muted-foreground">What are you looking for?</p>
+        <form
+          className={`mt-3 border-b transition-colors duration-300 ${focused ? "border-foreground/70" : "border-foreground/25"}`}
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (matches[0]) window.location.assign(matches[0].href);
+          }}
+        >
+          <input
+            ref={inputRef}
+            value={q}
+            onChange={(event) => setQ(event.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder="Search photoX..."
+            aria-label="Search photoX"
+            className="px-serif w-full bg-transparent py-3 text-[1.25rem] text-foreground outline-none placeholder:text-foreground/40 placeholder:transition-colors placeholder:duration-300 focus:placeholder:text-foreground/75 md:text-[1.7rem]"
+          />
+        </form>
+        <div key={term || "quick-links"} className="px-fade mt-12 md:mt-16">
           {term ? (
-            <p className="px-meta mt-3 text-muted-foreground">
-              {matches.length} {matches.length === 1 ? "result" : "results"} for “{q.trim()}”
-            </p>
-          ) : null}
-
-          <div key={term ? "results" : "discovery"} className="px-fade">
-            {empty ? (
-              <div className="mt-12 md:mt-16">
-                <p className="px-serif text-[1.3rem]">No results for “{q.trim()}”</p>
-                <p className="px-meta mt-2 text-muted-foreground">
-                  Try another search or explore all inspiration.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => goToShop("")}
-                  className="px-label px-underline mt-5 inline-block"
-                >
-                  See all ideas →
-                </button>
-              </div>
-            ) : (
-              <div className="mt-12 grid gap-10 md:mt-20 md:grid-cols-[0.26fr_1fr] md:gap-12">
-                <div>
-                  <p className="px-label text-muted-foreground">
-                    {term ? "Related" : "Popular searches"}
-                  </p>
-                  <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2.5 md:grid-cols-1 md:gap-x-0">
-                    {(term ? categoryHits : popularTerms).map((t) => (
-                      <li key={t}>
-                        <button
-                          type="button"
-                          onClick={() => (term ? goToShop(t) : setQ(t))}
-                          className="px-serif px-underline text-left text-[1rem] transition-opacity hover:opacity-60"
+            <section aria-label="Search results">
+              <p className="px-label text-muted-foreground">Matching pages</p>
+              {matches.length ? (
+                <ul className="mt-5 border-t border-hairline">
+                  {matches.map((item) => (
+                    <li key={item.label} className="border-b border-hairline">
+                      <a
+                        href={item.href}
+                        onClick={closeSearch}
+                        className="group flex items-baseline justify-between gap-6 py-4"
+                      >
+                        <span>
+                          <span className="px-label block">{item.label}</span>
+                          <span className="px-meta mt-1 block text-muted-foreground">
+                            {item.detail}
+                          </span>
+                        </span>
+                        <span
+                          aria-hidden
+                          className="px-label shrink-0 transition-transform group-hover:translate-x-1"
                         >
-                          {t}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="px-label text-muted-foreground">
-                    {term ? "Results" : "Starting points"}
-                  </p>
-                  <ul className="mt-4 flex flex-col gap-4 sm:grid sm:grid-cols-3 sm:gap-x-7 sm:gap-y-9 lg:grid-cols-4">
-                    {(term ? results : popularArtwork).map((p) => (
-                      <li key={p.id}>
-                        <ResultCard product={p} onSelect={() => startWithExample(p.id)} />
-                      </li>
-                    ))}
-                  </ul>
-                  {term && matches.length > results.length && (
-                    <button
-                      type="button"
-                      onClick={() => goToShop(q.trim())}
-                      className="px-label px-underline mt-7 inline-block"
+                          →
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="px-meta mt-5 text-muted-foreground">
+                  No quick links match “{q.trim()}”. Try a material, size, topic or tool.
+                </p>
+              )}
+            </section>
+          ) : (
+            <section aria-label="Quick links">
+              <p className="px-label text-muted-foreground">Quick links</p>
+              <ul className="mt-5 grid gap-x-8 border-t border-hairline sm:grid-cols-2">
+                {links.map((item) => (
+                  <li key={item.label} className="border-b border-hairline">
+                    <a
+                      href={item.href}
+                      onClick={closeSearch}
+                      className="group flex items-center justify-between gap-5 py-3.5"
                     >
-                      View all results →
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+                      <span className="px-label">{item.label}</span>
+                      <span
+                        aria-hidden
+                        className="px-label text-muted-foreground transition-transform group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
       </div>
     </div>
-  );
-}
-
-function ResultCard({
-  product,
-  onSelect,
-}: {
-  product: (typeof shopProducts)[number];
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className="group flex w-full items-center gap-4 text-left sm:block"
-    >
-      <div className="relative aspect-[4/3] w-16 shrink-0 overflow-hidden bg-secondary sm:w-full">
-        <img
-          src={product.image}
-          alt={product.name}
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-85"
-        />
-      </div>
-      <div className="min-w-0 sm:mt-2.5">
-        <p className="px-label">{product.name}</p>
-        <p className="px-meta text-muted-foreground">{materialLabel[product.material]}</p>
-        <p className="px-meta mt-0.5 text-muted-foreground">Use this style →</p>
-      </div>
-    </button>
   );
 }

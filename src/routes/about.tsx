@@ -107,7 +107,7 @@ function AboutPage() {
         </Shell>
 
         {/* 03 Material matters */}
-        <Shell label="Material matters" className="pb-20 md:pb-28">
+        <Shell id="material-matters" label="Material matters" className="pb-20 md:pb-28">
           <h2 className="px-serif max-w-[12ch] text-[2.2rem] leading-[1.05] md:text-[3.4rem]">
             MATERIAL
             <br />

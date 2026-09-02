@@ -313,7 +313,7 @@ export function CustomBuilder({
                       letterSpacing: cfg.letterSpacing,
                       lineHeight: cfg.lineHeight,
                       textTransform: cfg.textTransform,
-                      fontSize: `${cfg.size / 2.6}px`,
+                      fontSize: `${cfg.size / 1.8}px`,
                       color: cfg.color === "light" ? "#fff" : "#141414",
                     }}
                   >

@@ -202,8 +202,8 @@ export function CustomToolPanel({
                 <input
                   id="tool-size"
                   type="range"
-                  min={8}
-                  max={68}
+                  min={18}
+                  max={140}
                   value={cfg.size}
                   onChange={(event) => setCfg({ ...cfg, size: Number(event.target.value) })}
                   className="mt-3 w-full accent-foreground"

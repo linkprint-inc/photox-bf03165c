@@ -1116,7 +1116,7 @@ function TextPreviewOverlay({
       if (fittedScale < 0.995) {
         // Size is normalized to the printable frame. Persist the fitted value
         // rather than adding a temporary CSS scale that would be lost on Apply.
-        onChange({ ...config, size: Math.max(8, config.size * fittedScale) });
+        onChange({ ...config, size: Math.max(18, config.size * fittedScale) });
         return;
       }
 
@@ -1205,7 +1205,7 @@ function TextPreviewOverlay({
         letterSpacing: config.letterSpacing,
         lineHeight: config.lineHeight,
         textTransform: config.textTransform,
-        fontSize: `clamp(8px, ${config.size * 0.09}cqw, 48px)`,
+        fontSize: `clamp(10px, ${config.size * 0.12}cqw, 160px)`,
         color: config.color === "light" ? "#fff" : "#141414",
         textShadow:
           config.color === "light"
@@ -1417,7 +1417,7 @@ function AppliedTextOverlay({ config }: { config: TextConfig }) {
         letterSpacing: config.letterSpacing,
         lineHeight: config.lineHeight,
         textTransform: config.textTransform,
-        fontSize: `clamp(8px, ${config.size * 0.09}cqw, 48px)`,
+        fontSize: `clamp(10px, ${config.size * 0.12}cqw, 160px)`,
         color: config.color === "light" ? "#fff" : "#141414",
         textShadow:
           config.color === "light"
