@@ -16,7 +16,7 @@ export const toolMeta: Record<ToolId, { label: string; heading: string; body: st
   text: {
     label: "Add text",
     heading: "Add text",
-    body: "Add a name, date, caption or personal message before printing.",
+    body: "Add a name, date or short message.",
   },
 };
 
@@ -101,9 +101,9 @@ export async function runEnhance(image: PreparedImage): Promise<PreparedImage> {
 
 export type TextConfig = {
   text: string;
-  /** The selected generated treatment. Typography remains intentionally internal. */
+  /** The selected fixed typography treatment. */
   styleId: TextStyleId;
-  /** A regenerated style set can be selected without replacing the accepted design. */
+  /** Maintains compatibility with saved text configurations. */
   styleVersion: number;
   font: string;
   fontWeight: number;
@@ -342,13 +342,6 @@ export type GeneratedTextStyle = Pick<
   | "align"
 >;
 
-export type TextStyleGenerationInput = {
-  text: string;
-  imageContext?: { width: number; height: number; orientation?: "landscape" | "portrait" };
-  count?: number;
-  batch?: number;
-};
-
 /** The approved internal typography pool. It is intentionally not exposed as a font picker. */
 const textStylePool: Record<TextStyleId, GeneratedTextStyle> = {
   editorial: {
@@ -440,56 +433,6 @@ const textStylePool: Record<TextStyleId, GeneratedTextStyle> = {
  */
 export function generatedTextStyle(styleId: TextStyleId): GeneratedTextStyle {
   return textStylePool[styleId];
-}
-
-function withBatchVariation(
-  style: GeneratedTextStyle,
-  styleIndex: number,
-  batch: number,
-): GeneratedTextStyle {
-  // Each local-development batch deliberately has a different typographic
-  // composition. A future provider can replace this adapter without changing
-  // the selection UI or the persisted customer layout state.
-  const variation = (Math.max(1, batch) - 1) % 3;
-  if (variation === 0) return style;
-
-  if (variation === 1) {
-    return {
-      ...style,
-      fontWeight: Math.min(700, style.fontWeight + (styleIndex % 2 ? 100 : 0)),
-      letterSpacing: styleIndex % 2 ? "0.035em" : "-0.015em",
-      lineHeight: Math.max(0.92, style.lineHeight - 0.04),
-      fontStyle: style.styleId === "soft" ? "normal" : style.fontStyle,
-    };
-  }
-
-  return {
-    ...style,
-    fontWeight: Math.max(400, style.fontWeight - (styleIndex % 2 ? 0 : 100)),
-    letterSpacing: styleIndex % 2 ? "0.075em" : "0.01em",
-    lineHeight: Math.min(1.2, style.lineHeight + 0.06),
-    fontStyle: style.styleId === "refined" ? "italic" : style.fontStyle,
-  };
-}
-
-/** Deterministic local batch used until a text-style provider is connected. */
-export function createTextStyleBatch(batch = 1, count = 8): GeneratedTextStyle[] {
-  const offset = (Math.max(1, batch) - 1) % textStyleIds.length;
-  return Array.from({ length: Math.min(count, textStyleIds.length) }, (_, index) => {
-    const styleId = textStyleIds[(index + offset) % textStyleIds.length]!;
-    return withBatchVariation(generatedTextStyle(styleId), index, batch);
-  });
-}
-
-/**
- * Provider boundary for future AI-assisted typography. The deterministic local
- * fallback keeps all eight style choices functional without exposing fonts.
- */
-export async function generateTextStyles({
-  count = 8,
-  batch = 1,
-}: TextStyleGenerationInput): Promise<GeneratedTextStyle[]> {
-  return createTextStyleBatch(batch, count);
 }
 
 export const defaultTextConfig: TextConfig = {

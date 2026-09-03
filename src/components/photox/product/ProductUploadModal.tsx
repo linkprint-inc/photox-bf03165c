@@ -94,6 +94,29 @@ function printLongEdge(sizeLabel: string) {
   return Math.max(Number(match[1]), Number(match[2]));
 }
 
+function cropPanLimits(image: PreparedImage, crop: CropPosition) {
+  const frameWidth = crop.aspectRatio;
+  const sourceAspect = image.width / image.height;
+  const baseWidth = sourceAspect >= frameWidth ? sourceAspect : frameWidth;
+  const baseHeight = sourceAspect >= frameWidth ? 1 : frameWidth / sourceAspect;
+  const zoomedWidth = baseWidth * crop.zoom;
+  const zoomedHeight = baseHeight * crop.zoom;
+  return {
+    x: Math.max(0, ((zoomedWidth - frameWidth) / (2 * zoomedWidth)) * 100),
+    y: Math.max(0, ((zoomedHeight - 1) / (2 * zoomedHeight)) * 100),
+  };
+}
+
+function constrainCrop(image: PreparedImage | null, crop: CropPosition) {
+  if (!image) return crop;
+  const limits = cropPanLimits(image, crop);
+  return {
+    ...crop,
+    x: Math.max(-limits.x, Math.min(limits.x, crop.x)),
+    y: Math.max(-limits.y, Math.min(limits.y, crop.y)),
+  };
+}
+
 export function ProductUploadModal({
   product,
   material,
@@ -148,13 +171,18 @@ export function ProductUploadModal({
   const [draftCrop, setDraftCrop] = useState<CropPosition | null>(null);
 
   const image = currentWorkingImage ?? originalSourceImage;
+  const updatePhotoCrop = (nextCrop: CropPosition) => setCrop(constrainCrop(image, nextCrop));
   const prepareCrop = cropEditing && draftCrop ? draftCrop : crop;
   const selectedSize = sizeSteps[sizeIndex]!;
   const roomWidth =
     ((orientation === "landscape" ? selectedSize.inches * 1.5 : selectedSize.inches) * 100) / 108;
   const requiredPixels = printLongEdge(sizeLabel) * 150;
-  const imageQuality =
-    image && Math.max(image.width, image.height) >= requiredPixels ? "good" : "low";
+  const croppedLongEdge = image
+    ? (crop.aspectRatio >= 1
+        ? Math.min(image.width, image.height * crop.aspectRatio)
+        : Math.min(image.height, image.width / crop.aspectRatio)) / crop.zoom
+    : 0;
+  const imageQuality = croppedLongEdge >= requiredPixels ? "good" : "low";
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -238,7 +266,7 @@ export function ProductUploadModal({
       setBusy(false);
       setToolError(null);
       setResetConfirming(false);
-      goTo("prepare");
+      goTo("photo");
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not read that image.");
     } finally {
@@ -262,7 +290,7 @@ export function ProductUploadModal({
       setTextConfig({
         ...defaultTextConfig,
         ...existing,
-        styleVersion: existing.styleVersion || (existing.text ? 1 : 0),
+        styleVersion: existing.styleVersion || 1,
       });
     }
   };
@@ -386,6 +414,23 @@ export function ProductUploadModal({
       y: Math.max(
         -40,
         Math.min(40, start.crop.y + ((clientY - start.clientY) / bounds.height) * 100),
+      ),
+    });
+  };
+
+  const moveCommittedCrop = (clientX: number, clientY: number, bounds: DOMRect) => {
+    const start = cropDragRef.current;
+    if (!start) return;
+    const limits = image ? cropPanLimits(image, start.crop) : { x: 0, y: 0 };
+    setCrop({
+      ...start.crop,
+      x: Math.max(
+        -limits.x,
+        Math.min(limits.x, start.crop.x + ((clientX - start.clientX) / bounds.width) * 100),
+      ),
+      y: Math.max(
+        -limits.y,
+        Math.min(limits.y, start.crop.y + ((clientY - start.clientY) / bounds.height) * 100),
       ),
     });
   };
@@ -539,11 +584,19 @@ export function ProductUploadModal({
                 sizeLabel={sizeLabel}
                 price={price}
                 orientation={orientation}
+                crop={crop}
                 onDragOver={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={load}
                 onPick={() => inputRef.current?.click()}
-                onContinue={() => goTo("prepare")}
+                onCropChange={updatePhotoCrop}
+                onCropStart={(clientX, clientY) => startCropDrag(clientX, clientY, crop)}
+                onCropMove={moveCommittedCrop}
+                onCropEnd={endCropDrag}
+                onContinue={() => {
+                  setCropApplied(true);
+                  goTo("prepare");
+                }}
               />
             ) : null}
             {step === "prepare" && image ? (
@@ -570,7 +623,7 @@ export function ProductUploadModal({
                 onCropStart={startCropDrag}
                 onCropMove={moveCrop}
                 onCropEnd={endCropDrag}
-                onEnterCrop={beginCrop}
+                onEnterCrop={() => goTo("photo")}
                 onApplyCrop={applyCrop}
                 onCancelCrop={cancelCrop}
                 onResetCrop={resetCrop}
@@ -602,10 +655,7 @@ export function ProductUploadModal({
                 onViewChange={setPreviewView}
                 onBack={() => goTo("prepare")}
                 onSizeChange={changePreviewSize}
-                onAdjustCrop={() => {
-                  beginCrop();
-                  goTo("prepare");
-                }}
+                onAdjustCrop={() => goTo("photo")}
                 onAddToBag={addCustomizedPrint}
               />
             ) : null}
@@ -647,10 +697,15 @@ function PhotoStep({
   sizeLabel,
   price,
   orientation,
+  crop,
   onDragOver,
   onDragLeave,
   onDrop,
   onPick,
+  onCropChange,
+  onCropStart,
+  onCropMove,
+  onCropEnd,
   onContinue,
 }: {
   image: PreparedImage | null;
@@ -661,10 +716,15 @@ function PhotoStep({
   sizeLabel: string;
   price: number;
   orientation: PrintOrientation;
+  crop: CropPosition;
   onDragOver: () => void;
   onDragLeave: () => void;
   onDrop: (file: File | undefined) => void;
   onPick: () => void;
+  onCropChange: (crop: CropPosition) => void;
+  onCropStart: (clientX: number, clientY: number) => void;
+  onCropMove: (clientX: number, clientY: number, bounds: DOMRect) => void;
+  onCropEnd: () => void;
   onContinue: () => void;
 }) {
   return (
@@ -689,7 +749,13 @@ function PhotoStep({
         }`}
       >
         {image ? (
-          <PreviewImageFrame image={image} alt="Your uploaded image" />
+          <CropCompositionFrame
+            image={image}
+            crop={crop}
+            onCropStart={onCropStart}
+            onCropMove={onCropMove}
+            onCropEnd={onCropEnd}
+          />
         ) : (
           <div className="text-center">
             <p className="px-label">Drop your image here</p>
@@ -707,7 +773,7 @@ function PhotoStep({
         {error ? <p className="px-meta absolute bottom-6 text-destructive">{error}</p> : null}
       </div>
       <aside className="flex flex-col lg:pt-0">
-        <div className="px-rule pt-5 lg:pt-0">
+        <div>
           <p className="px-label text-muted-foreground">Your print</p>
           <p className="px-label mt-4">{materialName[material]}</p>
           <p className="px-meta mt-2 text-muted-foreground">{sizeLabel}</p>
@@ -715,8 +781,32 @@ function PhotoStep({
             {orientation === "landscape" ? "Landscape" : "Portrait"}
           </p>
           <p className="px-price mt-5">${price}</p>
+          {image ? (
+            <div className="mt-8">
+              <p className="px-label text-muted-foreground">Crop &amp; position</p>
+              <p className="px-meta mt-2 text-muted-foreground">
+                Adjust which part of your image will be printed.
+              </p>
+              <label
+                htmlFor="photo-crop-zoom"
+                className="px-label mt-6 block text-muted-foreground"
+              >
+                Zoom
+              </label>
+              <input
+                id="photo-crop-zoom"
+                type="range"
+                min={1}
+                max={2.25}
+                step={0.01}
+                value={crop.zoom}
+                onChange={(event) => onCropChange({ ...crop, zoom: Number(event.target.value) })}
+                className="mt-3 w-full accent-foreground"
+              />
+            </div>
+          ) : null}
         </div>
-        <div className="mt-7">
+        <div className={image ? "mt-8" : "mt-7"}>
           {image ? (
             <>
               <button
@@ -746,6 +836,53 @@ function PhotoStep({
           )}
         </div>
       </aside>
+    </div>
+  );
+}
+
+function CropCompositionFrame({
+  image,
+  crop,
+  onCropStart,
+  onCropMove,
+  onCropEnd,
+}: {
+  image: PreparedImage;
+  crop: CropPosition;
+  onCropStart: (clientX: number, clientY: number) => void;
+  onCropMove: (clientX: number, clientY: number, bounds: DOMRect) => void;
+  onCropEnd: () => void;
+}) {
+  const portrait = crop.aspectRatio < 1;
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <div
+        onPointerDown={(event) => {
+          event.preventDefault();
+          event.currentTarget.setPointerCapture(event.pointerId);
+          onCropStart(event.clientX, event.clientY);
+        }}
+        onPointerMove={(event) => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            onCropMove(event.clientX, event.clientY, event.currentTarget.getBoundingClientRect());
+          }
+        }}
+        onPointerUp={onCropEnd}
+        onPointerCancel={onCropEnd}
+        className="relative touch-none overflow-hidden bg-secondary [container-type:inline-size] cursor-grab active:cursor-grabbing"
+        style={{
+          aspectRatio: crop.aspectRatio,
+          width: portrait ? undefined : "78%",
+          height: portrait ? "78%" : undefined,
+        }}
+      >
+        <PreparedPrintImage
+          image={image}
+          crop={crop}
+          alt="The printable crop area"
+          className="h-full w-full"
+        />
+      </div>
     </div>
   );
 }
@@ -924,7 +1061,7 @@ function PrepareStep({
           )}
         </div>
       </div>
-      <aside className="flex min-h-0 min-w-0 flex-col overflow-y-auto overscroll-contain border-t border-hairline pt-6 pb-[calc(1rem+env(safe-area-inset-bottom))] lg:h-full lg:overflow-visible lg:border-t-0 lg:pt-0 lg:pb-0">
+      <aside className="flex min-h-0 min-w-0 flex-col overflow-y-auto overscroll-contain pb-[calc(1rem+env(safe-area-inset-bottom))] lg:h-full lg:overflow-visible lg:pb-0">
         {editing && toolOriginal ? (
           <div
             key={editing}
@@ -969,25 +1106,32 @@ function PrepareStep({
                   : "This image may appear soft at the selected print size."}
               </p>
               {imageQuality === "low" ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenTool("enhance")}
-                  className="px-label px-underline mt-4 text-muted-foreground"
-                >
-                  Enhance resolution →
-                </button>
-              ) : null}
-              <ul className="mt-6 border-t border-hairline">
-                <li className="border-b border-hairline">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-x-8 gap-y-3">
                   <button
                     type="button"
                     onClick={onEnterCrop}
-                    className="px-label flex w-full items-center justify-between py-4 text-left"
+                    className="px-label px-underline text-muted-foreground"
                   >
-                    <span>Crop &amp; position</span>
-                    <span aria-hidden>{cropApplied ? "✓" : "→"}</span>
+                    Edit crop →
                   </button>
-                </li>
+                  <button
+                    type="button"
+                    onClick={() => onOpenTool("enhance")}
+                    className="px-label px-underline text-foreground/80"
+                  >
+                    Enhance resolution →
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={onEnterCrop}
+                  className="px-label px-underline mt-4 text-muted-foreground"
+                >
+                  Edit crop →
+                </button>
+              )}
+              <ul className="mt-6 border-t border-hairline">
                 {(["restore", "enhance", "text"] as const).map((tool) => (
                   <li key={tool} className="border-b border-hairline">
                     <button
@@ -1052,7 +1196,7 @@ function CropToolPanel({
         >
           ← Back
         </button>
-        <div className="px-rule pt-6">
+        <div>
           <p className="px-label text-muted-foreground">Image preparation</p>
           <h3 className="px-label mt-2">Crop &amp; position</h3>
           <p className="px-meta mt-2 max-w-[38ch] text-muted-foreground">
@@ -1316,7 +1460,7 @@ function PreviewStep({
         </div>
       </div>
       <aside className="flex flex-col lg:py-0">
-        <div className="px-rule pt-0">
+        <div>
           <p className="px-label text-muted-foreground">Your print</p>
           <p className="px-label mt-4">{materialName[material]}</p>
           <div className="mt-6">

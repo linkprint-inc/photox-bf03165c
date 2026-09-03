@@ -475,7 +475,7 @@ export function CustomBuilder({
                   busy={busy}
                   error={toolError}
                   onRun={() => void run()}
-                  onGenerateText={(config) => {
+                  onTextStyleChange={(config) => {
                     setCfg(config);
                     void run(config);
                   }}
