@@ -13,7 +13,7 @@ import type { TextConfig, ToolId } from "./image-tools";
 import type { PreparedImage } from "./prepared-image";
 
 export type BagMaterial = "metal";
-export type PrintOrientation = "landscape" | "portrait";
+export type PrintOrientation = "landscape" | "square" | "portrait";
 
 export type CropPosition = {
   zoom: number;
@@ -130,6 +130,7 @@ export function orientedSizeLabel(sizeIndex: number, orientation: PrintOrientati
   const label = sizeLabel(sizeIndex);
   if (orientation === "portrait") return label;
   const match = label.match(/(\d+)\s*×\s*(\d+)(.*)/);
+  if (orientation === "square") return match ? `${match[1]} × ${match[1]}${match[3]}` : label;
   return match ? `${match[2]} × ${match[1]}${match[3]}` : label;
 }
 

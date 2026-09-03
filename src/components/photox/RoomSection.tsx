@@ -14,6 +14,7 @@ const rooms = [
     price: 249,
     ratio: "7 / 5",
     className: "md:col-span-7",
+    href: "/products/north-sea",
   },
   {
     label: "Bedroom",
@@ -25,6 +26,7 @@ const rooms = [
     price: 189,
     ratio: "4 / 5",
     className: "md:col-span-4 md:col-start-9 md:mt-28",
+    href: "/products/monolith",
   },
   {
     label: "Workspace",
@@ -36,6 +38,7 @@ const rooms = [
     price: 159,
     ratio: "5 / 4",
     className: "md:col-span-5 md:col-start-2 md:-mt-16",
+    href: "/products/red-field-02",
   },
   {
     label: "Dining",
@@ -47,6 +50,7 @@ const rooms = [
     price: 199,
     ratio: "4 / 5",
     className: "md:col-span-4 md:col-start-8 md:mt-20",
+    href: "/products/after-the-rain",
   },
 ];
 
@@ -61,7 +65,7 @@ export function RoomSection() {
       <div className="mt-14 grid gap-x-8 gap-y-16 md:grid-cols-12">
         {rooms.map((r) => (
           <article key={r.label} className={r.className}>
-            <a href="/shop" className="group relative block overflow-hidden">
+            <a href={r.href} className="group relative block overflow-hidden">
               <div className="w-full" style={{ aspectRatio: r.ratio }}>
                 <img
                   src={r.image}

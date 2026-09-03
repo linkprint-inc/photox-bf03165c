@@ -33,7 +33,7 @@ const entries = [
     cta: "Create your print →",
     image: idxCustom,
     alt: "A small photograph beside the same image finished as a large metal print",
-    href: "/custom",
+    href: "/products/north-sea",
   },
 ];
 

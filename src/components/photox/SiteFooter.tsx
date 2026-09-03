@@ -31,7 +31,7 @@ const columns: FooterColumn[] = [
     links: [
       { label: "About photoX", href: "/about" },
       { label: "Materials", href: "/about" },
-      { label: "Print Process", href: "/custom" },
+      { label: "Print Process", href: "/metal" },
     ],
   },
   {

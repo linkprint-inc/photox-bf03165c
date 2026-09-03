@@ -65,7 +65,7 @@ export function MaterialExplorer() {
               <p className="px-price">
                 <span className="px-label mr-1 opacity-70">From</span>${s.from}
               </p>
-              <a href="/custom" className="px-label px-underline">
+              <a href="/products/north-sea" className="px-label px-underline">
                 {s.cta}
               </a>
             </div>

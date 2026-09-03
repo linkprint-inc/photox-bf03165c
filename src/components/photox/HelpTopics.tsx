@@ -82,7 +82,7 @@ const topics: Topic[] = [
     descriptor: "Custom prints and image quality.",
     image: helpImage,
     alt: "A photograph on a screen beside the same photograph as a physical print",
-    destination: { label: "Go to Custom", href: "/custom" },
+    destination: { label: "Choose a Metal Print", href: "/products/north-sea" },
     answers: [
       {
         q: "Can I print my own photo or artwork?",
@@ -168,7 +168,7 @@ const topics: Topic[] = [
     descriptor: "Uploads, ownership and privacy.",
     image: helpPrivacy,
     alt: "Close detail of a fine art print edge",
-    destination: { label: "Go to Custom", href: "/custom" },
+    destination: { label: "Choose a Metal Print", href: "/products/north-sea" },
     answers: [
       {
         q: "Can I print my own artwork?",

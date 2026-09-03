@@ -173,7 +173,7 @@ export function SiteNav({
                 ))}
                 <li className="border-t border-foreground/10 px-5 py-4">
                   <a
-                    href="/custom"
+                    href={landscapeHref}
                     onClick={() => setCreateOpen(false)}
                     className="px-meta px-underline text-muted-foreground transition-colors hover:text-foreground"
                   >
@@ -292,7 +292,7 @@ export function SiteNav({
                 ))}
               </div>
               <a
-                href="/custom"
+                href={landscapeHref}
                 onClick={() => setMenuOpen(false)}
                 className="px-meta px-underline mt-4 inline-block text-muted-foreground"
               >

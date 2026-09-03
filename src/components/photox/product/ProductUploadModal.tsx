@@ -39,7 +39,9 @@ type ProductUploadModalProps = {
   sizeLabel: string;
   price: number;
   orientation: PrintOrientation;
+  initialImage?: PreparedImage;
   onSizeChange: (sizeIndex: number) => void;
+  onOrientationChange: (orientation: PrintOrientation) => void;
   onClose: () => void;
 };
 
@@ -48,6 +50,16 @@ const steps: Array<{ key: Exclude<Step, "success">; label: string }> = [
   { key: "photo", label: "Your photo" },
   { key: "prepare", label: "Prepare" },
   { key: "preview", label: "Preview" },
+];
+
+const printFormats: Array<{
+  key: PrintOrientation;
+  label: string;
+  shape: string;
+}> = [
+  { key: "landscape", label: "Landscape", shape: "h-[14px] w-[22px]" },
+  { key: "square", label: "Square", shape: "h-[17px] w-[17px]" },
+  { key: "portrait", label: "Portrait", shape: "h-[22px] w-[14px]" },
 ];
 
 const defaultCrop: CropPosition = { zoom: 1, x: 0, y: 0, aspectRatio: 1.5 };
@@ -124,7 +136,9 @@ export function ProductUploadModal({
   sizeLabel,
   price,
   orientation,
+  initialImage,
   onSizeChange,
+  onOrientationChange,
   onClose,
 }: ProductUploadModalProps) {
   const { image: savedImage, setImage } = usePreparedImage();
@@ -135,13 +149,15 @@ export function ProductUploadModal({
   const cropDragRef = useRef<{ clientX: number; clientY: number; crop: CropPosition } | null>(null);
   const toolRunRef = useRef(0);
   const [savedDraft] = useState(() => readCustomizationDraft(product.id));
-  const [step, setStep] = useState<Step>(savedDraft || savedImage ? "prepare" : "photo");
+  const resumesDraft = Boolean(savedDraft && !initialImage);
+  const startingImage = initialImage ?? savedImage;
+  const [step, setStep] = useState<Step>(resumesDraft ? "prepare" : "photo");
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
   const [originalSourceImage, setOriginalSourceImage] = useState<PreparedImage | null>(
-    savedDraft?.originalImage ?? savedImage,
+    resumesDraft ? (savedDraft?.originalImage ?? null) : startingImage,
   );
   const [currentWorkingImage, setCurrentWorkingImage] = useState<PreparedImage | null>(
-    savedDraft?.image ?? savedImage,
+    resumesDraft ? (savedDraft?.image ?? null) : startingImage,
   );
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -151,21 +167,25 @@ export function ProductUploadModal({
   const [result, setResult] = useState<PreparedImage | null>(null);
   const [busy, setBusy] = useState(false);
   const [toolError, setToolError] = useState<string | null>(null);
-  const [applied, setApplied] = useState<ToolId[]>(savedDraft?.applied ?? []);
+  const [applied, setApplied] = useState<ToolId[]>(resumesDraft ? (savedDraft?.applied ?? []) : []);
   const [textConfig, setTextConfig] = useState<TextConfig>(
-    savedDraft?.textConfig ?? defaultTextConfig,
+    resumesDraft ? (savedDraft?.textConfig ?? defaultTextConfig) : defaultTextConfig,
   );
   const [appliedTextConfig, setAppliedTextConfig] = useState<TextConfig | null>(
-    savedDraft?.appliedTextConfig ?? null,
+    resumesDraft ? (savedDraft?.appliedTextConfig ?? null) : null,
   );
-  const [previewView, setPreviewView] = useState<PreviewView>(savedDraft?.previewView ?? "room");
+  const [previewView, setPreviewView] = useState<PreviewView>(
+    resumesDraft ? (savedDraft?.previewView ?? "room") : "room",
+  );
   const [cropNeedsAdjustment, setCropNeedsAdjustment] = useState(false);
   const [cropEditing, setCropEditing] = useState(false);
   const [cropSource, setCropSource] = useState<PreparedImage | null>(null);
-  const [cropApplied, setCropApplied] = useState(savedDraft?.cropApplied ?? false);
+  const [cropApplied, setCropApplied] = useState(
+    resumesDraft ? (savedDraft?.cropApplied ?? false) : false,
+  );
   const [resetConfirming, setResetConfirming] = useState(false);
   const [crop, setCrop] = useState<CropPosition>({
-    ...(savedDraft?.crop ?? defaultCrop),
+    ...(resumesDraft ? (savedDraft?.crop ?? defaultCrop) : defaultCrop),
     aspectRatio: printAspectRatio(sizeLabel),
   });
   const [draftCrop, setDraftCrop] = useState<CropPosition | null>(null);
@@ -183,6 +203,10 @@ export function ProductUploadModal({
         : Math.min(image.height, image.width / crop.aspectRatio)) / crop.zoom
     : 0;
   const imageQuality = croppedLongEdge >= requiredPixels ? "good" : "low";
+
+  useEffect(() => {
+    if (initialImage) setImage(initialImage);
+  }, [initialImage, setImage]);
 
   useEffect(() => {
     closeRef.current?.focus();
@@ -237,6 +261,28 @@ export function ProductUploadModal({
     setStep(next);
   };
 
+  const acceptImage = (next: PreparedImage) => {
+    setImage(next);
+    setOriginalSourceImage(next);
+    setCurrentWorkingImage(next);
+    setApplied([]);
+    setTextConfig({ ...defaultTextConfig });
+    setAppliedTextConfig(null);
+    setCrop({ ...defaultCrop, aspectRatio: printAspectRatio(sizeLabel) });
+    setCropNeedsAdjustment(false);
+    setCropEditing(false);
+    setCropSource(null);
+    setDraftCrop(null);
+    setCropApplied(false);
+    setEditing(null);
+    setToolOriginal(null);
+    setResult(null);
+    setBusy(false);
+    setToolError(null);
+    setResetConfirming(false);
+    goTo("photo");
+  };
+
   const load = async (file: File | undefined) => {
     if (!file || uploading) return;
     toolRunRef.current += 1;
@@ -247,31 +293,18 @@ export function ProductUploadModal({
     }
     setUploading(true);
     try {
-      const next = await readImageFile(file);
-      setImage(next);
-      setOriginalSourceImage(next);
-      setCurrentWorkingImage(next);
-      setApplied([]);
-      setTextConfig({ ...defaultTextConfig });
-      setAppliedTextConfig(null);
-      setCrop({ ...defaultCrop, aspectRatio: printAspectRatio(sizeLabel) });
-      setCropNeedsAdjustment(false);
-      setCropEditing(false);
-      setCropSource(null);
-      setDraftCrop(null);
-      setCropApplied(false);
-      setEditing(null);
-      setToolOriginal(null);
-      setResult(null);
-      setBusy(false);
-      setToolError(null);
-      setResetConfirming(false);
-      goTo("photo");
+      acceptImage(await readImageFile(file));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Could not read that image.");
     } finally {
       setUploading(false);
     }
+  };
+
+  const openNativeImagePicker = () => {
+    if (!inputRef.current) return;
+    inputRef.current.value = "";
+    inputRef.current.click();
   };
 
   const openTool = (tool: ToolId) => {
@@ -481,6 +514,27 @@ export function ProductUploadModal({
     onSizeChange(nextSizeIndex);
   };
 
+  const changePrintFormat = (nextOrientation: PrintOrientation) => {
+    if (nextOrientation === orientation) return;
+    const nextAspectRatio = printAspectRatio(orientedSizeLabel(sizeIndex, nextOrientation));
+    setCrop((current) =>
+      constrainCrop(image, {
+        ...current,
+        aspectRatio: nextAspectRatio,
+      }),
+    );
+    setDraftCrop((current) =>
+      current
+        ? constrainCrop(image, {
+            ...current,
+            aspectRatio: nextAspectRatio,
+          })
+        : current,
+    );
+    setCropNeedsAdjustment(false);
+    onOrientationChange(nextOrientation);
+  };
+
   const addCustomizedPrint = () => {
     if (!image || !originalSourceImage) return;
     addToBag({
@@ -520,7 +574,7 @@ export function ProductUploadModal({
         className="absolute inset-0 cursor-default"
       />
       <section
-        className={`relative z-10 flex h-[96dvh] w-full flex-col overflow-hidden border border-foreground/15 bg-paper shadow-[0_16px_38px_rgba(30,25,20,0.08)] md:h-[84vh] md:w-[86vw] md:max-w-[1280px] ${step === "prepare" ? "px-prepare-modal" : ""}`}
+        className={`px-customize-editor-enter relative z-10 flex h-[96dvh] w-full flex-col overflow-hidden border border-foreground/15 bg-paper shadow-[0_16px_38px_rgba(30,25,20,0.08)] md:h-[84vh] md:w-[86vw] md:max-w-[1280px] ${step === "prepare" ? "px-prepare-modal" : ""}`}
       >
         <header className="relative z-10 shrink-0 flex items-center justify-between gap-4 border-b border-hairline bg-paper px-6 py-5 md:px-8">
           <p id="customize-print-title" className="px-label shrink-0">
@@ -581,18 +635,21 @@ export function ProductUploadModal({
                 uploading={uploading}
                 error={error}
                 material={material}
-                sizeLabel={sizeLabel}
                 price={price}
                 orientation={orientation}
+                sizeIndex={sizeIndex}
                 crop={crop}
                 onDragOver={() => setDragOver(true)}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={load}
-                onPick={() => inputRef.current?.click()}
+                onPick={openNativeImagePicker}
                 onCropChange={updatePhotoCrop}
                 onCropStart={(clientX, clientY) => startCropDrag(clientX, clientY, crop)}
                 onCropMove={moveCommittedCrop}
                 onCropEnd={endCropDrag}
+                onReplaceImage={openNativeImagePicker}
+                onFormatChange={changePrintFormat}
+                onSizeChange={changePreviewSize}
                 onContinue={() => {
                   setCropApplied(true);
                   goTo("prepare");
@@ -694,7 +751,7 @@ function PhotoStep({
   uploading,
   error,
   material,
-  sizeLabel,
+  sizeIndex,
   price,
   orientation,
   crop,
@@ -706,6 +763,9 @@ function PhotoStep({
   onCropStart,
   onCropMove,
   onCropEnd,
+  onReplaceImage,
+  onFormatChange,
+  onSizeChange,
   onContinue,
 }: {
   image: PreparedImage | null;
@@ -713,7 +773,7 @@ function PhotoStep({
   uploading: boolean;
   error: string | null;
   material: BagMaterial;
-  sizeLabel: string;
+  sizeIndex: number;
   price: number;
   orientation: PrintOrientation;
   crop: CropPosition;
@@ -725,6 +785,9 @@ function PhotoStep({
   onCropStart: (clientX: number, clientY: number) => void;
   onCropMove: (clientX: number, clientY: number, bounds: DOMRect) => void;
   onCropEnd: () => void;
+  onReplaceImage: () => void;
+  onFormatChange: (orientation: PrintOrientation) => void;
+  onSizeChange: (sizeIndex: number) => void;
   onContinue: () => void;
 }) {
   return (
@@ -776,13 +839,57 @@ function PhotoStep({
         <div>
           <p className="px-label text-muted-foreground">Your print</p>
           <p className="px-label mt-4">{materialName[material]}</p>
-          <p className="px-meta mt-2 text-muted-foreground">{sizeLabel}</p>
-          <p className="px-meta mt-1 text-muted-foreground">
-            {orientation === "landscape" ? "Landscape" : "Portrait"}
-          </p>
+          <div className="mt-7">
+            <p className="px-label text-muted-foreground">Format</p>
+            <div className="mt-3 flex items-center gap-2" role="group" aria-label="Print format">
+              {printFormats.map(({ key, label, shape }) => {
+                const selected = orientation === key;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => onFormatChange(key)}
+                    aria-label={label}
+                    aria-pressed={selected}
+                    className="flex h-10 w-10 items-center justify-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
+                  >
+                    <span
+                      aria-hidden
+                      className={`${shape} border transition-colors ${selected ? "border-foreground" : "border-foreground/35 hover:border-foreground/65"}`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="mt-7">
+            <label htmlFor="print-size" className="px-label text-muted-foreground">
+              Size
+            </label>
+            <div className="relative mt-3">
+              <select
+                id="print-size"
+                value={sizeIndex}
+                onChange={(event) => onSizeChange(Number(event.target.value))}
+                className="px-label block w-full appearance-none border-b border-hairline bg-transparent py-2.5 pr-8 text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
+              >
+                {sizeSteps.map((size, index) => (
+                  <option key={size.label} value={index}>
+                    {orientedSizeLabel(index, orientation)} — ${unitPrice(material, index)}
+                  </option>
+                ))}
+              </select>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                ▾
+              </span>
+            </div>
+          </div>
           <p className="px-price mt-5">${price}</p>
           {image ? (
-            <div className="mt-8">
+            <div className="mt-7">
               <p className="px-label text-muted-foreground">Crop &amp; position</p>
               <p className="px-meta mt-2 text-muted-foreground">
                 Adjust which part of your image will be printed.
@@ -818,7 +925,7 @@ function PhotoStep({
               </button>
               <button
                 type="button"
-                onClick={onPick}
+                onClick={onReplaceImage}
                 className="px-label px-underline mt-5 text-muted-foreground"
               >
                 Replace image →

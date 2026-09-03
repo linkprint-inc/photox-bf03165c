@@ -4,8 +4,22 @@ import { Shell, SectionHead } from "../Section";
 import { ShopProductCard } from "../shop/ShopProductCard";
 import { ProductReviews, RatingJump } from "./ProductReviews";
 import { ProductUploadModal } from "./ProductUploadModal";
-import { MainVisual, PrintFace, type ViewMode } from "./ProductVisual";
-import { categoryLabel, closeUps, productInfo, relatedProducts } from "@/lib/product-detail";
+import {
+  MainVisual,
+  MediaThumbnail,
+  PrintFace,
+  type GalleryMediaItem,
+  type ViewMode,
+} from "./ProductVisual";
+import {
+  categoryLabel,
+  closeUps,
+  dedicatedDetailFor,
+  productInfo,
+  relatedProducts,
+} from "@/lib/product-detail";
+import { hoverImages } from "@/lib/hover-images";
+import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
   materialName,
@@ -21,6 +35,92 @@ const views: { key: ViewMode; label: string }[] = [
   { key: "detail", label: "Detail" },
   { key: "room", label: "In a room" },
 ];
+
+type ProductMediaItem = GalleryMediaItem & { id: string; label: string };
+type GalleryGroup = {
+  id: string;
+  artwork: ProductMediaItem;
+  detail: ProductMediaItem;
+  room: ProductMediaItem;
+};
+type GalleryCarouselItem = ProductMediaItem & { groupIndex: number; view: ViewMode };
+type ProductMedia = {
+  artworkSource: string;
+  groups: GalleryGroup[];
+  carousel: GalleryCarouselItem[];
+};
+const GALLERY_GROUP_COUNT = 3;
+
+function groupMedia(item: ProductMediaItem, view: ViewMode, groupIndex: number): ProductMediaItem {
+  return {
+    ...item,
+    id: `group-${groupIndex + 1}-${view}-${item.id}`,
+    label: `Group ${groupIndex + 1}, ${item.label}`,
+  };
+}
+
+/** Every gallery variant uses this one product artwork source. */
+function productMedia(product: ShopProduct): ProductMedia {
+  const matchingShopRoom = hoverImages[product.id];
+  const dedicatedDetail = dedicatedDetailFor(product, "metal");
+  const artwork: ProductMediaItem[] = [
+    { id: "original", label: "Original artwork", presentation: "original" },
+    { id: "metal-front", label: "Metal print front", presentation: "front" },
+    ...(matchingShopRoom
+      ? [
+          {
+            id: "shop-room",
+            label: "Metal print in a room",
+            presentation: "room-image" as const,
+            source: matchingShopRoom,
+          },
+        ]
+      : []),
+    ...(dedicatedDetail
+      ? [
+          {
+            id: "metal-close",
+            label: "Metal print close-up",
+            presentation: "detail-image" as const,
+            source: dedicatedDetail,
+          },
+        ]
+      : []),
+  ];
+  const detail: ProductMediaItem[] = [
+    { id: "surface", label: "Surface", presentation: "front" },
+    { id: "edge", label: "Metal edge", presentation: "front" },
+    { id: "reflection", label: "Reflection detail", presentation: "front" },
+  ];
+  const room: ProductMediaItem[] = [
+    ...(matchingShopRoom
+      ? [
+          {
+            id: "shop-room",
+            label: "Shop room view",
+            presentation: "room-image" as const,
+            source: matchingShopRoom,
+          },
+        ]
+      : []),
+    { id: "room-standard", label: "Room scale", presentation: "room" },
+    { id: "room-large", label: "Larger room scale", presentation: "room" },
+  ];
+  const groups = Array.from({ length: GALLERY_GROUP_COUNT }, (_, groupIndex) => ({
+    id: `group-${groupIndex + 1}`,
+    artwork: groupMedia(artwork[groupIndex % artwork.length]!, "artwork", groupIndex),
+    detail: groupMedia(detail[groupIndex % detail.length]!, "detail", groupIndex),
+    room: groupMedia(room[groupIndex % room.length]!, "room", groupIndex),
+  }));
+  const carousel = groups.flatMap((group, groupIndex) =>
+    views.map((view) => ({ ...group[view.key], groupIndex, view: view.key })),
+  );
+  return {
+    artworkSource: product.image,
+    groups,
+    carousel,
+  };
+}
 
 function parsePhysicalSize(size: (typeof sizeSteps)[number]) {
   const match = size.label.match(/(\d+)\s*×\s*(\d+)/);
@@ -44,7 +144,8 @@ function SizePrint({
   orientation: PrintOrientation;
 }) {
   const { width, height } = parsePhysicalSize(size);
-  const aspectRatio = orientation === "landscape" ? width / height : height / width;
+  const aspectRatio =
+    orientation === "landscape" ? width / height : orientation === "square" ? 1 : height / width;
   return (
     <div
       className={["relative w-full overflow-hidden bg-secondary shadow-sm", "px-gloss"].join(" ")}
@@ -61,23 +162,181 @@ function SizePrint({
   );
 }
 
+function MediaRail({
+  product,
+  items,
+  activeIndex,
+  onSelect,
+  orientation,
+  inches,
+  sizeLabel,
+  artworkSource,
+  layout,
+}: {
+  product: ShopProduct;
+  items: GalleryCarouselItem[];
+  activeIndex: number;
+  onSelect: (index: number) => void;
+  orientation: PrintOrientation;
+  inches: number;
+  sizeLabel: string;
+  artworkSource: string;
+  layout: "vertical" | "horizontal";
+}) {
+  const isVertical = layout === "vertical";
+  const itemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  useEffect(() => {
+    if (!isVertical) return;
+
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const updateScrollControls = () => {
+      const maxScroll = Math.max(0, rail.scrollHeight - rail.clientHeight);
+      setCanScrollUp(rail.scrollTop > 1);
+      setCanScrollDown(rail.scrollTop < maxScroll - 1);
+    };
+
+    const frame = window.requestAnimationFrame(updateScrollControls);
+    const resizeObserver = new ResizeObserver(updateScrollControls);
+    resizeObserver.observe(rail);
+    rail.addEventListener("scroll", updateScrollControls, { passive: true });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      rail.removeEventListener("scroll", updateScrollControls);
+    };
+  }, [isVertical, items.length]);
+
+  useEffect(() => {
+    if (!isVertical) return;
+    itemRefs.current[activeIndex]?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: "smooth",
+    });
+  }, [activeIndex, isVertical]);
+
+  const scrollRail = (direction: -1 | 1) => {
+    railRef.current?.scrollBy({ top: direction * 88, behavior: "smooth" });
+  };
+
+  const mediaButtons = items.map((item, index) => {
+    const selected = index === activeIndex;
+    return (
+      <button
+        key={item.id}
+        ref={(element) => {
+          itemRefs.current[index] = element;
+        }}
+        type="button"
+        onClick={() => onSelect(index)}
+        aria-label={item.label}
+        aria-pressed={selected}
+        className={[
+          "aspect-square shrink-0 overflow-hidden border transition-[border-color,opacity] duration-200 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65",
+          isVertical ? "w-[76px]" : "w-[72px]",
+          selected
+            ? "border-foreground opacity-100"
+            : "border-hairline opacity-65 hover:opacity-100",
+        ].join(" ")}
+        role="listitem"
+      >
+        <MediaThumbnail
+          product={product}
+          view={item.view}
+          mediaIndex={item.groupIndex}
+          orientation={orientation}
+          inches={inches}
+          sizeLabel={sizeLabel}
+          artworkSource={artworkSource}
+          media={item}
+        />
+      </button>
+    );
+  });
+
+  if (!isVertical) {
+    return (
+      <div
+        className="mt-3 flex gap-3 overflow-x-auto pb-px md:hidden"
+        aria-label="Product media"
+        role="list"
+      >
+        {mediaButtons}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative hidden h-full min-h-0 w-[76px] overflow-hidden md:block">
+      <div
+        ref={railRef}
+        className="flex h-full min-h-0 flex-col gap-3 overflow-y-auto overscroll-contain pr-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Product media"
+        role="list"
+      >
+        {mediaButtons}
+      </div>
+      <button
+        type="button"
+        onClick={() => scrollRail(-1)}
+        disabled={!canScrollUp}
+        aria-label="Scroll gallery thumbnails up"
+        className="px-label absolute left-1/2 top-2 z-10 flex h-9 w-9 -translate-x-1/2 items-center justify-center bg-[rgba(250,249,246,0.82)] text-foreground/70 opacity-85 backdrop-blur-[2px] transition-[color,opacity] duration-200 hover:text-foreground hover:opacity-100 disabled:pointer-events-none disabled:opacity-20 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
+      >
+        ↑
+      </button>
+      <button
+        type="button"
+        onClick={() => scrollRail(1)}
+        disabled={!canScrollDown}
+        aria-label="Scroll gallery thumbnails down"
+        className="px-label absolute bottom-2 left-1/2 z-10 flex h-9 w-9 -translate-x-1/2 items-center justify-center bg-[rgba(250,249,246,0.82)] text-foreground/70 opacity-85 backdrop-blur-[2px] transition-[color,opacity] duration-200 hover:text-foreground hover:opacity-100 disabled:pointer-events-none disabled:opacity-20 focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
+      >
+        ↓
+      </button>
+    </div>
+  );
+}
+
 export function ProductDetail({ product }: { product: ShopProduct }) {
   const material: BagMaterial = "metal";
   const [sizeIndex, setSizeIndex] = useState(2);
   const [orientation, setOrientation] = useState<PrintOrientation>(
-    product.orientation === "Portrait" ? "portrait" : "landscape",
+    product.orientation === "Portrait"
+      ? "portrait"
+      : product.orientation === "Square"
+        ? "square"
+        : "landscape",
   );
-  const [view, setView] = useState<ViewMode>("artwork");
+  const [mediaPosition, setMediaPosition] = useState(0);
+  const [carouselDirection, setCarouselDirection] = useState<-1 | 1>(1);
+  const [customizationEntry, setCustomizationEntry] = useState<"idle" | "editing">("idle");
+  const [selectedImage, setSelectedImage] = useState<PreparedImage | null>(null);
+  const [imagePickerError, setImagePickerError] = useState<string | null>(null);
   const [openInfo, setOpenInfo] = useState<string | null>(null);
-  const [uploadOpen, setUploadOpen] = useState(false);
   const [mainCtaVisible, setMainCtaVisible] = useState<boolean | null>(null);
   const mainCtaRef = useRef<HTMLButtonElement>(null);
+  const imagePickerRef = useRef<HTMLInputElement>(null);
+  const mediaSwipeStartRef = useRef<number | null>(null);
   const { toggleSaved, isSaved, hydrated } = useStore();
 
   useEffect(() => {
     setSizeIndex(2);
-    setOrientation(product.orientation === "Portrait" ? "portrait" : "landscape");
-    setView("artwork");
+    setOrientation(
+      product.orientation === "Portrait"
+        ? "portrait"
+        : product.orientation === "Square"
+          ? "square"
+          : "landscape",
+    );
+    setMediaPosition(0);
   }, [product.id, product.orientation]);
 
   useEffect(() => {
@@ -126,6 +385,72 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const price = unitPrice(material, sizeIndex);
   const saved = hydrated && isSaved(product.id);
   const related = useMemo(() => relatedProducts(product), [product]);
+  const gallery = useMemo(() => productMedia(product), [product]);
+  const currentMedia = gallery.carousel[mediaPosition]!;
+  const currentView = currentMedia.view;
+  const currentGroupIndex = currentMedia.groupIndex;
+  const changeMedia = (nextPosition: number) => {
+    const total = gallery.carousel.length;
+    const next = (nextPosition + total) % total;
+    setCarouselDirection(nextPosition > mediaPosition ? 1 : -1);
+    setMediaPosition(next);
+  };
+  const moveMedia = (direction: -1 | 1) => {
+    setCarouselDirection(direction);
+    setMediaPosition(
+      (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
+    );
+  };
+  const selectView = (nextView: ViewMode) => {
+    changeMedia(
+      currentGroupIndex * views.length + views.findIndex((view) => view.key === nextView),
+    );
+  };
+  const openNativeImagePicker = () => {
+    setImagePickerError(null);
+    if (imagePickerRef.current) {
+      imagePickerRef.current.value = "";
+      imagePickerRef.current.click();
+    }
+  };
+  const selectCustomizationImage = async (file: File | undefined) => {
+    if (!file) return;
+    if (!acceptedTypes.split(",").includes(file.type)) {
+      setImagePickerError("Choose a JPG, PNG or WebP image.");
+      return;
+    }
+    try {
+      const image = await readImageFile(file);
+      setSelectedImage(image);
+      setCustomizationEntry("editing");
+    } catch (reason) {
+      setImagePickerError(reason instanceof Error ? reason.message : "Could not read that image.");
+    }
+  };
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (
+        !desktop.matches ||
+        event.defaultPrevented ||
+        target?.isContentEditable ||
+        ["INPUT", "TEXTAREA", "SELECT", "BUTTON"].includes(target?.tagName ?? "")
+      ) {
+        return;
+      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        const direction = event.key === "ArrowLeft" ? -1 : 1;
+        setCarouselDirection(direction);
+        setMediaPosition(
+          (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
+        );
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [gallery.carousel.length]);
 
   return (
     <>
@@ -142,34 +467,102 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         <div className="mt-5 grid gap-10 lg:grid-cols-12 lg:gap-12">
           {/* LEFT — product visual */}
           <div className="lg:col-span-7">
-            <MainVisual
-              product={product}
-              material={material}
-              view={view}
-              inches={size.inches}
-              sizeLabel={sizeLabel}
-              orientation={orientation}
-            />
-
-            <ul className="mt-4 flex gap-6">
-              {views.map((v) => (
-                <li key={v.key}>
-                  <button
-                    type="button"
-                    onClick={() => setView(v.key)}
-                    aria-pressed={view === v.key}
-                    className={[
-                      "px-label px-underline transition-opacity duration-[420ms]",
-                      view === v.key
-                        ? "opacity-100 after:scale-x-100"
-                        : "opacity-45 hover:opacity-100",
-                    ].join(" ")}
-                  >
-                    {v.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <div className="grid min-w-0 md:grid-cols-[76px_minmax(0,1fr)] md:gap-x-4">
+              <div className="relative hidden min-h-0 overflow-hidden [contain:size] md:block">
+                <MediaRail
+                  product={product}
+                  items={gallery.carousel}
+                  activeIndex={mediaPosition}
+                  onSelect={changeMedia}
+                  orientation={orientation}
+                  inches={size.inches}
+                  sizeLabel={sizeLabel}
+                  artworkSource={gallery.artworkSource}
+                  layout="vertical"
+                />
+              </div>
+              <div
+                className="group relative min-w-0"
+                onPointerDown={(event) => {
+                  mediaSwipeStartRef.current = event.clientX;
+                }}
+                onPointerUp={(event) => {
+                  const start = mediaSwipeStartRef.current;
+                  mediaSwipeStartRef.current = null;
+                  if (start === null || Math.abs(event.clientX - start) < 48) return;
+                  moveMedia(event.clientX < start ? 1 : -1);
+                }}
+                onPointerCancel={() => {
+                  mediaSwipeStartRef.current = null;
+                }}
+              >
+                <div
+                  key={mediaPosition}
+                  className={carouselDirection === 1 ? "px-carousel-next" : "px-carousel-previous"}
+                >
+                  <MainVisual
+                    product={product}
+                    material={material}
+                    view={currentView}
+                    inches={size.inches}
+                    sizeLabel={sizeLabel}
+                    orientation={orientation}
+                    mediaIndex={currentGroupIndex}
+                    artworkSource={gallery.artworkSource}
+                    media={currentMedia}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => moveMedia(-1)}
+                  aria-label="Previous product image"
+                  className="absolute left-3 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-foreground/15 bg-paper/85 text-foreground/80 opacity-60 transition-opacity group-hover:opacity-90 hover:opacity-100 focus-visible:opacity-100"
+                >
+                  ←
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveMedia(1)}
+                  aria-label="Next product image"
+                  className="absolute right-3 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-foreground/15 bg-paper/85 text-foreground/80 opacity-60 transition-opacity group-hover:opacity-90 hover:opacity-100 focus-visible:opacity-100"
+                >
+                  →
+                </button>
+              </div>
+              <div aria-hidden className="hidden md:block" />
+              <div className="min-w-0 md:col-start-2">
+                <MediaRail
+                  product={product}
+                  items={gallery.carousel}
+                  activeIndex={mediaPosition}
+                  onSelect={changeMedia}
+                  orientation={orientation}
+                  inches={size.inches}
+                  sizeLabel={sizeLabel}
+                  artworkSource={gallery.artworkSource}
+                  layout="horizontal"
+                />
+                <ul className="mt-4 flex gap-6">
+                  {views.map((v) => (
+                    <li key={v.key}>
+                      <button
+                        type="button"
+                        onClick={() => selectView(v.key)}
+                        aria-pressed={currentView === v.key}
+                        className={[
+                          "px-label px-underline transition-opacity duration-[420ms]",
+                          currentView === v.key
+                            ? "opacity-100 after:scale-x-100"
+                            : "opacity-45 hover:opacity-100",
+                        ].join(" ")}
+                      >
+                        {v.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* RIGHT — purchase configuration */}
@@ -202,90 +595,17 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                 </button>
               </div>
               <p className="px-meta mt-2 text-muted-foreground">
-                {orientation === "landscape" ? "Landscape" : "Portrait"} · Metal Print
+                {product.orientation} · Metal Print
               </p>
               <RatingJump productId={product.id} />
 
-              {/* Size */}
-              <div className="px-rule mt-7 pt-5">
-                <div className="flex items-center justify-between gap-4">
-                  <h2 className="px-label text-muted-foreground">Choose your size</h2>
-                  <div
-                    className="-mr-2 flex items-center"
-                    role="group"
-                    aria-label="Print orientation"
-                  >
-                    {(
-                      [
-                        {
-                          key: "landscape",
-                          label: "Landscape orientation",
-                          shape: "h-[15px] w-[22px]",
-                        },
-                        {
-                          key: "portrait",
-                          label: "Portrait orientation",
-                          shape: "h-[22px] w-[15px]",
-                        },
-                      ] as const
-                    ).map(({ key, label, shape }) => {
-                      const active = orientation === key;
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => setOrientation(key)}
-                          aria-label={label}
-                          aria-pressed={active}
-                          className="flex h-10 w-10 items-center justify-center outline-none transition-colors focus-visible:ring-1 focus-visible:ring-foreground/60"
-                        >
-                          <span
-                            aria-hidden
-                            className={`${shape} border transition-colors ${active ? "border-foreground" : "border-foreground/35 hover:border-foreground/65"}`}
-                          />
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <ul className="mt-3 border-t border-hairline">
-                  {sizeSteps.map((s, i) => {
-                    const active = sizeIndex === i;
-                    return (
-                      <li key={s.label} className="border-b border-hairline">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSizeIndex(i);
-                            setView("room");
-                          }}
-                          aria-pressed={active}
-                          className={[
-                            "flex w-full items-baseline justify-between gap-6 py-[9px] transition-opacity duration-[420ms]",
-                            active ? "opacity-100" : "opacity-50 hover:opacity-100",
-                          ].join(" ")}
-                        >
-                          <span className="px-label">{orientedSizeLabel(i, orientation)}</span>
-                          <span className="px-price">${unitPrice(material, i)}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
-              <div className="mt-4 flex items-baseline justify-between gap-6">
-                <p className="px-label text-muted-foreground">
-                  {materialName[material]} · {sizeLabel}
-                </p>
-                <p className="px-price">${price}</p>
-              </div>
+              <p className="px-price mt-6">From ${product.from}</p>
 
               <button
                 ref={mainCtaRef}
                 type="button"
-                onClick={() => setUploadOpen(true)}
-                className="px-label mt-5 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
+                onClick={openNativeImagePicker}
+                className="px-label mt-6 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
               >
                 Customize your print
               </button>
@@ -293,6 +613,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           </div>
         </div>
       </Shell>
+
+      <ProductInformationSection
+        product={product}
+        openInfo={openInfo}
+        onOpenInfoChange={setOpenInfo}
+      />
 
       {/* ---------- Product image sequence ---------- */}
       <Shell className="pt-20 md:pt-28">
@@ -342,12 +668,6 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           ))}
         </div>
       </Shell>
-
-      <ProductInformationSection
-        product={product}
-        openInfo={openInfo}
-        onOpenInfoChange={setOpenInfo}
-      />
 
       <ProductReviews product={product} />
 
@@ -508,12 +828,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         }`}
       >
         <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-          <span className="px-meta text-muted-foreground">
-            {sizeLabel} · ${price}
-          </span>
+          <span className="px-meta text-muted-foreground">From ${product.from}</span>
           <button
             type="button"
-            onClick={() => setUploadOpen(true)}
+            onClick={openNativeImagePicker}
             tabIndex={mainCtaVisible === false ? 0 : -1}
             className="px-label border border-foreground px-5 py-3"
           >
@@ -521,17 +839,37 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           </button>
         </div>
       </div>
-      {uploadOpen ? (
+      {customizationEntry === "editing" && selectedImage ? (
         <ProductUploadModal
           product={product}
           material={material}
           sizeIndex={sizeIndex}
           sizeLabel={sizeLabel}
           price={price}
+          initialImage={selectedImage}
           onSizeChange={setSizeIndex}
           orientation={orientation}
-          onClose={() => setUploadOpen(false)}
+          onOrientationChange={setOrientation}
+          onClose={() => {
+            setSelectedImage(null);
+            setCustomizationEntry("idle");
+          }}
         />
+      ) : null}
+      <input
+        ref={imagePickerRef}
+        type="file"
+        accept={acceptedTypes}
+        className="sr-only"
+        onChange={(event) => void selectCustomizationImage(event.target.files?.[0])}
+      />
+      {imagePickerError ? (
+        <p
+          role="alert"
+          className="px-meta fixed bottom-6 left-1/2 z-[90] -translate-x-1/2 border border-foreground/15 bg-paper px-4 py-3 text-destructive shadow-sm"
+        >
+          {imagePickerError}
+        </p>
       ) : null}
     </>
   );

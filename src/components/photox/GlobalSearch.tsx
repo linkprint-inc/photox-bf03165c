@@ -7,7 +7,7 @@ const quickFindItems: QuickFindItem[] = [
   {
     label: "Create your print",
     detail: "Start with your own photo",
-    href: "/custom",
+    href: "/products/north-sea",
     terms: ["create", "custom", "upload", "print", "your photo"],
   },
   {
@@ -100,25 +100,25 @@ const quickFindItems: QuickFindItem[] = [
   {
     label: "Print process",
     detail: "Prepare and make your print",
-    href: "/custom",
+    href: "/products/north-sea",
     terms: ["process", "print process", "production", "how it works"],
   },
   {
     label: "Restore old photo",
     detail: "Prepare a faded or damaged image",
-    href: "/custom?prepare=true&tool=restore",
+    href: "/products/north-sea",
     terms: ["restore", "restoration", "old photo", "repair"],
   },
   {
     label: "Enhance resolution",
     detail: "Prepare an image for a larger print",
-    href: "/custom?prepare=true&tool=enhance",
+    href: "/products/north-sea",
     terms: ["enhance", "resolution", "quality", "upscale"],
   },
   {
     label: "Add text",
     detail: "Add a name, date or caption to a print",
-    href: "/custom?prepare=true&tool=text",
+    href: "/products/north-sea",
     terms: ["text", "caption", "date", "typography", "add text"],
   },
 ];

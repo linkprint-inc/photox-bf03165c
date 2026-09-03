@@ -58,7 +58,12 @@ const fallbackDetail: Record<BagMaterial, string> = {
 
 /** Material-specific detail image for a product, falling back to a generic view. */
 export function detailFor(p: ShopProduct, material: BagMaterial) {
-  return artworkDetail.get(p.image)?.[material] ?? fallbackDetail[material];
+  return dedicatedDetailFor(p, material) ?? fallbackDetail[material];
+}
+
+/** A detail asset only when it was made for this exact artwork. */
+export function dedicatedDetailFor(p: ShopProduct, material: BagMaterial) {
+  return artworkDetail.get(p.image)?.[material];
 }
 
 export const closeUps: Record<

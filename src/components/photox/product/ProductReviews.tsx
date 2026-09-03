@@ -4,8 +4,9 @@ import type { ShopProduct } from "@/lib/shop-data";
 import { productReviewData, type ProductReview } from "@/lib/product-reviews";
 import { Shell } from "../Section";
 
-const FEATURED_REVIEW_COUNT = 2;
-const EXPANDED_REVIEW_COUNT = 6;
+const DESKTOP_INITIAL_REVIEW_COUNT = 6;
+const MOBILE_INITIAL_REVIEW_COUNT = 4;
+const REVIEW_REVEAL_COUNT = 3;
 
 export function RatingStars({
   rating,
@@ -65,22 +66,28 @@ export function RatingJump({ productId }: { productId: string }) {
 }
 
 export function ProductReviews({ product }: { product: ShopProduct }) {
-  const { rating, reviewCount, reviews } = productReviewData(product.id);
+  const { rating, reviewCount, reviews } = productReviewData(product.id, product);
   const [activeReviewIndex, setActiveReviewIndex] = useState<number | null>(null);
-  const [shown, setShown] = useState(FEATURED_REVIEW_COUNT);
+  const [mobile, setMobile] = useState(false);
+  const initialReviewCount = mobile ? MOBILE_INITIAL_REVIEW_COUNT : DESKTOP_INITIAL_REVIEW_COUNT;
+  const [shown, setShown] = useState(DESKTOP_INITIAL_REVIEW_COUNT);
   const hasMoreReviews = shown < reviews.length;
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const update = () => setMobile(mediaQuery.matches);
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
     setActiveReviewIndex(null);
-    setShown(FEATURED_REVIEW_COUNT);
-  }, [product.id]);
+    setShown(initialReviewCount);
+  }, [initialReviewCount, product.id]);
 
   const showMoreReviews = () => {
-    setShown((current) =>
-      current < EXPANDED_REVIEW_COUNT
-        ? Math.min(EXPANDED_REVIEW_COUNT, reviews.length)
-        : reviews.length,
-    );
+    setShown((current) => Math.min(current + REVIEW_REVEAL_COUNT, reviews.length));
   };
 
   return (
@@ -101,20 +108,20 @@ export function ProductReviews({ product }: { product: ShopProduct }) {
         </div>
       </div>
 
-      <div className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
+      <div className="mt-9 columns-1 gap-x-5 md:columns-3 md:gap-x-6">
         {reviews.slice(0, shown).map((review, index) => (
           <ReviewPreview
             key={review.id}
             review={review}
-            number={index + 1}
-            onImageOpen={() => setActiveReviewIndex(index)}
+            reveal={index >= initialReviewCount}
+            onOpen={() => setActiveReviewIndex(index)}
           />
         ))}
       </div>
 
       {hasMoreReviews ? (
         <button type="button" onClick={showMoreReviews} className="px-label px-underline mt-10">
-          {shown < EXPANDED_REVIEW_COUNT ? "View all reviews →" : "Show more reviews →"}
+          Show more reviews ↓
         </button>
       ) : null}
       {activeReviewIndex !== null ? (
@@ -131,48 +138,51 @@ export function ProductReviews({ product }: { product: ShopProduct }) {
 
 function ReviewPreview({
   review,
-  number,
-  onImageOpen,
+  reveal,
+  onOpen,
 }: {
   review: ProductReview;
-  number: number;
-  onImageOpen: () => void;
+  reveal: boolean;
+  onOpen: () => void;
 }) {
   const previewImage = reviewImages(review)[0];
   return (
-    <article className="grid gap-4 md:grid-cols-[150px_minmax(0,1fr)] md:gap-5">
-      {previewImage ? (
-        <button
-          type="button"
-          onClick={onImageOpen}
-          aria-label={`View customer photo from ${review.name}`}
-          className="group relative aspect-[16/10] w-full overflow-hidden bg-secondary md:aspect-[4/5]"
-        >
-          <img
-            src={previewImage}
-            alt={reviewImageAlt(review, 0)}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-          />
-        </button>
-      ) : null}
-      <div className="min-w-0">
-        <p className="px-meta text-muted-foreground">{String(number).padStart(2, "0")}</p>
-        <div className="mt-3">
+    <article className={`mb-9 break-inside-avoid ${reveal ? "px-review-reveal" : ""}`}>
+      <button
+        type="button"
+        onClick={onOpen}
+        aria-label={`Read the full review from ${review.name}`}
+        className="group block w-full text-left"
+      >
+        {previewImage ? (
+          <div
+            className="relative w-full overflow-hidden bg-secondary"
+            style={{ aspectRatio: review.imageRatio ?? "4 / 5" }}
+          >
+            <img
+              src={previewImage}
+              alt={reviewImageAlt(review, 0)}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.015]"
+            />
+          </div>
+        ) : null}
+        <div className={previewImage ? "pt-4" : "border-l border-hairline pl-5"}>
           <RatingStars rating={review.rating} label={false} />
-        </div>
-        <h3 className="px-label mt-3">{review.title}</h3>
-        <p className="px-serif mt-3 max-w-[31ch] text-[1.15rem] leading-[1.3] text-foreground md:text-[1.3rem]">
-          “{review.body}”
-        </p>
-        <div className="mt-4">
-          <p className="px-meta text-foreground">{review.name}</p>
-          <p className="px-meta mt-1 text-muted-foreground">
-            {review.material} · {review.size}
+          <p className="px-serif mt-2.5 text-[1.15rem] leading-[1.28] text-foreground md:text-[1.25rem]">
+            “{review.body}”
           </p>
-          <p className="px-meta mt-1 text-muted-foreground">Verified purchase</p>
+          <div className="mt-3">
+            <p className="px-meta text-foreground">{review.name}</p>
+            <p className="px-meta mt-1 text-muted-foreground">
+              {review.material} · {review.size}
+            </p>
+            {review.verified !== false ? (
+              <p className="px-meta mt-1 text-muted-foreground">Verified purchase</p>
+            ) : null}
+          </div>
         </div>
-      </div>
+      </button>
     </article>
   );
 }
