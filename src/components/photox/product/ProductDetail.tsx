@@ -249,6 +249,7 @@ function MediaRail({
 
 export function ProductDetail({ product }: { product: ShopProduct }) {
   const material: BagMaterial = "metal";
+  const featureDetails = mediaForProduct(product).featureDetails;
   const [sizeIndex, setSizeIndex] = useState(2);
   const [orientation, setOrientation] = useState<PrintOrientation>(
     product.orientation === "Portrait"
