@@ -13,6 +13,7 @@ import {
   orientedSizeLabel,
   materialName,
   type Order,
+  type PrintOrientation,
 } from "@/lib/store";
 
 export const Route = createFileRoute("/account")({
