@@ -8,6 +8,7 @@ import {
   MainVisual,
   MediaThumbnail,
   PrintFace,
+  RoomScene,
   type GalleryMediaItem,
   type ViewMode,
 } from "./ProductVisual";
