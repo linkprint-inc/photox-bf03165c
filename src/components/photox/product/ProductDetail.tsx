@@ -334,42 +334,34 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
     setCarouselDirection(nextPosition > mediaPosition ? 1 : -1);
     setMediaPosition(next);
   };
-  const visibleMedia = useMemo(
-    () => gallery.carousel.filter((item) => item.view === currentView),
-    [currentView, gallery.carousel],
-  );
-  const visibleMediaPosition = Math.max(
-    0,
-    visibleMedia.findIndex((item) => item.id === currentMedia.id),
-  );
+  const visibleMedia = gallery.carousel;
+  const visibleMediaPosition = mediaPosition;
   const selectMediaItem = (item: GalleryCarouselItem) => {
     const nextPosition = gallery.carousel.findIndex((candidate) => candidate.id === item.id);
     if (nextPosition >= 0) changeMedia(nextPosition);
   };
   const moveMedia = (direction: -1 | 1) => {
-    const nextVisiblePosition =
-      (visibleMediaPosition + direction + visibleMedia.length) % visibleMedia.length;
-    const nextItem = visibleMedia[nextVisiblePosition];
-    if (!nextItem) return;
-    const nextPosition = gallery.carousel.findIndex((item) => item.id === nextItem.id);
-    if (nextPosition < 0) return;
     setCarouselDirection(direction);
-    setMediaPosition(nextPosition);
+    setMediaPosition((position) => {
+      const total = gallery.carousel.length;
+      return (position + direction + total) % total;
+    });
   };
-  const availableViews = useMemo(
-    () => new Set(gallery.carousel.map((item) => item.view)),
-    [gallery.carousel],
+  const groupStart = gallery.carousel.findLastIndex(
+    (item, index) => index <= mediaPosition && item.view === "artwork",
   );
-  /** Jump to the next genuine media item of that type — never fabricate one. */
+  const nextGroupStart = gallery.carousel.findIndex(
+    (item, index) => index > groupStart && item.view === "artwork",
+  );
+  const groupEnd = nextGroupStart < 0 ? gallery.carousel.length : nextGroupStart;
+  const currentGroupItems = gallery.carousel.slice(groupStart, groupEnd);
+  const availableViews = new Set(currentGroupItems.map((item) => item.view));
+  /** Switch media type without leaving the currently selected artwork group. */
   const selectView = (nextView: ViewMode) => {
-    const total = gallery.carousel.length;
-    for (let step = 1; step <= total; step += 1) {
-      const index = (mediaPosition + step) % total;
-      if (gallery.carousel[index]!.view === nextView) {
-        changeMedia(index);
-        return;
-      }
-    }
+    const item = currentGroupItems.find((candidate) => candidate.view === nextView);
+    if (!item) return;
+    const index = gallery.carousel.findIndex((candidate) => candidate.id === item.id);
+    if (index >= 0) changeMedia(index);
   };
   const openNativeImagePicker = () => {
     setImagePickerError(null);
