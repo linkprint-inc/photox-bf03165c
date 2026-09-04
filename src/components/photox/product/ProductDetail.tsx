@@ -18,7 +18,7 @@ import {
   productInfo,
   relatedProducts,
 } from "@/lib/product-detail";
-import { hoverImages } from "@/lib/hover-images";
+import { productMediaGroups, type PdpMediaGroup } from "@/lib/product-media";
 import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
