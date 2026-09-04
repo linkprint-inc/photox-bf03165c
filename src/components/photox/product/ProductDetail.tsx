@@ -340,9 +340,20 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
     );
   };
+  const availableViews = useMemo(
+    () => new Set(gallery.carousel.map((item) => item.view)),
+    [gallery.carousel],
+  );
+  /** Jump to the next genuine media item of that type — never fabricate one. */
   const selectView = (nextView: ViewMode) => {
-    const index = gallery.carousel.findIndex((item) => item.view === nextView);
-    if (index >= 0) changeMedia(index);
+    const total = gallery.carousel.length;
+    for (let step = 1; step <= total; step += 1) {
+      const index = (mediaPosition + step) % total;
+      if (gallery.carousel[index]!.view === nextView) {
+        changeMedia(index);
+        return;
+      }
+    }
   };
   const openNativeImagePicker = () => {
     setImagePickerError(null);
@@ -481,23 +492,29 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                   layout="horizontal"
                 />
                 <ul className="mt-4 flex gap-6">
-                  {views.map((v) => (
-                    <li key={v.key}>
-                      <button
-                        type="button"
-                        onClick={() => selectView(v.key)}
-                        aria-pressed={currentView === v.key}
-                        className={[
-                          "px-label px-underline transition-opacity duration-[420ms]",
-                          currentView === v.key
-                            ? "opacity-100 after:scale-x-100"
-                            : "opacity-45 hover:opacity-100",
-                        ].join(" ")}
-                      >
-                        {v.label}
-                      </button>
-                    </li>
-                  ))}
+                  {views.map((v) => {
+                    const available = availableViews.has(v.key);
+                    return (
+                      <li key={v.key}>
+                        <button
+                          type="button"
+                          onClick={() => selectView(v.key)}
+                          disabled={!available}
+                          aria-pressed={currentView === v.key}
+                          className={[
+                            "px-label px-underline transition-opacity duration-[420ms]",
+                            !available
+                              ? "cursor-not-allowed opacity-25"
+                              : currentView === v.key
+                                ? "opacity-100 after:scale-x-100"
+                                : "opacity-45 hover:opacity-100",
+                          ].join(" ")}
+                        >
+                          {v.label}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
