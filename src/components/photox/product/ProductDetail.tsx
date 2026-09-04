@@ -347,9 +347,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       return (position + direction + total) % total;
     });
   };
-  const groupStart = gallery.carousel.findLastIndex(
-    (item, index) => index <= mediaPosition && item.view === "artwork",
-  );
+  let groupStart = mediaPosition;
+  while (groupStart > 0 && gallery.carousel[groupStart]?.view !== "artwork") groupStart -= 1;
   const nextGroupStart = gallery.carousel.findIndex(
     (item, index) => index > groupStart && item.view === "artwork",
   );
