@@ -17,7 +17,7 @@ import {
   productInfo,
   relatedProducts,
 } from "@/lib/product-detail";
-import { productMediaGroups, type PdpMediaGroup } from "@/lib/product-media";
+import { mediaForProduct, type PdpMediaGroup } from "@/lib/product-media";
 import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
@@ -45,7 +45,7 @@ type ProductMedia = {
 
 /** Curated, per-product gallery media defined once in src/lib/product-media.ts. */
 function productMedia(product: ShopProduct): ProductMedia {
-  const groups = productMediaGroups(product);
+  const { gallery: groups, featureDetails } = mediaForProduct(product);
   const carousel = groups.flatMap((group, groupIndex) =>
     views.map((view) => ({
       ...group[view.key],
@@ -576,10 +576,10 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               node: (
                 <div className="aspect-square overflow-hidden bg-secondary">
                   <img
-                    src={closeUps[material][1]!.image}
-                    alt={closeUps[material][1]!.alt}
+                    src={featureDetails.surfaceEdge.source}
+                    alt={featureDetails.surfaceEdge.alt}
                     loading="lazy"
-                    className="h-full w-full object-cover"
+                    className={`h-full w-full object-cover ${featureDetails.surfaceEdge.crop ?? ""}`}
                   />
                 </div>
               ),
@@ -589,12 +589,23 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               label: "In a room",
               node: (
                 <div className="aspect-square overflow-hidden bg-secondary">
-                  <img
-                    src={product.room}
-                    alt={`${product.name} installed in an interior`}
-                    loading="lazy"
-                    className="h-full w-full object-cover"
-                  />
+                  {featureDetails.room.source ? (
+                    <img
+                      src={featureDetails.room.source}
+                      alt={featureDetails.room.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <RoomScene
+                      product={product}
+                      material={material}
+                      inches={20}
+                      sizeLabel={orientedSizeLabel(sizeIndex, orientation)}
+                      orientation={orientation}
+                      background={featureDetails.room.roomBackground}
+                    />
+                  )}
                 </div>
               ),
             },
