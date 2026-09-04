@@ -12,10 +12,19 @@ import {
   type GalleryMediaItem,
   type ViewMode,
 } from "./ProductVisual";
-import { categoryLabel, closeUps, productInfo, relatedProducts } from "@/lib/product-detail";
+import {
+  categoryLabel,
+  closeUps,
+  deliveryEstimate,
+  printBenefits,
+  productBlurb,
+  productInfo,
+  relatedProducts,
+  serviceNotes,
+} from "@/lib/product-detail";
 import { mediaForProduct, type PdpMediaItem, type PdpMediaType } from "@/lib/product-media";
 import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
-import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
+import { sizeRangeLong, sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
   materialName,
   orientedSizeLabel,
@@ -560,26 +569,99 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               </p>
               <RatingJump productId={product.id} />
 
-              <p className="px-price mt-6">From ${product.from}</p>
+              <p className="px-price mt-6">
+                <span className="px-label mr-1 opacity-70">From</span>${product.from}
+              </p>
+
+              <p className="px-meta mt-5 max-w-[46ch] text-muted-foreground">
+                {productBlurb(product)}
+              </p>
+
+              <ul className="mt-8 grid grid-cols-3 gap-4 border-t border-hairline pt-5">
+                {printBenefits.map((b) => (
+                  <li key={b.title}>
+                    <p className="px-label">{b.title}</p>
+                    <p className="px-meta mt-1.5 text-muted-foreground">{b.body}</p>
+                  </li>
+                ))}
+              </ul>
 
               <button
                 ref={mainCtaRef}
                 type="button"
                 onClick={openNativeImagePicker}
-                className="px-label mt-6 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
+                className="px-label mt-8 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
               >
                 Customize your print
               </button>
+
+              <p className="px-meta mt-4 text-center text-muted-foreground">{deliveryEstimate}</p>
+
+              <ul className="mt-8 border-t border-hairline">
+                {[
+                  {
+                    title: "Details",
+                    body: `${product.name} — ${categoryLabel(product)} · ${product.orientation} · Metal Print · ${sizeRangeLong}.`,
+                  },
+                  ...productInfo,
+                ].map((row) => {
+                  const open = openInfo === row.title;
+                  const accordionId = `product-information-${row.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
+                  return (
+                    <li key={row.title} className="border-b border-hairline">
+                      <button
+                        type="button"
+                        onClick={() => setOpenInfo(open ? null : row.title)}
+                        aria-expanded={open}
+                        aria-controls={accordionId}
+                        className="flex w-full items-center justify-between gap-6 py-4 text-left"
+                      >
+                        <span className="px-label">{row.title}</span>
+                        <span
+                          aria-hidden
+                          className={[
+                            "text-lg leading-none transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                            open ? "rotate-45" : "",
+                          ].join(" ")}
+                        >
+                          +
+                        </span>
+                      </button>
+                      <div
+                        id={accordionId}
+                        role="region"
+                        aria-label={row.title}
+                        className={[
+                          "grid transition-[grid-template-rows] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                          open
+                            ? "grid-rows-[1fr] duration-[360ms]"
+                            : "grid-rows-[0fr] duration-[300ms]",
+                        ].join(" ")}
+                      >
+                        <div className="min-h-0 overflow-hidden" aria-hidden={!open} inert={!open}>
+                          <p className="px-meta max-w-prose pb-5 text-muted-foreground">
+                            {row.body}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <ul className="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+                {serviceNotes.map((note) => (
+                  <li key={note} className="px-meta flex items-center gap-2 text-muted-foreground">
+                    <span aria-hidden className="inline-block h-1 w-1 rounded-full bg-foreground/40" />
+                    {note}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </Shell>
 
-      <ProductInformationSection
-        product={product}
-        openInfo={openInfo}
-        onOpenInfoChange={setOpenInfo}
-      />
 
       {/* ---------- Product image sequence ---------- */}
       <Shell className="pt-20 md:pt-28">
@@ -844,100 +926,5 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         </p>
       ) : null}
     </>
-  );
-}
-
-function ProductInformationSection({
-  product,
-  openInfo,
-  onOpenInfoChange,
-}: {
-  product: ShopProduct;
-  openInfo: string | null;
-  onOpenInfoChange: (title: string | null) => void;
-}) {
-  return (
-    <Shell className="pt-16 md:pt-20">
-      <div className="grid gap-12 md:grid-cols-12">
-        <div className="md:col-span-5">
-          <h2 className="px-label text-muted-foreground">About the work</h2>
-          <dl className="mt-6 border-t border-hairline">
-            <div className="flex justify-between gap-6 border-b border-hairline py-3">
-              <dt className="px-meta text-muted-foreground">Title</dt>
-              <dd className="px-label">{product.name}</dd>
-            </div>
-            <div className="flex justify-between gap-6 border-b border-hairline py-3">
-              <dt className="px-meta text-muted-foreground">Category</dt>
-              <dd className="px-label">{categoryLabel(product)}</dd>
-            </div>
-            <div className="flex justify-between gap-6 border-b border-hairline py-3">
-              <dt className="px-meta text-muted-foreground">Orientation</dt>
-              <dd className="px-label">{product.orientation}</dd>
-            </div>
-            <div className="flex justify-between gap-6 border-b border-hairline py-3">
-              <dt className="px-meta text-muted-foreground">Materials</dt>
-              <dd className="px-label">Metal Print</dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="md:col-span-6 md:col-start-7">
-          <h2 className="px-label text-muted-foreground">Product information</h2>
-          <ul className="mt-6 border-t border-hairline">
-            {productInfo.map((row) => {
-              const open = openInfo === row.title;
-              const accordionId = `product-information-${row.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
-              return (
-                <li key={row.title} className="border-b border-hairline">
-                  <button
-                    type="button"
-                    onClick={() => onOpenInfoChange(open ? null : row.title)}
-                    aria-expanded={open}
-                    aria-controls={accordionId}
-                    className="flex w-full items-center justify-between gap-6 py-4 text-left"
-                  >
-                    <span className="px-label">{row.title}</span>
-                    <span
-                      aria-hidden
-                      className={[
-                        "text-lg leading-none transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-                        open ? "duration-[360ms]" : "duration-[300ms]",
-                        open ? "rotate-45" : "",
-                      ].join(" ")}
-                    >
-                      +
-                    </span>
-                  </button>
-                  <div
-                    id={accordionId}
-                    role="region"
-                    aria-label={row.title}
-                    className={[
-                      "grid transition-[grid-template-rows] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-                      open
-                        ? "grid-rows-[1fr] duration-[360ms]"
-                        : "grid-rows-[0fr] duration-[300ms]",
-                    ].join(" ")}
-                  >
-                    <div className="min-h-0 overflow-hidden" aria-hidden={!open} inert={!open}>
-                      <p
-                        className={[
-                          "px-meta max-w-prose pb-5 text-muted-foreground transition-[opacity,transform] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
-                          open
-                            ? "translate-y-0 opacity-100 duration-[360ms]"
-                            : "-translate-y-1.5 opacity-0 duration-[300ms]",
-                        ].join(" ")}
-                      >
-                        {row.body}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      </div>
-    </Shell>
   );
 }
