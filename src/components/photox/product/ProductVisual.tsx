@@ -8,7 +8,11 @@ export type GalleryMediaPresentation =
 
 export type GalleryMediaItem = {
   presentation: GalleryMediaPresentation;
-  source?: string;
+  source?: string | undefined;
+  /** Optional object-fit crop classes used for artwork / detail framing. */
+  crop?: string | undefined;
+  /** Optional interior background for composited room views. */
+  roomBackground?: string | undefined;
 };
 
 const WALL_INCHES = 96;
@@ -123,7 +127,7 @@ export function MainVisual({
   orientation: PrintOrientation;
   mediaIndex?: number;
   artworkSource?: string;
-  media?: GalleryMediaItem;
+  media?: GalleryMediaItem | undefined;
 }) {
   const frame = (active: boolean) =>
     [
@@ -190,7 +194,7 @@ function ArtworkMedia({
   sizeLabel: string;
   mediaIndex: number;
   artworkSource: string;
-  media?: GalleryMediaItem;
+  media?: GalleryMediaItem | undefined;
 }) {
   if (media?.presentation === "original") {
     return (
@@ -243,7 +247,7 @@ function DetailMedia({
   sizeLabel: string;
   mediaIndex: number;
   artworkSource: string;
-  media?: GalleryMediaItem;
+  media?: GalleryMediaItem | undefined;
 }) {
   if (media?.presentation === "detail-image" && media.source) {
     return <StaticGalleryImage source={media.source} alt={`${product.name} metal print detail`} />;
@@ -299,7 +303,7 @@ export function MediaThumbnail({
   sizeLabel?: string;
   orientation?: PrintOrientation;
   artworkSource?: string;
-  media?: GalleryMediaItem;
+  media?: GalleryMediaItem | undefined;
 }) {
   if (media?.presentation === "room-image" && media.source) {
     return <StaticGalleryImage source={media.source} alt="" />;
