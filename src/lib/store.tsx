@@ -26,7 +26,7 @@ export type PrintCustomization = {
   originalImage: PreparedImage;
   image: PreparedImage;
   appliedTools: ToolId[];
-  textConfig?: TextConfig;
+  textConfig?: TextConfig | undefined;
   crop: CropPosition;
   startingPointId: string;
   price: number;
@@ -39,9 +39,9 @@ export type BagItem = {
   productId: string;
   material: BagMaterial;
   sizeIndex: number;
-  orientation?: PrintOrientation;
+  orientation?: PrintOrientation | undefined;
   qty: number;
-  customization?: PrintCustomization;
+  customization?: PrintCustomization | undefined;
 };
 
 export type ShippingAddress = {
@@ -67,9 +67,9 @@ export type OrderItem = {
   productId: string;
   material: BagMaterial;
   sizeIndex: number;
-  orientation?: PrintOrientation;
+  orientation?: PrintOrientation | undefined;
   qty: number;
-  customization?: PrintCustomization;
+  customization?: PrintCustomization | undefined;
 };
 
 export type Order = {

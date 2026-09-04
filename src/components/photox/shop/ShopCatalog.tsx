@@ -35,7 +35,7 @@ export function ShopCatalog({
   category: initialCategory,
 }: {
   query?: string;
-  category?: InspirationCategory;
+  category?: InspirationCategory | undefined;
 }) {
   const [selected, setSelected] = useState<InspirationCategory>(
     initialCategory ?? categoryForQuery(query) ?? "all",

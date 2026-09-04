@@ -13,6 +13,7 @@ import {
   orientedSizeLabel,
   materialName,
   type Order,
+  type PrintOrientation,
 } from "@/lib/store";
 
 export const Route = createFileRoute("/account")({
@@ -440,7 +441,7 @@ function ItemRow({
   productId: string;
   material: "metal";
   sizeIndex: number;
-  orientation?: "landscape" | "portrait";
+  orientation?: PrintOrientation | undefined;
   qty: number;
 }) {
   const p = productById(productId);

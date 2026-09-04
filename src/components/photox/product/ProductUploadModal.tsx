@@ -586,9 +586,7 @@ export function ProductUploadModal({
           >
             {steps.map((item) => {
               const active = step === item.key;
-              const complete =
-                step === "success" ||
-                (step !== "success" && stepNumber[item.key] < stepNumber[step]);
+              const complete = (stepNumber[item.key] ?? 0) < (stepNumber[step as keyof typeof stepNumber] ?? 0);
               const canReturn = Boolean(image) && complete;
               return (
                 <li

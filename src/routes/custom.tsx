@@ -50,7 +50,7 @@ export const Route = createFileRoute("/custom")({
   component: CustomPage,
 });
 
-function CustomIntro({ inspiration }: { inspiration?: string }) {
+function CustomIntro({ inspiration }: { inspiration?: string | undefined }) {
   const ref = useRef<HTMLDivElement>(null);
   const dragPointer = useRef<number | null>(null);
   const [pos, setPos] = useState(50);
