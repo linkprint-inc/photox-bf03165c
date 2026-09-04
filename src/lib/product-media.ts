@@ -36,6 +36,20 @@ import ncAerial from "@/assets/art/nightcity-02-aerial-grid.jpg";
 import ncAlley from "@/assets/art/nightcity-03-neon-alley.jpg";
 import ncTower from "@/assets/art/nightcity-04-tower-windows.jpg";
 import ncTrails from "@/assets/art/nightcity-05-light-trails.jpg";
+import artFigure from "@/assets/art-figure.jpg";
+import oliveThreeQuarter from "@/assets/art/olive-02-three-quarter.jpg";
+import oliveSeatedFigure from "@/assets/art/olive-03-seated-figure.jpg";
+import oliveShoulderProfile from "@/assets/art/olive-04-shoulder-profile.jpg";
+import oliveStandingShadow from "@/assets/art/olive-05-standing-shadow.jpg";
+import oliveSoftEditorial from "@/assets/art/olive-06-soft-editorial.jpg";
+import artCanopy from "@/assets/art-canopy.jpg";
+import canopyUpwardForest from "@/assets/art/canopy-02-upward-forest.jpg";
+import canopyLeafStudy from "@/assets/art/canopy-03-leaf-study.jpg";
+import canopyMistForest from "@/assets/art/canopy-04-mist-forest.jpg";
+import canopyDappledLight from "@/assets/art/canopy-05-dappled-light.jpg";
+import canopySolitaryTree from "@/assets/art/canopy-06-solitary-tree.jpg";
+import studyInOliveRoom from "@/assets/hover/study-in-olive.jpg";
+import canopyRoom from "@/assets/hover/canopy.jpg";
 import { hoverImages } from "./hover-images";
 import { dedicatedDetailFor } from "./product-detail";
 import { shopProducts, type ShopProduct } from "./shop-data";
@@ -124,6 +138,32 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
     { id: "tower-windows", label: "Tower windows", source: ncTower },
     { id: "light-trails", label: "Light trails", source: ncTrails },
     { id: "signal", label: "Signal", source: artSignal },
+  ],
+  "study-in-olive": [
+    {
+      id: "study-in-olive",
+      label: "Study in Olive",
+      source: artFigure,
+      room: { source: studyInOliveRoom, label: "In a room" },
+    },
+    { id: "olive-three-quarter", label: "Olive, three-quarter", source: oliveThreeQuarter },
+    { id: "olive-seated-figure", label: "Seated figure", source: oliveSeatedFigure },
+    { id: "olive-shoulder-profile", label: "Shoulder profile", source: oliveShoulderProfile },
+    { id: "olive-standing-shadow", label: "Standing in shadow", source: oliveStandingShadow },
+    { id: "olive-soft-editorial", label: "Soft editorial", source: oliveSoftEditorial },
+  ],
+  canopy: [
+    {
+      id: "canopy",
+      label: "Canopy",
+      source: artCanopy,
+      room: { source: canopyRoom, label: "In a room" },
+    },
+    { id: "upward-forest", label: "Upward forest", source: canopyUpwardForest },
+    { id: "leaf-study", label: "Leaf study", source: canopyLeafStudy },
+    { id: "mist-forest", label: "Forest in mist", source: canopyMistForest },
+    { id: "dappled-light", label: "Dappled light", source: canopyDappledLight },
+    { id: "solitary-tree", label: "Solitary tree", source: canopySolitaryTree },
   ],
 };
 

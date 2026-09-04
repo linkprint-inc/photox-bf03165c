@@ -114,7 +114,7 @@ function MediaRail({
   product: ShopProduct;
   items: GalleryCarouselItem[];
   activeIndex: number;
-  onSelect: (index: number) => void;
+  onSelect: (item: GalleryCarouselItem) => void;
   orientation: PrintOrientation;
   inches: number;
   sizeLabel: string;
@@ -173,7 +173,7 @@ function MediaRail({
           itemRefs.current[index] = element;
         }}
         type="button"
-        onClick={() => onSelect(index)}
+          onClick={() => onSelect(item)}
         aria-label={item.label}
         aria-pressed={selected}
         className={[
@@ -334,11 +334,27 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
     setCarouselDirection(nextPosition > mediaPosition ? 1 : -1);
     setMediaPosition(next);
   };
+  const visibleMedia = useMemo(
+    () => gallery.carousel.filter((item) => item.view === currentView),
+    [currentView, gallery.carousel],
+  );
+  const visibleMediaPosition = Math.max(
+    0,
+    visibleMedia.findIndex((item) => item.id === currentMedia.id),
+  );
+  const selectMediaItem = (item: GalleryCarouselItem) => {
+    const nextPosition = gallery.carousel.findIndex((candidate) => candidate.id === item.id);
+    if (nextPosition >= 0) changeMedia(nextPosition);
+  };
   const moveMedia = (direction: -1 | 1) => {
+    const nextVisiblePosition =
+      (visibleMediaPosition + direction + visibleMedia.length) % visibleMedia.length;
+    const nextItem = visibleMedia[nextVisiblePosition];
+    if (!nextItem) return;
+    const nextPosition = gallery.carousel.findIndex((item) => item.id === nextItem.id);
+    if (nextPosition < 0) return;
     setCarouselDirection(direction);
-    setMediaPosition(
-      (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
-    );
+    setMediaPosition(nextPosition);
   };
   const availableViews = useMemo(
     () => new Set(gallery.carousel.map((item) => item.view)),
@@ -391,15 +407,12 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       }
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         const direction = event.key === "ArrowLeft" ? -1 : 1;
-        setCarouselDirection(direction);
-        setMediaPosition(
-          (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
-        );
+        moveMedia(direction);
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [gallery.carousel.length]);
+  }, [currentMedia.id, gallery.carousel, visibleMedia, visibleMediaPosition]);
 
   return (
     <>
@@ -420,9 +433,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <div className="relative hidden min-h-0 overflow-hidden [contain:size] md:block">
                 <MediaRail
                   product={product}
-                  items={gallery.carousel}
-                  activeIndex={mediaPosition}
-                  onSelect={changeMedia}
+                   items={visibleMedia}
+                   activeIndex={visibleMediaPosition}
+                   onSelect={selectMediaItem}
                   orientation={orientation}
                   inches={size.inches}
                   sizeLabel={sizeLabel}
@@ -482,9 +495,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <div className="min-w-0 md:col-start-2">
                 <MediaRail
                   product={product}
-                  items={gallery.carousel}
-                  activeIndex={mediaPosition}
-                  onSelect={changeMedia}
+                   items={visibleMedia}
+                   activeIndex={visibleMediaPosition}
+                   onSelect={selectMediaItem}
                   orientation={orientation}
                   inches={size.inches}
                   sizeLabel={sizeLabel}
