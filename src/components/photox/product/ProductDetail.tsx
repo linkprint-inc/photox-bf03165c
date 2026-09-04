@@ -37,83 +37,24 @@ const views: { key: ViewMode; label: string }[] = [
 ];
 
 type ProductMediaItem = GalleryMediaItem & { id: string; label: string };
-type GalleryGroup = {
-  id: string;
-  artwork: ProductMediaItem;
-  detail: ProductMediaItem;
-  room: ProductMediaItem;
-};
 type GalleryCarouselItem = ProductMediaItem & { groupIndex: number; view: ViewMode };
 type ProductMedia = {
   artworkSource: string;
-  groups: GalleryGroup[];
+  groups: PdpMediaGroup[];
   carousel: GalleryCarouselItem[];
 };
-const GALLERY_GROUP_COUNT = 3;
 
-function groupMedia(item: ProductMediaItem, view: ViewMode, groupIndex: number): ProductMediaItem {
-  return {
-    ...item,
-    id: `group-${groupIndex + 1}-${view}-${item.id}`,
-    label: `Group ${groupIndex + 1}, ${item.label}`,
-  };
-}
-
-/** Every gallery variant uses this one product artwork source. */
+/** Curated, per-product gallery media defined once in src/lib/product-media.ts. */
 function productMedia(product: ShopProduct): ProductMedia {
-  const matchingShopRoom = hoverImages[product.id];
-  const dedicatedDetail = dedicatedDetailFor(product, "metal");
-  const artwork: ProductMediaItem[] = [
-    { id: "original", label: "Original artwork", presentation: "original" },
-    { id: "metal-front", label: "Metal print front", presentation: "front" },
-    ...(matchingShopRoom
-      ? [
-          {
-            id: "shop-room",
-            label: "Metal print in a room",
-            presentation: "room-image" as const,
-            source: matchingShopRoom,
-          },
-        ]
-      : []),
-    ...(dedicatedDetail
-      ? [
-          {
-            id: "metal-close",
-            label: "Metal print close-up",
-            presentation: "detail-image" as const,
-            source: dedicatedDetail,
-          },
-        ]
-      : []),
-  ];
-  const detail: ProductMediaItem[] = [
-    { id: "surface", label: "Surface", presentation: "front" },
-    { id: "edge", label: "Metal edge", presentation: "front" },
-    { id: "reflection", label: "Reflection detail", presentation: "front" },
-  ];
-  const room: ProductMediaItem[] = [
-    ...(matchingShopRoom
-      ? [
-          {
-            id: "shop-room",
-            label: "Shop room view",
-            presentation: "room-image" as const,
-            source: matchingShopRoom,
-          },
-        ]
-      : []),
-    { id: "room-standard", label: "Room scale", presentation: "room" },
-    { id: "room-large", label: "Larger room scale", presentation: "room" },
-  ];
-  const groups = Array.from({ length: GALLERY_GROUP_COUNT }, (_, groupIndex) => ({
-    id: `group-${groupIndex + 1}`,
-    artwork: groupMedia(artwork[groupIndex % artwork.length]!, "artwork", groupIndex),
-    detail: groupMedia(detail[groupIndex % detail.length]!, "detail", groupIndex),
-    room: groupMedia(room[groupIndex % room.length]!, "room", groupIndex),
-  }));
+  const groups = productMediaGroups(product);
   const carousel = groups.flatMap((group, groupIndex) =>
-    views.map((view) => ({ ...group[view.key], groupIndex, view: view.key })),
+    views.map((view) => ({
+      ...group[view.key],
+      id: `${group.id}-${view.key}`,
+      label: `${group[view.key].label}`,
+      groupIndex,
+      view: view.key,
+    })),
   );
   return {
     artworkSource: product.image,
@@ -121,6 +62,7 @@ function productMedia(product: ShopProduct): ProductMedia {
     carousel,
   };
 }
+
 
 function parsePhysicalSize(size: (typeof sizeSteps)[number]) {
   const match = size.label.match(/(\d+)\s*×\s*(\d+)/);
