@@ -341,9 +341,8 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
     );
   };
   const selectView = (nextView: ViewMode) => {
-    changeMedia(
-      currentGroupIndex * views.length + views.findIndex((view) => view.key === nextView),
-    );
+    const index = gallery.carousel.findIndex((item) => item.view === nextView);
+    if (index >= 0) changeMedia(index);
   };
   const openNativeImagePicker = () => {
     setImagePickerError(null);
