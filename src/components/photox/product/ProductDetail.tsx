@@ -18,7 +18,7 @@ import {
   productInfo,
   relatedProducts,
 } from "@/lib/product-detail";
-import { mediaForProduct, type PdpMediaGroup } from "@/lib/product-media";
+import { mediaForProduct, type PdpMediaItem } from "@/lib/product-media";
 import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
@@ -40,25 +40,21 @@ type ProductMediaItem = GalleryMediaItem & { id: string; label: string };
 type GalleryCarouselItem = ProductMediaItem & { groupIndex: number; view: ViewMode };
 type ProductMedia = {
   artworkSource: string;
-  groups: PdpMediaGroup[];
+  items: PdpMediaItem[];
   carousel: GalleryCarouselItem[];
 };
 
 /** Curated, per-product gallery media defined once in src/lib/product-media.ts. */
 function productMedia(product: ShopProduct): ProductMedia {
-  const { gallery: groups } = mediaForProduct(product);
-  const carousel = groups.flatMap((group, groupIndex) =>
-    views.map((view) => ({
-      ...group[view.key],
-      id: `${group.id}-${view.key}`,
-      label: `${group[view.key].label}`,
-      groupIndex,
-      view: view.key,
-    })),
-  );
+  const { gallery: items } = mediaForProduct(product);
+  const carousel = items.map((item, index) => ({
+    ...item,
+    groupIndex: index,
+    view: item.view,
+  }));
   return {
     artworkSource: product.image,
-    groups,
+    items,
     carousel,
   };
 }
