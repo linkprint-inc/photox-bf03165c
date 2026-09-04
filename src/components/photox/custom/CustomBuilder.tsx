@@ -112,8 +112,8 @@ export function CustomBuilder({
   startInEditor = false,
 }: {
   initialTool?: ToolId | undefined;
-  initialConfiguration?: InitialPrintConfiguration;
-  startInEditor?: boolean;
+  initialConfiguration?: InitialPrintConfiguration | undefined;
+  startInEditor?: boolean | undefined;
 }) {
   const { image, setImage } = usePreparedImage();
   const { addToBag } = useStore();
