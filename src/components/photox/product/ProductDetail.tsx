@@ -492,23 +492,29 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                   layout="horizontal"
                 />
                 <ul className="mt-4 flex gap-6">
-                  {views.map((v) => (
-                    <li key={v.key}>
-                      <button
-                        type="button"
-                        onClick={() => selectView(v.key)}
-                        aria-pressed={currentView === v.key}
-                        className={[
-                          "px-label px-underline transition-opacity duration-[420ms]",
-                          currentView === v.key
-                            ? "opacity-100 after:scale-x-100"
-                            : "opacity-45 hover:opacity-100",
-                        ].join(" ")}
-                      >
-                        {v.label}
-                      </button>
-                    </li>
-                  ))}
+                  {views.map((v) => {
+                    const available = availableViews.has(v.key);
+                    return (
+                      <li key={v.key}>
+                        <button
+                          type="button"
+                          onClick={() => selectView(v.key)}
+                          disabled={!available}
+                          aria-pressed={currentView === v.key}
+                          className={[
+                            "px-label px-underline transition-opacity duration-[420ms]",
+                            !available
+                              ? "cursor-not-allowed opacity-25"
+                              : currentView === v.key
+                                ? "opacity-100 after:scale-x-100"
+                                : "opacity-45 hover:opacity-100",
+                          ].join(" ")}
+                        >
+                          {v.label}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
