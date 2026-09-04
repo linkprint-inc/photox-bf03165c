@@ -115,9 +115,14 @@ import canopyRoom from "@/assets/pdp/canopy-room.jpg";
 import { hoverImages } from "./hover-images";
 import { dedicatedDetailFor } from "./product-detail";
 import { shopProducts, type ShopProduct } from "./shop-data";
-import type { GalleryMediaItem, ViewMode } from "@/components/photox/product/ProductVisual";
+import type { GalleryMediaItem } from "@/components/photox/product/ProductVisual";
 
-export type PdpMediaItem = GalleryMediaItem & { id: string; label: string; view: ViewMode };
+export type PdpMediaType = "detail" | "room";
+export type PdpMediaItem = GalleryMediaItem & {
+  id: string;
+  label: string;
+  type: PdpMediaType;
+};
 
 /**
  * PHASE 1 media model.
@@ -446,22 +451,15 @@ export function productGroups(product: ShopProduct): PdpGalleryGroup[] {
   ];
 }
 
-/** Flattened carousel: Artwork → (Detail) → (In a room) per group, skipping empty slots. */
+/** Flattened carousel: Detail → In a room per group, skipping empty slots. */
 export function productGallery(product: ShopProduct): PdpMediaItem[] {
   const items: PdpMediaItem[] = [];
   for (const group of productGroups(product)) {
-    items.push({
-      id: `${group.id}-artwork`,
-      label: group.artwork.label,
-      view: "artwork",
-      presentation: "original",
-      source: group.artwork.source,
-    });
     if (group.detail) {
       items.push({
         id: `${group.id}-detail`,
         label: group.detail.label,
-        view: "detail",
+        type: "detail",
         presentation: "detail-image",
         source: group.detail.source,
       });
@@ -470,7 +468,7 @@ export function productGallery(product: ShopProduct): PdpMediaItem[] {
       items.push({
         id: `${group.id}-room`,
         label: group.room.label,
-        view: "room",
+        type: "room",
         presentation: "room-image",
         source: group.room.source,
       });

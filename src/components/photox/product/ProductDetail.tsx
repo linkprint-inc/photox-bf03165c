@@ -12,13 +12,8 @@ import {
   type GalleryMediaItem,
   type ViewMode,
 } from "./ProductVisual";
-import {
-  categoryLabel,
-  closeUps,
-  productInfo,
-  relatedProducts,
-} from "@/lib/product-detail";
-import { mediaForProduct, type PdpMediaItem } from "@/lib/product-media";
+import { categoryLabel, closeUps, productInfo, relatedProducts } from "@/lib/product-detail";
+import { mediaForProduct, type PdpMediaItem, type PdpMediaType } from "@/lib/product-media";
 import { acceptedTypes, readImageFile, type PreparedImage } from "@/lib/prepared-image";
 import { sizeSteps, type ShopProduct } from "@/lib/shop-data";
 import {
@@ -36,8 +31,13 @@ const views: { key: ViewMode; label: string }[] = [
   { key: "room", label: "In a room" },
 ];
 
+type GalleryFilter = ViewMode;
 type ProductMediaItem = GalleryMediaItem & { id: string; label: string };
-type GalleryCarouselItem = ProductMediaItem & { groupIndex: number; view: ViewMode };
+type GalleryCarouselItem = ProductMediaItem & {
+  groupIndex: number;
+  type: PdpMediaType;
+  view: Exclude<ViewMode, "artwork">;
+};
 type ProductMedia = {
   artworkSource: string;
   items: PdpMediaItem[];
@@ -50,7 +50,7 @@ function productMedia(product: ShopProduct): ProductMedia {
   const carousel = items.map((item, index) => ({
     ...item,
     groupIndex: index,
-    view: item.view,
+    view: item.type,
   }));
   return {
     artworkSource: product.image,
@@ -58,7 +58,6 @@ function productMedia(product: ShopProduct): ProductMedia {
     carousel,
   };
 }
-
 
 function parsePhysicalSize(size: (typeof sizeSteps)[number]) {
   const match = size.label.match(/(\d+)\s*×\s*(\d+)/);
@@ -158,7 +157,7 @@ function MediaRail({
       inline: "nearest",
       behavior: "smooth",
     });
-  }, [activeIndex, isVertical]);
+  }, [activeIndex, isVertical, items]);
 
   const scrollRail = (direction: -1 | 1) => {
     railRef.current?.scrollBy({ top: direction * 88, behavior: "smooth" });
@@ -173,7 +172,7 @@ function MediaRail({
           itemRefs.current[index] = element;
         }}
         type="button"
-          onClick={() => onSelect(item)}
+        onClick={() => onSelect(item)}
         aria-label={item.label}
         aria-pressed={selected}
         className={[
@@ -255,6 +254,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
         : "landscape",
   );
   const [mediaPosition, setMediaPosition] = useState(0);
+  const [activeFilter, setActiveFilter] = useState<GalleryFilter>("artwork");
   const [carouselDirection, setCarouselDirection] = useState<-1 | 1>(1);
   const [customizationEntry, setCustomizationEntry] = useState<"idle" | "editing">("idle");
   const [selectedImage, setSelectedImage] = useState<PreparedImage | null>(null);
@@ -276,6 +276,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
           : "landscape",
     );
     setMediaPosition(0);
+    setActiveFilter("artwork");
   }, [product.id, product.orientation]);
 
   useEffect(() => {
@@ -325,42 +326,45 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
   const saved = hydrated && isSaved(product.id);
   const related = useMemo(() => relatedProducts(product), [product]);
   const gallery = useMemo(() => productMedia(product), [product]);
-  const currentMedia = gallery.carousel[mediaPosition]!;
+  const visibleMedia = useMemo(
+    () =>
+      activeFilter === "artwork"
+        ? gallery.carousel
+        : gallery.carousel.filter((item) => item.type === activeFilter),
+    [activeFilter, gallery.carousel],
+  );
+  const visibleMediaPosition = Math.min(mediaPosition, Math.max(visibleMedia.length - 1, 0));
+  const currentMedia = visibleMedia[visibleMediaPosition]!;
   const currentView = currentMedia.view;
   const currentGroupIndex = currentMedia.groupIndex;
   const changeMedia = (nextPosition: number) => {
-    const total = gallery.carousel.length;
+    const total = visibleMedia.length;
+    if (!total) return;
     const next = (nextPosition + total) % total;
-    setCarouselDirection(nextPosition > mediaPosition ? 1 : -1);
+    setCarouselDirection(nextPosition > visibleMediaPosition ? 1 : -1);
     setMediaPosition(next);
   };
-  const visibleMedia = gallery.carousel;
-  const visibleMediaPosition = mediaPosition;
   const selectMediaItem = (item: GalleryCarouselItem) => {
-    const nextPosition = gallery.carousel.findIndex((candidate) => candidate.id === item.id);
+    const nextPosition = visibleMedia.findIndex((candidate) => candidate.id === item.id);
     if (nextPosition >= 0) changeMedia(nextPosition);
   };
   const moveMedia = (direction: -1 | 1) => {
     setCarouselDirection(direction);
     setMediaPosition((position) => {
-      const total = gallery.carousel.length;
+      const total = visibleMedia.length;
+      if (!total) return 0;
       return (position + direction + total) % total;
     });
   };
-  let groupStart = mediaPosition;
-  while (groupStart > 0 && gallery.carousel[groupStart]?.view !== "artwork") groupStart -= 1;
-  const nextGroupStart = gallery.carousel.findIndex(
-    (item, index) => index > groupStart && item.view === "artwork",
-  );
-  const groupEnd = nextGroupStart < 0 ? gallery.carousel.length : nextGroupStart;
-  const currentGroupItems = gallery.carousel.slice(groupStart, groupEnd);
-  const availableViews = new Set(currentGroupItems.map((item) => item.view));
-  /** Switch media type without leaving the currently selected artwork group. */
-  const selectView = (nextView: ViewMode) => {
-    const item = currentGroupItems.find((candidate) => candidate.view === nextView);
-    if (!item) return;
-    const index = gallery.carousel.findIndex((candidate) => candidate.id === item.id);
-    if (index >= 0) changeMedia(index);
+  const selectView = (nextView: GalleryFilter) => {
+    const nextMedia =
+      nextView === "artwork"
+        ? gallery.carousel
+        : gallery.carousel.filter((item) => item.type === nextView);
+    const existingIndex = nextMedia.findIndex((item) => item.id === currentMedia.id);
+    setCarouselDirection(existingIndex >= 0 && existingIndex < visibleMediaPosition ? -1 : 1);
+    setActiveFilter(nextView);
+    setMediaPosition(existingIndex >= 0 ? existingIndex : 0);
   };
   const openNativeImagePicker = () => {
     setImagePickerError(null);
@@ -398,12 +402,16 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       }
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         const direction = event.key === "ArrowLeft" ? -1 : 1;
-        moveMedia(direction);
+        setCarouselDirection(direction);
+        setMediaPosition((position) => {
+          const total = visibleMedia.length;
+          return total ? (position + direction + total) % total : 0;
+        });
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [currentMedia.id, gallery.carousel, visibleMedia, visibleMediaPosition]);
+  }, [currentMedia.id, visibleMedia, visibleMediaPosition]);
 
   return (
     <>
@@ -424,9 +432,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <div className="relative hidden min-h-0 overflow-hidden [contain:size] md:block">
                 <MediaRail
                   product={product}
-                   items={visibleMedia}
-                   activeIndex={visibleMediaPosition}
-                   onSelect={selectMediaItem}
+                  items={visibleMedia}
+                  activeIndex={visibleMediaPosition}
+                  onSelect={selectMediaItem}
                   orientation={orientation}
                   inches={size.inches}
                   sizeLabel={sizeLabel}
@@ -486,9 +494,9 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               <div className="min-w-0 md:col-start-2">
                 <MediaRail
                   product={product}
-                   items={visibleMedia}
-                   activeIndex={visibleMediaPosition}
-                   onSelect={selectMediaItem}
+                  items={visibleMedia}
+                  activeIndex={visibleMediaPosition}
+                  onSelect={selectMediaItem}
                   orientation={orientation}
                   inches={size.inches}
                   sizeLabel={sizeLabel}
@@ -496,29 +504,23 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
                   layout="horizontal"
                 />
                 <ul className="mt-4 flex gap-6">
-                  {views.map((v) => {
-                    const available = availableViews.has(v.key);
-                    return (
-                      <li key={v.key}>
-                        <button
-                          type="button"
-                          onClick={() => selectView(v.key)}
-                          disabled={!available}
-                          aria-pressed={currentView === v.key}
-                          className={[
-                            "px-label px-underline transition-opacity duration-[420ms]",
-                            !available
-                              ? "cursor-not-allowed opacity-25"
-                              : currentView === v.key
-                                ? "opacity-100 after:scale-x-100"
-                                : "opacity-45 hover:opacity-100",
-                          ].join(" ")}
-                        >
-                          {v.label}
-                        </button>
-                      </li>
-                    );
-                  })}
+                  {views.map((v) => (
+                    <li key={v.key}>
+                      <button
+                        type="button"
+                        onClick={() => selectView(v.key)}
+                        aria-pressed={activeFilter === v.key}
+                        className={[
+                          "px-label px-underline transition-opacity duration-[420ms]",
+                          activeFilter === v.key
+                            ? "opacity-100 after:scale-x-100"
+                            : "opacity-45 hover:opacity-100",
+                        ].join(" ")}
+                      >
+                        {v.label}
+                      </button>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
