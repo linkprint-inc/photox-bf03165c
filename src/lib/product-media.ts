@@ -48,6 +48,8 @@ import canopyLeafStudy from "@/assets/art/canopy-03-leaf-study.jpg";
 import canopyMistForest from "@/assets/art/canopy-04-mist-forest.jpg";
 import canopyDappledLight from "@/assets/art/canopy-05-dappled-light.jpg";
 import canopySolitaryTree from "@/assets/art/canopy-06-solitary-tree.jpg";
+import studyInOliveRoom from "@/assets/hover/study-in-olive.jpg";
+import canopyRoom from "@/assets/hover/canopy.jpg";
 import { hoverImages } from "./hover-images";
 import { dedicatedDetailFor } from "./product-detail";
 import { shopProducts, type ShopProduct } from "./shop-data";
@@ -142,7 +144,7 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       id: "study-in-olive",
       label: "Study in Olive",
       source: artFigure,
-      room: { source: hoverImages["study-in-olive"], label: "In a room" },
+      room: { source: studyInOliveRoom, label: "In a room" },
     },
     { id: "olive-three-quarter", label: "Olive, three-quarter", source: oliveThreeQuarter },
     { id: "olive-seated-figure", label: "Seated figure", source: oliveSeatedFigure },
@@ -155,7 +157,7 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       id: "canopy",
       label: "Canopy",
       source: artCanopy,
-      room: { source: hoverImages.canopy, label: "In a room" },
+      room: { source: canopyRoom, label: "In a room" },
     },
     { id: "upward-forest", label: "Upward forest", source: canopyUpwardForest },
     { id: "leaf-study", label: "Leaf study", source: canopyLeafStudy },
