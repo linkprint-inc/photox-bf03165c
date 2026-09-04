@@ -29,6 +29,9 @@ import cpStair from "@/assets/art/concrete-02-stair.jpg";
 import cpFacade from "@/assets/art/concrete-03-facade.jpg";
 import cpVault from "@/assets/art/concrete-04-vault.jpg";
 import artNightcity from "@/assets/art-nightcity.jpg";
+import artBluehour from "@/assets/art-bluehour.jpg";
+import artSignal from "@/assets/art-signal.jpg";
+import artMonolith from "@/assets/art-monolith.jpg";
 import ncAerial from "@/assets/art/nightcity-02-aerial-grid.jpg";
 import ncAlley from "@/assets/art/nightcity-03-neon-alley.jpg";
 import ncTower from "@/assets/art/nightcity-04-tower-windows.jpg";
@@ -92,6 +95,7 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
     { id: "window-drops", label: "Rain on glass", source: rainWindow },
     { id: "puddle-neon", label: "Puddle, neon", source: rainPuddle },
     { id: "crosswalk", label: "Crosswalk", source: rainCrosswalk },
+    { id: "blue-hour", label: "Blue hour", source: artBluehour },
   ],
   "concrete-planes": [
     {
@@ -105,6 +109,7 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
     { id: "concrete-facade", label: "Facade grid", source: cpFacade },
     { id: "concrete-vault", label: "Vault", source: cpVault },
     { id: "brutal-form", label: "Brutal form", source: artBrutal },
+    { id: "monolith", label: "Monolith", source: artMonolith },
   ],
   "night-city": [
     {
@@ -118,6 +123,7 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
     { id: "neon-alley", label: "Neon alley", source: ncAlley },
     { id: "tower-windows", label: "Tower windows", source: ncTower },
     { id: "light-trails", label: "Light trails", source: ncTrails },
+    { id: "signal", label: "Signal", source: artSignal },
   ],
 };
 
