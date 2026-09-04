@@ -202,7 +202,7 @@ function ArtworkMedia({
   if (media?.presentation === "original") {
     return (
       <StaticGalleryImage
-        source={artworkSource}
+        source={media.source ?? artworkSource}
         alt={`${product.name} original artwork`}
         fit="contain"
       />
@@ -329,7 +329,7 @@ export function MediaThumbnail({
     );
   }
   if (media?.presentation === "original") {
-    return <StaticGalleryImage source={artworkSource} alt="" fit="contain" />;
+    return <StaticGalleryImage source={media.source ?? artworkSource} alt="" fit="contain" />;
   }
   if (media?.presentation === "detail-image" && media.source) {
     return <StaticGalleryImage source={media.source} alt="" />;
