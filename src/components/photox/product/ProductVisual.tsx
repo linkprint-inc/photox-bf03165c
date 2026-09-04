@@ -53,6 +53,7 @@ export function RoomScene({
   orientation,
   mediaIndex = 0,
   artworkSource = product.image,
+  background = sizeRoom,
   className = "",
 }: {
   product: ShopProduct;
@@ -62,6 +63,7 @@ export function RoomScene({
   orientation: PrintOrientation;
   mediaIndex?: number;
   artworkSource?: string;
+  background?: string | undefined;
   className?: string;
 }) {
   const roomScale = [1, 0.8, 1.12][mediaIndex % 3]!;
@@ -71,7 +73,7 @@ export function RoomScene({
   return (
     <div className={["relative h-full w-full overflow-hidden bg-secondary", className].join(" ")}>
       <img
-        src={sizeRoom}
+        src={background}
         width={1600}
         height={1104}
         loading="lazy"
@@ -173,6 +175,7 @@ export function MainVisual({
               orientation={orientation}
               mediaIndex={mediaIndex}
               artworkSource={artworkSource}
+              background={media?.roomBackground}
             />
           )}
         </div>
@@ -212,11 +215,12 @@ function ArtworkMedia({
     return <StaticGalleryImage source={media.source} alt={`${product.name} as a metal print`} />;
   }
   const cropClass =
-    media?.presentation === "front"
+    media?.crop ??
+    (media?.presentation === "front"
       ? "scale-100"
       : ["scale-100", "scale-[1.16] object-[50%_42%]", "scale-[1.34] object-[56%_50%]"][
           mediaIndex % 3
-        ]!;
+        ]!);
   return (
     <div className="flex h-full w-full items-center justify-center bg-secondary p-6 md:p-8">
       <div
@@ -252,11 +256,13 @@ function DetailMedia({
   if (media?.presentation === "detail-image" && media.source) {
     return <StaticGalleryImage source={media.source} alt={`${product.name} metal print detail`} />;
   }
-  const cropClass = [
-    "scale-[1.38] object-[48%_50%]",
-    "scale-[1.62] object-[70%_45%]",
-    "scale-[1.48] object-[35%_60%]",
-  ][mediaIndex % 3]!;
+  const cropClass =
+    media?.crop ??
+    [
+      "scale-[1.38] object-[48%_50%]",
+      "scale-[1.62] object-[70%_45%]",
+      "scale-[1.48] object-[35%_60%]",
+    ][mediaIndex % 3]!;
   return (
     <div className="flex h-full w-full items-center justify-center bg-secondary p-6 md:p-8">
       <div
@@ -318,6 +324,7 @@ export function MediaThumbnail({
         orientation={orientation}
         mediaIndex={mediaIndex}
         artworkSource={artworkSource}
+        background={media?.roomBackground}
       />
     );
   }
@@ -328,13 +335,14 @@ export function MediaThumbnail({
     return <StaticGalleryImage source={media.source} alt="" />;
   }
   const cropClass =
-    view === "detail"
+    media?.crop ??
+    (view === "detail"
       ? ["scale-[1.35]", "scale-[1.6] object-[70%_45%]", "scale-[1.48] object-[35%_60%]"][
           mediaIndex % 3
         ]!
       : ["scale-100", "scale-[1.16] object-[50%_42%]", "scale-[1.34] object-[56%_50%]"][
           mediaIndex % 3
-        ]!;
+        ]!);
   return (
     <div className="relative h-full w-full overflow-hidden bg-secondary px-gloss">
       <img
