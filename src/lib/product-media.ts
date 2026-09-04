@@ -3,7 +3,7 @@ import roomWorkspace from "@/assets/room/workspace-empty.jpg";
 import roomDining from "@/assets/room/dining-empty.jpg";
 import { hoverImages } from "./hover-images";
 import { dedicatedDetailFor } from "./product-detail";
-import type { ShopProduct } from "./shop-data";
+import { shopProducts, type ShopProduct } from "./shop-data";
 import type { GalleryMediaItem } from "@/components/photox/product/ProductVisual";
 
 export type PdpMediaItem = GalleryMediaItem & { id: string; label: string };
@@ -107,4 +107,55 @@ export function productMediaGroups(product: ShopProduct): PdpMediaGroup[] {
       },
     },
   ];
+}
+
+
+export type PdpFeatureDetails = {
+  /** 01 FRONT — the print itself, always this product's artwork. */
+  front: { source: string };
+  /** 02 SURFACE / EDGE — a material close-up of THIS artwork. */
+  surfaceEdge: { source: string; crop?: string; alt: string };
+  /** 03 IN A ROOM — this artwork installed, or composited into a room. */
+  room: { source?: string; roomBackground?: string; alt: string };
+};
+
+/** Lower three-image sequence, resolved per product — never cross-product. */
+export function productFeatureDetails(product: ShopProduct): PdpFeatureDetails {
+  const dedicatedDetail = dedicatedDetailFor(product, "metal");
+  const ownRoom = hoverImages[product.id];
+  return {
+    front: { source: product.image },
+    surfaceEdge: dedicatedDetail
+      ? { source: dedicatedDetail, alt: `${product.name} printed on metal, surface and edge` }
+      : {
+          source: product.image,
+          crop: "scale-[1.55] object-[88%_50%]",
+          alt: `${product.name} printed on metal, surface and edge`,
+        },
+    room: ownRoom
+      ? { source: ownRoom, alt: `${product.name} installed in an interior` }
+      : { roomBackground: roomHallway, alt: `${product.name} installed in an interior` },
+  };
+}
+
+export type PdpMedia = { gallery: PdpMediaGroup[]; featureDetails: PdpFeatureDetails };
+
+/**
+ * Centralized media configuration keyed by product handle. Every handle in the
+ * catalog gets its own curated set built from that product's own assets only.
+ */
+export const productMedia: Record<string, PdpMedia> = Object.fromEntries(
+  shopProducts.map((p) => [
+    p.id,
+    { gallery: productMediaGroups(p), featureDetails: productFeatureDetails(p) },
+  ]),
+);
+
+export function mediaForProduct(product: ShopProduct): PdpMedia {
+  return (
+    productMedia[product.id] ?? {
+      gallery: productMediaGroups(product),
+      featureDetails: productFeatureDetails(product),
+    }
+  );
 }
