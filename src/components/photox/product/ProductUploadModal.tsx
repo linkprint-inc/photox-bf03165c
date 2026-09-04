@@ -283,6 +283,36 @@ export function ProductUploadModal({
     goTo("photo");
   };
 
+  const clearImage = () => {
+    toolRunRef.current += 1;
+    setImage(null);
+    setOriginalSourceImage(null);
+    setCurrentWorkingImage(null);
+    setApplied([]);
+    setTextConfig({ ...defaultTextConfig });
+    setAppliedTextConfig(null);
+    setCrop({ ...defaultCrop, aspectRatio: printAspectRatio(sizeLabel) });
+    setCropNeedsAdjustment(false);
+    setCropEditing(false);
+    setCropSource(null);
+    setDraftCrop(null);
+    setCropApplied(false);
+    setEditing(null);
+    setToolOriginal(null);
+    setResult(null);
+    setBusy(false);
+    setToolError(null);
+    setResetConfirming(false);
+    setDragOver(false);
+    setError(null);
+    try {
+      sessionStorage.removeItem(customizationDraftKey);
+    } catch {
+      /* Ignore unavailable session storage. */
+    }
+    goTo("photo");
+  };
+
   const load = async (file: File | undefined) => {
     if (!file || uploading) return;
     toolRunRef.current += 1;
@@ -305,6 +335,11 @@ export function ProductUploadModal({
     if (!inputRef.current) return;
     inputRef.current.value = "";
     inputRef.current.click();
+  };
+
+  const replaceImage = () => {
+    clearImage();
+    openNativeImagePicker();
   };
 
   const openTool = (tool: ToolId) => {
@@ -586,7 +621,8 @@ export function ProductUploadModal({
           >
             {steps.map((item) => {
               const active = step === item.key;
-              const complete = (stepNumber[item.key] ?? 0) < (stepNumber[step as keyof typeof stepNumber] ?? 0);
+              const complete =
+                (stepNumber[item.key] ?? 0) < (stepNumber[step as keyof typeof stepNumber] ?? 0);
               const canReturn = Boolean(image) && complete;
               return (
                 <li
@@ -645,7 +681,8 @@ export function ProductUploadModal({
                 onCropStart={(clientX, clientY) => startCropDrag(clientX, clientY, crop)}
                 onCropMove={moveCommittedCrop}
                 onCropEnd={endCropDrag}
-                onReplaceImage={openNativeImagePicker}
+                onRemoveImage={clearImage}
+                onReplaceImage={replaceImage}
                 onFormatChange={changePrintFormat}
                 onSizeChange={changePreviewSize}
                 onContinue={() => {
@@ -761,6 +798,7 @@ function PhotoStep({
   onCropStart,
   onCropMove,
   onCropEnd,
+  onRemoveImage,
   onReplaceImage,
   onFormatChange,
   onSizeChange,
@@ -783,6 +821,7 @@ function PhotoStep({
   onCropStart: (clientX: number, clientY: number) => void;
   onCropMove: (clientX: number, clientY: number, bounds: DOMRect) => void;
   onCropEnd: () => void;
+  onRemoveImage: () => void;
   onReplaceImage: () => void;
   onFormatChange: (orientation: PrintOrientation) => void;
   onSizeChange: (sizeIndex: number) => void;
@@ -836,34 +875,49 @@ function PhotoStep({
       <aside className="flex flex-col lg:pt-0">
         <div>
           <p className="px-label text-muted-foreground">Your print</p>
-          <p className="px-label mt-4">{materialName[material]}</p>
-          <div className="mt-7">
-            <p className="px-label text-muted-foreground">Format</p>
-            <div className="mt-3 flex items-center gap-2" role="group" aria-label="Print format">
-              {printFormats.map(({ key, label, shape }) => {
-                const selected = orientation === key;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => onFormatChange(key)}
-                    aria-label={label}
-                    aria-pressed={selected}
-                    className="flex h-10 w-10 items-center justify-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
-                  >
-                    <span
-                      aria-hidden
-                      className={`${shape} border transition-colors ${selected ? "border-foreground" : "border-foreground/35 hover:border-foreground/65"}`}
-                    />
-                  </button>
-                );
-              })}
+          {image ? (
+            <div className="relative mt-3 h-20 w-[110px] overflow-hidden bg-secondary">
+              <img
+                src={image.dataUrl}
+                alt={`Current image: ${image.name}`}
+                className="h-full w-full object-contain"
+              />
+              <button
+                type="button"
+                onClick={onRemoveImage}
+                aria-label="Remove current image"
+                className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center bg-paper/80 text-foreground/75 backdrop-blur-sm transition-colors hover:bg-paper hover:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-foreground/65"
+              >
+                <X aria-hidden size={12} strokeWidth={1.5} />
+              </button>
             </div>
-          </div>
-          <div className="mt-7">
-            <label htmlFor="print-size" className="px-label text-muted-foreground">
-              Size
-            </label>
+          ) : null}
+          <div className={image ? "mt-5" : "mt-4"}>
+            <div className="flex items-center justify-between gap-4">
+              <label htmlFor="print-size" className="px-label text-muted-foreground">
+                Size
+              </label>
+              <div className="flex items-center gap-4" role="group" aria-label="Print format">
+                {printFormats.map(({ key, label, shape }) => {
+                  const selected = orientation === key;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => onFormatChange(key)}
+                      aria-label={label}
+                      aria-pressed={selected}
+                      className="flex h-10 w-10 items-center justify-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-foreground/65"
+                    >
+                      <span
+                        aria-hidden
+                        className={`${shape} border transition-colors ${selected ? "border-foreground" : "border-foreground/35 hover:border-foreground/65"}`}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
             <div className="relative mt-3">
               <select
                 id="print-size"
