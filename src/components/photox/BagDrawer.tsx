@@ -66,7 +66,8 @@ export function BagDrawer() {
               <p className="px-serif text-[1.5rem]">Your bag is empty.</p>
               <p className="px-meta mt-2 text-muted-foreground">Find something for your walls.</p>
               <Link
-                to="/products/north-sea"
+                to="/products/$slug"
+                params={{ slug: "north-sea" }}
                 onClick={closeDrawer}
                 className="px-label px-underline mt-6 inline-block"
               >

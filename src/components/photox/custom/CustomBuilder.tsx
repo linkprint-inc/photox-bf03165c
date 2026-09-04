@@ -101,9 +101,9 @@ function price(material: BagMaterial, sizeIndex: number) {
 }
 
 export type InitialPrintConfiguration = {
-  material?: BagMaterial;
-  sizeIndex?: number;
-  startingPoint?: string;
+  material?: BagMaterial | undefined;
+  sizeIndex?: number | undefined;
+  startingPoint?: string | undefined;
 };
 
 export function CustomBuilder({

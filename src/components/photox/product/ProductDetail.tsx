@@ -14,7 +14,6 @@ import {
 import {
   categoryLabel,
   closeUps,
-  dedicatedDetailFor,
   productInfo,
   relatedProducts,
 } from "@/lib/product-detail";
