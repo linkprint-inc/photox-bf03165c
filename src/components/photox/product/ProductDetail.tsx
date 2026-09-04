@@ -340,9 +340,20 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
     );
   };
+  const availableViews = useMemo(
+    () => new Set(gallery.carousel.map((item) => item.view)),
+    [gallery.carousel],
+  );
+  /** Jump to the next genuine media item of that type — never fabricate one. */
   const selectView = (nextView: ViewMode) => {
-    const index = gallery.carousel.findIndex((item) => item.view === nextView);
-    if (index >= 0) changeMedia(index);
+    const total = gallery.carousel.length;
+    for (let step = 1; step <= total; step += 1) {
+      const index = (mediaPosition + step) % total;
+      if (gallery.carousel[index]!.view === nextView) {
+        changeMedia(index);
+        return;
+      }
+    }
   };
   const openNativeImagePicker = () => {
     setImagePickerError(null);
