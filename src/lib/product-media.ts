@@ -50,9 +50,29 @@ import canopyTreeRoom from "@/assets/pdp/canopy-tree-room.jpg";
 import cpSurface from "@/assets/pdp/concrete-planes-surface.jpg";
 import cpEdge from "@/assets/pdp/concrete-planes-edge.jpg";
 import cpRoomWide from "@/assets/pdp/concrete-planes-room-wide.jpg";
+import cpStairDetail from "@/assets/pdp/concrete-stair-detail.jpg";
+import cpStairRoom from "@/assets/pdp/concrete-stair-room.jpg";
+import cpFacadeDetail from "@/assets/pdp/concrete-facade-detail.jpg";
+import cpFacadeRoom from "@/assets/pdp/concrete-facade-room.jpg";
+import cpVaultDetail from "@/assets/pdp/concrete-vault-detail.jpg";
+import cpVaultRoom from "@/assets/pdp/concrete-vault-room.jpg";
+import brutalFormDetail from "@/assets/pdp/brutal-form-detail.jpg";
+import brutalFormRoom from "@/assets/pdp/brutal-form-room.jpg";
+import monolithDetail from "@/assets/pdp/monolith-detail.jpg";
+import monolithRoom from "@/assets/pdp/monolith-room.jpg";
 import ncSurface from "@/assets/pdp/night-city-surface.jpg";
 import ncRoomWide from "@/assets/pdp/night-city-room-wide.jpg";
 import ncEdge from "@/assets/pdp/night-city-edge.jpg";
+import aerialGridDetail from "@/assets/pdp/aerial-grid-detail.jpg";
+import aerialGridRoom from "@/assets/pdp/aerial-grid-room.jpg";
+import neonAlleyDetail from "@/assets/pdp/neon-alley-detail.jpg";
+import neonAlleyRoom from "@/assets/pdp/neon-alley-room.jpg";
+import towerWindowsDetail from "@/assets/pdp/tower-windows-detail.jpg";
+import towerWindowsRoom from "@/assets/pdp/tower-windows-room.jpg";
+import lightTrailsDetail from "@/assets/pdp/light-trails-detail.jpg";
+import lightTrailsRoom from "@/assets/pdp/light-trails-room.jpg";
+import signalDetail from "@/assets/pdp/signal-detail.jpg";
+import signalRoom from "@/assets/pdp/signal-room.jpg";
 // Additional, genuinely different artworks per product collection.
 import artNorthsea from "@/assets/art-northsea.jpg";
 import artTideline from "@/assets/art-tideline.jpg";
@@ -90,8 +110,8 @@ import canopyLeafStudy from "@/assets/art/canopy-03-leaf-study.jpg";
 import canopyMistForest from "@/assets/art/canopy-04-mist-forest.jpg";
 import canopyDappledLight from "@/assets/art/canopy-05-dappled-light.jpg";
 import canopySolitaryTree from "@/assets/art/canopy-06-solitary-tree.jpg";
-import studyInOliveRoom from "@/assets/hover/study-in-olive.jpg";
-import canopyRoom from "@/assets/hover/canopy.jpg";
+import studyInOliveRoom from "@/assets/pdp/study-in-olive-room.jpg";
+import canopyRoom from "@/assets/pdp/canopy-room.jpg";
 import { hoverImages } from "./hover-images";
 import { dedicatedDetailFor } from "./product-detail";
 import { shopProducts, type ShopProduct } from "./shop-data";
@@ -133,11 +153,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: nsSurface, label: "Printed surface, close-up" },
       room: { source: nsRoomWide, label: "In a room" },
     },
-    { id: "misty-horizon", label: "Misty horizon", source: nsMisty, detail: { source: mistyDetail, label: "Glossy surface, raking light" }, room: { source: mistyRoom, label: "Warm minimal living room" } },
-    { id: "cliff-coast", label: "Cliff coast", source: nsCliff, detail: { source: cliffDetail, label: "Thin metal edge" }, room: { source: cliffRoom, label: "Bright hallway" } },
-    { id: "long-exposure", label: "Long-exposure shore", source: nsLongExposure, detail: { source: longExposureDetail, label: "Float-mounted corner" }, room: { source: longExposureRoom, label: "Workspace installation" } },
-    { id: "sea-stacks", label: "Sea stacks", source: nsSeaStacks, detail: { source: seaStacksDetail, label: "Angled side view" }, room: { source: seaStacksRoom, label: "Dining room installation" } },
-    { id: "tide-line", label: "Tide line", source: artTideline, detail: { source: tideLineDetail, label: "Surface reflection" }, room: { source: tideLineRoom, label: "Dark contemporary room" } },
+    {
+      id: "misty-horizon",
+      label: "Misty horizon",
+      source: nsMisty,
+      detail: { source: mistyDetail, label: "Glossy surface, raking light" },
+      room: { source: mistyRoom, label: "Warm minimal living room" },
+    },
+    {
+      id: "cliff-coast",
+      label: "Cliff coast",
+      source: nsCliff,
+      detail: { source: cliffDetail, label: "Thin metal edge" },
+      room: { source: cliffRoom, label: "Bright hallway" },
+    },
+    {
+      id: "long-exposure",
+      label: "Long-exposure shore",
+      source: nsLongExposure,
+      detail: { source: longExposureDetail, label: "Float-mounted corner" },
+      room: { source: longExposureRoom, label: "Workspace installation" },
+    },
+    {
+      id: "sea-stacks",
+      label: "Sea stacks",
+      source: nsSeaStacks,
+      detail: { source: seaStacksDetail, label: "Angled side view" },
+      room: { source: seaStacksRoom, label: "Dining room installation" },
+    },
+    {
+      id: "tide-line",
+      label: "Tide line",
+      source: artTideline,
+      detail: { source: tideLineDetail, label: "Surface reflection" },
+      room: { source: tideLineRoom, label: "Dark contemporary room" },
+    },
   ],
   "after-the-rain": [
     {
@@ -147,11 +197,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: rainSurface, label: "Printed surface, close-up" },
       room: { source: rainRoomWide, label: "In a room" },
     },
-    { id: "wet-street", label: "Wet street", source: rainStreet, detail: { source: wetStreetDetail, label: "Glossy surface close-up" }, room: { source: wetStreetRoom, label: "Living room installation" } },
-    { id: "window-drops", label: "Rain on glass", source: rainWindow, detail: { source: windowDropsDetail, label: "Thin metal edge" }, room: { source: windowDropsRoom, label: "Hallway installation" } },
-    { id: "puddle-neon", label: "Puddle, neon", source: rainPuddle, detail: { source: puddleNeonDetail, label: "Printed corner detail" }, room: { source: puddleNeonRoom, label: "Workspace installation" } },
-    { id: "crosswalk", label: "Crosswalk", source: rainCrosswalk, detail: { source: crosswalkDetail, label: "Angled front view" }, room: { source: crosswalkRoom, label: "Dining room installation" } },
-    { id: "blue-hour", label: "Blue hour", source: artBluehour, detail: { source: blueHourDetail, label: "Surface reflection" }, room: { source: blueHourRoom, label: "Dark contemporary room" } },
+    {
+      id: "wet-street",
+      label: "Wet street",
+      source: rainStreet,
+      detail: { source: wetStreetDetail, label: "Glossy surface close-up" },
+      room: { source: wetStreetRoom, label: "Living room installation" },
+    },
+    {
+      id: "window-drops",
+      label: "Rain on glass",
+      source: rainWindow,
+      detail: { source: windowDropsDetail, label: "Thin metal edge" },
+      room: { source: windowDropsRoom, label: "Hallway installation" },
+    },
+    {
+      id: "puddle-neon",
+      label: "Puddle, neon",
+      source: rainPuddle,
+      detail: { source: puddleNeonDetail, label: "Printed corner detail" },
+      room: { source: puddleNeonRoom, label: "Workspace installation" },
+    },
+    {
+      id: "crosswalk",
+      label: "Crosswalk",
+      source: rainCrosswalk,
+      detail: { source: crosswalkDetail, label: "Angled front view" },
+      room: { source: crosswalkRoom, label: "Dining room installation" },
+    },
+    {
+      id: "blue-hour",
+      label: "Blue hour",
+      source: artBluehour,
+      detail: { source: blueHourDetail, label: "Surface reflection" },
+      room: { source: blueHourRoom, label: "Dark contemporary room" },
+    },
   ],
   "concrete-planes": [
     {
@@ -161,11 +241,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: cpSurface, label: "Printed surface, close-up" },
       room: { source: cpRoomWide, label: "In a room" },
     },
-    { id: "concrete-stair", label: "Concrete stair", source: cpStair },
-    { id: "concrete-facade", label: "Facade grid", source: cpFacade },
-    { id: "concrete-vault", label: "Vault", source: cpVault },
-    { id: "brutal-form", label: "Brutal form", source: artBrutal },
-    { id: "monolith", label: "Monolith", source: artMonolith },
+    {
+      id: "concrete-stair",
+      label: "Concrete stair",
+      source: cpStair,
+      detail: { source: cpStairDetail, label: "Thin silver edge" },
+      room: { source: cpStairRoom, label: "Workspace installation" },
+    },
+    {
+      id: "concrete-facade",
+      label: "Facade grid",
+      source: cpFacade,
+      detail: { source: cpFacadeDetail, label: "Glossy surface close-up" },
+      room: { source: cpFacadeRoom, label: "Dark dining room installation" },
+    },
+    {
+      id: "concrete-vault",
+      label: "Vault",
+      source: cpVault,
+      detail: { source: cpVaultDetail, label: "Printed corner detail" },
+      room: { source: cpVaultRoom, label: "Bright hallway installation" },
+    },
+    {
+      id: "brutal-form",
+      label: "Brutal form",
+      source: artBrutal,
+      detail: { source: brutalFormDetail, label: "Surface reflection" },
+      room: { source: brutalFormRoom, label: "Minimal workspace installation" },
+    },
+    {
+      id: "monolith",
+      label: "Monolith",
+      source: artMonolith,
+      detail: { source: monolithDetail, label: "Angled metal profile" },
+      room: { source: monolithRoom, label: "Contemporary dining room" },
+    },
   ],
   "night-city": [
     {
@@ -175,11 +285,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: ncSurface, label: "Printed surface, close-up" },
       room: { source: ncRoomWide, label: "In a room" },
     },
-    { id: "aerial-grid", label: "Aerial grid", source: ncAerial },
-    { id: "neon-alley", label: "Neon alley", source: ncAlley },
-    { id: "tower-windows", label: "Tower windows", source: ncTower },
-    { id: "light-trails", label: "Light trails", source: ncTrails },
-    { id: "signal", label: "Signal", source: artSignal },
+    {
+      id: "aerial-grid",
+      label: "Aerial grid",
+      source: ncAerial,
+      detail: { source: aerialGridDetail, label: "Thin silver edge" },
+      room: { source: aerialGridRoom, label: "Workspace installation" },
+    },
+    {
+      id: "neon-alley",
+      label: "Neon alley",
+      source: ncAlley,
+      detail: { source: neonAlleyDetail, label: "Glossy surface close-up" },
+      room: { source: neonAlleyRoom, label: "Dark dining room installation" },
+    },
+    {
+      id: "tower-windows",
+      label: "Tower windows",
+      source: ncTower,
+      detail: { source: towerWindowsDetail, label: "Printed corner detail" },
+      room: { source: towerWindowsRoom, label: "Bright hallway installation" },
+    },
+    {
+      id: "light-trails",
+      label: "Light trails",
+      source: ncTrails,
+      detail: { source: lightTrailsDetail, label: "Surface reflection" },
+      room: { source: lightTrailsRoom, label: "Minimal workspace installation" },
+    },
+    {
+      id: "signal",
+      label: "Signal",
+      source: artSignal,
+      detail: { source: signalDetail, label: "Angled metal profile" },
+      room: { source: signalRoom, label: "Contemporary dining room" },
+    },
   ],
   "study-in-olive": [
     {
@@ -189,11 +329,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: studyDetail, label: "Glossy surface close-up" },
       room: { source: studyInOliveRoom, label: "Warm living room" },
     },
-    { id: "olive-three-quarter", label: "Olive, three-quarter", source: oliveThreeQuarter, detail: { source: oliveThreeQuarterDetail, label: "Metal edge and corner" }, room: { source: oliveThreeQuarterRoom, label: "Neutral hallway" } },
-    { id: "olive-seated-figure", label: "Seated figure", source: oliveSeatedFigure, detail: { source: oliveSeatedDetail, label: "Glossy printed corner" }, room: { source: oliveSeatedRoom, label: "Creative workspace" } },
-    { id: "olive-shoulder-profile", label: "Shoulder profile", source: oliveShoulderProfile, detail: { source: oliveShoulderDetail, label: "Surface reflection detail" }, room: { source: oliveShoulderRoom, label: "Dining and console wall" } },
-    { id: "olive-standing-shadow", label: "Standing in shadow", source: oliveStandingShadow, detail: { source: oliveStandingDetail, label: "Angled metal profile" }, room: { source: oliveStandingRoom, label: "Dark contemporary room" } },
-    { id: "olive-soft-editorial", label: "Soft editorial", source: oliveSoftEditorial, detail: { source: oliveEditorialDetail, label: "Print sharpness macro" }, room: { source: oliveEditorialRoom, label: "Bright minimal bedroom" } },
+    {
+      id: "olive-three-quarter",
+      label: "Olive, three-quarter",
+      source: oliveThreeQuarter,
+      detail: { source: oliveThreeQuarterDetail, label: "Metal edge and corner" },
+      room: { source: oliveThreeQuarterRoom, label: "Neutral hallway" },
+    },
+    {
+      id: "olive-seated-figure",
+      label: "Seated figure",
+      source: oliveSeatedFigure,
+      detail: { source: oliveSeatedDetail, label: "Glossy printed corner" },
+      room: { source: oliveSeatedRoom, label: "Creative workspace" },
+    },
+    {
+      id: "olive-shoulder-profile",
+      label: "Shoulder profile",
+      source: oliveShoulderProfile,
+      detail: { source: oliveShoulderDetail, label: "Surface reflection detail" },
+      room: { source: oliveShoulderRoom, label: "Dining and console wall" },
+    },
+    {
+      id: "olive-standing-shadow",
+      label: "Standing in shadow",
+      source: oliveStandingShadow,
+      detail: { source: oliveStandingDetail, label: "Angled metal profile" },
+      room: { source: oliveStandingRoom, label: "Dark contemporary room" },
+    },
+    {
+      id: "olive-soft-editorial",
+      label: "Soft editorial",
+      source: oliveSoftEditorial,
+      detail: { source: oliveEditorialDetail, label: "Print sharpness macro" },
+      room: { source: oliveEditorialRoom, label: "Bright minimal bedroom" },
+    },
   ],
   canopy: [
     {
@@ -203,11 +373,41 @@ const artworkCollections: Record<string, ArtworkEntry[]> = {
       detail: { source: canopyDetail, label: "Glossy surface close-up" },
       room: { source: canopyRoom, label: "Living room installation" },
     },
-    { id: "upward-forest", label: "Upward forest", source: canopyUpwardForest, detail: { source: canopyUpwardDetail, label: "Thin metal edge" }, room: { source: canopyUpwardRoom, label: "Bright living room" } },
-    { id: "leaf-study", label: "Leaf study", source: canopyLeafStudy, detail: { source: canopyLeafDetail, label: "Corner and surface macro" }, room: { source: canopyLeafRoom, label: "Bright hallway" } },
-    { id: "mist-forest", label: "Forest in mist", source: canopyMistForest, detail: { source: canopyMistDetail, label: "Surface reflection close-up" }, room: { source: canopyMistRoom, label: "Workspace installation" } },
-    { id: "dappled-light", label: "Dappled light", source: canopyDappledLight, detail: { source: canopyDappledDetail, label: "Angled metal profile" }, room: { source: canopyDappledRoom, label: "Dining room installation" } },
-    { id: "solitary-tree", label: "Solitary tree", source: canopySolitaryTree, detail: { source: canopyTreeDetail, label: "Sharpness and corner macro" }, room: { source: canopyTreeRoom, label: "Dark contemporary room" } },
+    {
+      id: "upward-forest",
+      label: "Upward forest",
+      source: canopyUpwardForest,
+      detail: { source: canopyUpwardDetail, label: "Thin metal edge" },
+      room: { source: canopyUpwardRoom, label: "Bright living room" },
+    },
+    {
+      id: "leaf-study",
+      label: "Leaf study",
+      source: canopyLeafStudy,
+      detail: { source: canopyLeafDetail, label: "Corner and surface macro" },
+      room: { source: canopyLeafRoom, label: "Bright hallway" },
+    },
+    {
+      id: "mist-forest",
+      label: "Forest in mist",
+      source: canopyMistForest,
+      detail: { source: canopyMistDetail, label: "Surface reflection close-up" },
+      room: { source: canopyMistRoom, label: "Workspace installation" },
+    },
+    {
+      id: "dappled-light",
+      label: "Dappled light",
+      source: canopyDappledLight,
+      detail: { source: canopyDappledDetail, label: "Angled metal profile" },
+      room: { source: canopyDappledRoom, label: "Dining room installation" },
+    },
+    {
+      id: "solitary-tree",
+      label: "Solitary tree",
+      source: canopySolitaryTree,
+      detail: { source: canopyTreeDetail, label: "Sharpness and corner macro" },
+      room: { source: canopyTreeRoom, label: "Dark contemporary room" },
+    },
   ],
 };
 
