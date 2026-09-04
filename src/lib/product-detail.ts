@@ -125,3 +125,21 @@ export const productInfo = [
     body: "Every print is made to order in the USA and shipped protected in the packaging it was made for. Contact photoX if anything arrives other than as it should — we will make it right.",
   },
 ];
+
+/** Short informational blurb built from the work's own style data. */
+export function productBlurb(p: ShopProduct) {
+  const style = categoryLabel(p).toLowerCase();
+  return `${p.name} is a ${style} work, printed edge to edge on a frameless single-layer aluminium panel. The glossy surface holds deep blacks and fine detail, so the image reads clearly from across the room.`;
+}
+
+/** Informational product benefits — these describe the print, they do not configure it. */
+export const printBenefits = [
+  { title: "Glossy & crisp", body: "Luminous photographic detail" },
+  { title: "Frameless metal", body: "Thin single-layer silver panel" },
+  { title: "Made to order", body: "Produced individually in the USA" },
+];
+
+export const deliveryEstimate = "Made to order in 2–4 business days · delivered in 5–8 business days";
+
+export const serviceNotes = ["Free returns", "Ready to hang", "Secure checkout"];
+

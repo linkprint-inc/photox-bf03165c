@@ -560,26 +560,99 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
               </p>
               <RatingJump productId={product.id} />
 
-              <p className="px-price mt-6">From ${product.from}</p>
+              <p className="px-price mt-6">
+                <span className="px-label mr-1 opacity-70">From</span>${product.from}
+              </p>
+
+              <p className="px-meta mt-5 max-w-[46ch] text-muted-foreground">
+                {productBlurb(product)}
+              </p>
+
+              <ul className="mt-8 grid grid-cols-3 gap-4 border-t border-hairline pt-5">
+                {printBenefits.map((b) => (
+                  <li key={b.title}>
+                    <p className="px-label">{b.title}</p>
+                    <p className="px-meta mt-1.5 text-muted-foreground">{b.body}</p>
+                  </li>
+                ))}
+              </ul>
 
               <button
                 ref={mainCtaRef}
                 type="button"
                 onClick={openNativeImagePicker}
-                className="px-label mt-6 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
+                className="px-label mt-8 flex h-[54px] w-full items-center justify-center border border-foreground text-center transition-colors duration-300 hover:bg-foreground hover:text-background"
               >
                 Customize your print
               </button>
+
+              <p className="px-meta mt-4 text-center text-muted-foreground">{deliveryEstimate}</p>
+
+              <ul className="mt-8 border-t border-hairline">
+                {[
+                  {
+                    title: "Details",
+                    body: `${product.name} — ${categoryLabel(product)} · ${product.orientation} · Metal Print · ${sizeRangeLong}.`,
+                  },
+                  ...productInfo,
+                ].map((row) => {
+                  const open = openInfo === row.title;
+                  const accordionId = `product-information-${row.title.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`;
+                  return (
+                    <li key={row.title} className="border-b border-hairline">
+                      <button
+                        type="button"
+                        onClick={() => setOpenInfo(open ? null : row.title)}
+                        aria-expanded={open}
+                        aria-controls={accordionId}
+                        className="flex w-full items-center justify-between gap-6 py-4 text-left"
+                      >
+                        <span className="px-label">{row.title}</span>
+                        <span
+                          aria-hidden
+                          className={[
+                            "text-lg leading-none transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                            open ? "rotate-45" : "",
+                          ].join(" ")}
+                        >
+                          +
+                        </span>
+                      </button>
+                      <div
+                        id={accordionId}
+                        role="region"
+                        aria-label={row.title}
+                        className={[
+                          "grid transition-[grid-template-rows] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                          open
+                            ? "grid-rows-[1fr] duration-[360ms]"
+                            : "grid-rows-[0fr] duration-[300ms]",
+                        ].join(" ")}
+                      >
+                        <div className="min-h-0 overflow-hidden" aria-hidden={!open} inert={!open}>
+                          <p className="px-meta max-w-prose pb-5 text-muted-foreground">
+                            {row.body}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <ul className="mt-6 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+                {serviceNotes.map((note) => (
+                  <li key={note} className="px-meta flex items-center gap-2 text-muted-foreground">
+                    <span aria-hidden className="inline-block h-1 w-1 rounded-full bg-foreground/40" />
+                    {note}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </Shell>
 
-      <ProductInformationSection
-        product={product}
-        openInfo={openInfo}
-        onOpenInfoChange={setOpenInfo}
-      />
 
       {/* ---------- Product image sequence ---------- */}
       <Shell className="pt-20 md:pt-28">
