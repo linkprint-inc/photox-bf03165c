@@ -46,7 +46,7 @@ type ProductMedia = {
 
 /** Curated, per-product gallery media defined once in src/lib/product-media.ts. */
 function productMedia(product: ShopProduct): ProductMedia {
-  const { gallery: groups, featureDetails } = mediaForProduct(product);
+  const { gallery: groups } = mediaForProduct(product);
   const carousel = groups.flatMap((group, groupIndex) =>
     views.map((view) => ({
       ...group[view.key],
