@@ -407,10 +407,7 @@ export function ProductDetail({ product }: { product: ShopProduct }) {
       }
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         const direction = event.key === "ArrowLeft" ? -1 : 1;
-        setCarouselDirection(direction);
-        setMediaPosition(
-          (position) => (position + direction + gallery.carousel.length) % gallery.carousel.length,
-        );
+        moveMedia(direction);
       }
     };
     window.addEventListener("keydown", onKeyDown);
